@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flora Coffee — Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#20281f;
+    --ivory:#f7f3e9;
+    --leaf-deep:#2f4a34;
+    --leaf-mid:#537358;
+    --brass:#b7924a;
+    --coffee-brown:#5a3826;
+    --line:rgba(32,40,31,0.14);
+    --card:#fffdf7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* subtle paper texture */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
+    background-image:radial-gradient(rgba(32,40,31,0.035) 1px, transparent 1px);
+    background-size:3px 3px;
+    z-index:0;
+  }
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:var(--leaf-deep);
+    color:var(--ivory);
+    position:relative;
+    overflow:hidden;
+    padding:64px 0 56px;
+  }
+  header.hero .branch{
+    position:absolute;
+    opacity:0.5;
+  }
+  header.hero .branch.tl{top:-30px;left:-40px;width:220px;transform:rotate(-15deg);}
+  header.hero .branch.br{bottom:-40px;right:-50px;width:260px;transform:rotate(160deg);}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--brass);display:inline-block;}
+
+  h1.brand{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(46px,9vw,72px);
+    line-height:0.98;
+    letter-spacing:-0.01em;
+  }
+  h1.brand em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--brass);
+  }
+  .tagline{
+    margin-top:16px;
+    max-width:36ch;
+    font-size:15.5px;
+    color:rgba(247,243,233,0.78);
+  }
+  .hero-meta{
+    margin-top:36px;
+    display:flex;
+    gap:28px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:rgba(247,243,233,0.65);
+    flex-wrap:wrap;
+  }
+  .hero-meta strong{color:var(--ivory);font-weight:500;}
+
+  /* ---------- NAV / CATEGORY JUMP ---------- */
+  nav.cats{
+    position:sticky;top:0;z-index:5;
+    background:rgba(247,243,233,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.cats .wrap{
+    display:flex;gap:4px;overflow-x:auto;
+    padding-top:14px;padding-bottom:14px;
+    scrollbar-width:none;
+  }
+  nav.cats .wrap::-webkit-scrollbar{display:none;}
+  nav.cats a{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--leaf-mid);
+    white-space:nowrap;
+    padding:7px 13px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  nav.cats a:hover{
+    background:var(--leaf-deep);
+    color:var(--ivory);
+    border-color:var(--leaf-deep);
+  }
+
+  /* ---------- MENU SECTIONS ---------- */
+  main{padding:56px 0 20px;}
+  section.category{margin-bottom:52px;scroll-margin-top:64px;}
+
+  .cat-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin-bottom:6px;
+  }
+  .cat-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--brass);
+  }
+  .cat-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:28px;
+    color:var(--leaf-deep);
+  }
+  .cat-desc{
+    font-size:13.5px;
+    color:var(--leaf-mid);
+    margin-bottom:22px;
+    padding-left:38px;
+  }
+
+  .item{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:4px 16px;
+    padding:16px 0;
+    border-bottom:1px dashed var(--line);
+    align-items:start;
+  }
+  .item:last-child{border-bottom:none;}
+  .item-name{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:18px;
+  }
+  .item-tag{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--brass);
+    border:1px solid var(--brass);
+    border-radius:100px;
+    padding:1px 7px;
+    margin-left:8px;
+    vertical-align:middle;
+    transform:translateY(-2px);
+  }
+  .item-desc{
+    grid-column:1;
+    font-size:13px;
+    color:#5a5f52;
+    max-width:46ch;
+  }
+  .item-price{
+    grid-column:2;
+    grid-row:1;
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    color:var(--coffee-brown);
+    white-space:nowrap;
+    align-self:center;
+  }
+
+  /* ---------- SIGNATURE DIVIDER ---------- */
+  .divider{
+    display:flex;align-items:center;gap:14px;
+    margin:44px 0;
+    color:var(--leaf-mid);
+  }
+  .divider svg{flex-shrink:0;width:34px;height:20px;}
+  .divider .line{flex:1;height:1px;background:var(--line);}
+
+  /* ---------- FOOTER / ORDER ---------- */
+  footer{
+    background:var(--leaf-deep);
+    color:var(--ivory);
+    padding:48px 0 40px;
+    margin-top:20px;
+  }
+  footer h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:24px;
+    margin-bottom:10px;
+  }
+  footer p{
+    font-size:13.5px;
+    color:rgba(247,243,233,0.72);
+    max-width:40ch;
+    margin-bottom:22px;
+  }
+  .wa-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    background:var(--brass);
+    color:var(--leaf-deep);
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    font-weight:500;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:100px;
+    transition:transform .15s;
+  }
+  .wa-btn:hover{transform:translateY(-2px);}
+  .foot-note{
+    margin-top:30px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:rgba(247,243,233,0.45);
+  }
+
+  @media(max-width:600px){
+    .cat-desc{padding-left:0;}
+    .item{grid-template-columns:1fr auto;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .wa-btn{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="branch tl" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4"/>
+    <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2"/>
+    <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.7"/>
+    <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.7"/>
+    <ellipse cx="40" cy="150" rx="9" ry="4.5" transform="rotate(-50 40 150)" fill="#f7f3e9" opacity="0.6"/>
+  </svg>
+  <svg class="branch br" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4"/>
+    <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2"/>
+    <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.6"/>
+    <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.6"/>
+  </svg>
+
+  <div class="wrap">
+    <div class="eyebrow">Menu · Buka setiap hari</div>
+    <h1 class="brand">Flora<br><em>Coffee</em></h1>
+    <p class="tagline">Kopi seduh dari biji lokal pilihan, disajikan pelan-pelan di tengah taman kecil kami.</p>
+    <div class="hero-meta">
+      <div><strong>08.00–21.00</strong><br>Senin–Minggu</div>
+      <div><strong>Bogor</strong><br>Dine-in & Takeaway</div>
+    </div>
+  </div>
+</header>
+
+<nav class="cats">
+  <div class="wrap">
+    <a href="#kopi-klasik">Kopi Klasik</a>
+    <a href="#signature">Signature</a>
+    <a href="#non-kopi">Non-Kopi</a>
+    <a href="#camilan">Camilan</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="category" id="kopi-klasik">
+    <div class="cat-head"><span class="cat-num">01</span><h2>Kopi Klasik</h2></div>
+    <p class="cat-desc">Untuk yang suka rasa kopi apa adanya.</p>
+
+    <div class="item">
+      <div class="item-name">Espresso</div>
+      <div class="item-price">Rp18.000</div>
+      <div class="item-desc">Single shot, pekat dan singkat.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Americano</div>
+      <div class="item-price">Rp20.000</div>
+      <div class="item-desc">Espresso dengan air panas, bisa juga dingin.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Cappuccino</div>
+      <div class="item-price">Rp25.000</div>
+      <div class="item-desc">Espresso, susu, dan busa tebal.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Caffe Latte</div>
+      <div class="item-price">Rp26.000</div>
+      <div class="item-desc">Lebih banyak susu, tekstur lembut.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Kopi Susu Gula Aren</div>
+      <div class="item-price">Rp24.000</div>
+      <div class="item-desc">Kopi hitam, susu segar, gula aren asli.</div>
+    </div>
+  </section>
+
+  <div class="divider">
+    <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b7924a" stroke-width="1.3"/><circle cx="17" cy="5" r="2.4" fill="#b7924a"/></svg>
+    <div class="line"></div>
+  </div>
+
+  <section class="category" id="signature">
+    <div class="cat-head"><span class="cat-num">02</span><h2>Signature</h2></div>
+    <p class="cat-desc">Racikan khas Flora, tidak ada di tempat lain.</p>
+
+    <div class="item">
+      <div class="item-name">Flora Latte<span class="item-tag">Favorit</span></div>
+      <div class="item-price">Rp30.000</div>
+      <div class="item-desc">Bunga telang, vanila, dan espresso — berlapis biru ke krem.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Honey Oat Latte</div>
+      <div class="item-price">Rp29.000</div>
+      <div class="item-desc">Susu oat, madu hutan, dua shot espresso.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Aren Macchiato</div>
+      <div class="item-price">Rp28.000</div>
+      <div class="item-desc">Foam susu manis di atas, kopi gula aren di bawah.</div>
+    </div>
+  </section>
+
+  <div class="divider">
+    <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b7924a" stroke-width="1.3"/><circle cx="17" cy="5" r="2.4" fill="#b7924a"/></svg>
+    <div class="line"></div>
+  </div>
+
+  <section class="category" id="non-kopi">
+    <div class="cat-head"><span class="cat-num">03</span><h2>Non-Kopi</h2></div>
+    <p class="cat-desc">Untuk yang sedang menghindari kafein, atau memang tidak suka kopi.</p>
+
+    <div class="item">
+      <div class="item-name">Matcha Latte</div>
+      <div class="item-price">Rp27.000</div>
+      <div class="item-desc">Matcha grade upacara, susu segar.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Taro Latte</div>
+      <div class="item-price">Rp26.000</div>
+      <div class="item-desc">Manis, gurih, warna ungu lembut.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Coklat Susu</div>
+      <div class="item-price">Rp25.000</div>
+      <div class="item-desc">Dark chocolate leleh dengan susu segar.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Lemon Tea</div>
+      <div class="item-price">Rp20.000</div>
+      <div class="item-desc">Teh hitam, perasan lemon segar.</div>
+    </div>
+  </section>
+
+  <div class="divider">
+    <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b7924a" stroke-width="1.3"/><circle cx="17" cy="5" r="2.4" fill="#b7924a"/></svg>
+    <div class="line"></div>
+  </div>
+
+  <section class="category" id="camilan">
+    <div class="cat-head"><span class="cat-num">04</span><h2>Camilan</h2></div>
+    <p class="cat-desc">Teman ngobrol sambil menunggu kopi diseduh.</p>
+
+    <div class="item">
+      <div class="item-name">Croissant Butter</div>
+      <div class="item-price">Rp22.000</div>
+      <div class="item-desc">Dipanggang setiap pagi, renyah di luar.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Banana Bread</div>
+      <div class="item-price">Rp20.000</div>
+      <div class="item-desc">Lembab, dengan taburan kenari.</div>
+    </div>
+    <div class="item">
+      <div class="item-name">Cookies Dark Choco</div>
+      <div class="item-price">Rp15.000</div>
+      <div class="item-desc">Renyah di pinggir, lumer di tengah.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>Mau pesan?</h3>
+    <p>Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.</p>
+    <a class="wa-btn" href="https://wa.me/6281234567890?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener">
+      Pesan via WhatsApp →
+    </a>
+    <div class="foot-note">Flora Coffee — Bogor, Jawa Barat</div>
+  </div>
+</footer>
+
+</body>
+</html>
