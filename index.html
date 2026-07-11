@@ -510,8 +510,8 @@
 
         /* ===== ADMIN PANEL ===== */
         .admin-section {
-            margin-top: 24px;
-            padding: 20px;
+            margin-top: 32px;
+            padding: 24px;
             background: white;
             border-radius: 16px;
             border: 2px solid var(--brass);
@@ -573,6 +573,20 @@
         .progress-bar { width: 100%; height: 4px; background: #eee; border-radius: 4px; margin-top: 6px; overflow: hidden; }
         .progress-bar .progress { height: 100%; background: var(--leaf-deep); width: 0%; transition: width 0.3s; }
         .admin-hidden { display: none !important; }
+        .login-wrapper {
+            text-align: center;
+            padding: 30px 0;
+        }
+        .login-wrapper h3 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .login-wrapper p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
 
         /* ===== TOAST ===== */
         .toast {
@@ -619,6 +633,7 @@
             .cart-summary .wrap { flex-direction: column; align-items: stretch; gap: 8px; }
             .admin-section .form-row { grid-template-columns: 1fr; }
             .admin-section .menu-grid { grid-template-columns: 1fr; }
+            .admin-section { padding: 16px; }
         }
 
         @media (max-width: 400px) {
@@ -711,84 +726,95 @@
 
         <!-- ===== ADMIN PANEL (Hidden by default) ===== -->
         <div class="admin-section admin-hidden" id="adminSection">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-                <h2>☕ Admin Panel</h2>
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <span id="adminUserEmail" style="font-size:13px;color:var(--text-muted);"></span>
-                    <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
-                </div>
+
+            <!-- LOGIN WRAPPER (muncul saat belum login) -->
+            <div class="login-wrapper" id="loginWrapper">
+                <h3>🔐 Login Admin</h3>
+                <p>Gunakan akun Google untuk mengelola menu Flora Coffee</p>
+                <button class="btn" id="loginBtn">🔑 Login dengan Google</button>
             </div>
 
-            <!-- Form -->
-            <div id="formCard">
-                <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nama Menu *</label>
-                        <input type="text" id="inputName" placeholder="Espresso">
-                    </div>
-                    <div class="form-group">
-                        <label>Harga (Rp) *</label>
-                        <input type="number" id="inputPrice" placeholder="18000">
+            <!-- ADMIN CONTENT (muncul saat sudah login) -->
+            <div id="adminContent" class="admin-hidden">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+                    <h2>☕ Admin Panel</h2>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span id="adminUserEmail" style="font-size:13px;color:var(--text-muted);"></span>
+                        <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Deskripsi</label>
-                    <textarea id="inputDesc" rows="2" placeholder="Single shot, pekat dan singkat."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Kategori</label>
-                        <select id="inputCategory">
-                            <option value="kopi-klasik">☕ Kopi Klasik</option>
-                            <option value="signature">🌸 Signature</option>
-                            <option value="non-kopi">🍵 Non-Kopi</option>
-                            <option value="camilan">🥐 Camilan</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tag (opsional)</label>
-                        <select id="inputTag">
-                            <option value="">Tidak ada</option>
-                            <option value="Favorit">⭐ Favorit</option>
-                            <option value="Promo">🔥 Promo</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Stok (0 = Habis)</label>
-                        <input type="number" id="inputStock" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label>Harga Promo</label>
-                        <input type="number" id="inputPromo" placeholder="23000">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>URL Gambar</label>
-                    <input type="text" id="inputImage" placeholder="https://...">
-                </div>
-                <div class="form-group">
-                    <label>📤 Upload Gambar (Cloudinary)</label>
-                    <input type="file" id="fileInput" accept="image/*">
-                    <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
-                    <img id="previewImage" class="upload-preview hidden">
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="btn" id="saveBtn">💾 Simpan Menu</button>
-                    <button class="btn btn-outline" id="cancelBtn">Batal</button>
-                </div>
-            </div>
 
-            <!-- Daftar Menu Admin -->
-            <div style="margin-top:24px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h3>📋 Semua Menu</h3>
-                    <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
+                <!-- Form -->
+                <div id="formCard">
+                    <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Menu *</label>
+                            <input type="text" id="inputName" placeholder="Espresso">
+                        </div>
+                        <div class="form-group">
+                            <label>Harga (Rp) *</label>
+                            <input type="number" id="inputPrice" placeholder="18000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea id="inputDesc" rows="2" placeholder="Single shot, pekat dan singkat."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Kategori</label>
+                            <select id="inputCategory">
+                                <option value="kopi-klasik">☕ Kopi Klasik</option>
+                                <option value="signature">🌸 Signature</option>
+                                <option value="non-kopi">🍵 Non-Kopi</option>
+                                <option value="camilan">🥐 Camilan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tag (opsional)</label>
+                            <select id="inputTag">
+                                <option value="">Tidak ada</option>
+                                <option value="Favorit">⭐ Favorit</option>
+                                <option value="Promo">🔥 Promo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stok (0 = Habis)</label>
+                            <input type="number" id="inputStock" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Harga Promo</label>
+                            <input type="number" id="inputPromo" placeholder="23000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>URL Gambar</label>
+                        <input type="text" id="inputImage" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>📤 Upload Gambar (Cloudinary)</label>
+                        <input type="file" id="fileInput" accept="image/*">
+                        <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+                        <img id="previewImage" class="upload-preview hidden">
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="btn" id="saveBtn">💾 Simpan Menu</button>
+                        <button class="btn btn-outline" id="cancelBtn">Batal</button>
+                    </div>
                 </div>
-                <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
-                <div class="menu-grid" id="adminMenuGrid"></div>
+
+                <!-- Daftar Menu Admin -->
+                <div style="margin-top:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                        <h3>📋 Semua Menu</h3>
+                        <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
+                    </div>
+                    <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
+                    <div class="menu-grid" id="adminMenuGrid"></div>
+                </div>
             </div>
         </div>
 
@@ -849,24 +875,22 @@
             // ============================================
             // DOM ELEMENTS
             // ============================================
-            // Search
             const searchInput = document.getElementById('searchInput');
             const clearBtn = document.getElementById('clearSearch');
-
-            // Cart
             const cartSummary = document.getElementById('cartSummary');
             const cartTotal = document.getElementById('cartTotal');
             const cartDetail = document.getElementById('cartDetail');
             const orderBtn = document.getElementById('orderBtn');
-
-            // Menu
             const loadingState = document.getElementById('loadingState');
             const menuContainer = document.getElementById('menuContainer');
 
             // Admin
             const adminSection = document.getElementById('adminSection');
-            const adminUserEmail = document.getElementById('adminUserEmail');
+            const loginWrapper = document.getElementById('loginWrapper');
+            const adminContent = document.getElementById('adminContent');
+            const loginBtn = document.getElementById('loginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
+            const adminUserEmail = document.getElementById('adminUserEmail');
             const adminMenuGrid = document.getElementById('adminMenuGrid');
             const loadingMenu = document.getElementById('loadingMenu');
             const formTitle = document.getElementById('formTitle');
@@ -892,7 +916,6 @@
 
             let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
             let editingId = null;
-            let isAdmin = false;
 
             // ============================================
             // DARK MODE
@@ -961,7 +984,8 @@
                     }
                 });
 
-                noResult.style.display = (keyword !== '' && document.querySelectorAll('.item:not(.hidden)').length === 0) ? 'block' : 'none';
+                noResult.style.display = (keyword !== '' && document.querySelectorAll('.item:not(.hidden)').length === 0) ? 'block' :
+                'none';
                 clearBtn.classList.toggle('show', keyword.length > 0);
             }
 
@@ -1057,9 +1081,9 @@
                     const head = document.createElement('div');
                     head.className = 'cat-head';
                     head.innerHTML = `
-                        <span class="cat-num">${String(catIndex).padStart(2, '0')}</span>
-                        <h2>${categoryNames[catKey] || catKey}</h2>
-                    `;
+                            <span class="cat-num">${String(catIndex).padStart(2, '0')}</span>
+                            <h2>${categoryNames[catKey] || catKey}</h2>
+                        `;
                     section.appendChild(head);
 
                     const desc = document.createElement('p');
@@ -1209,9 +1233,9 @@
                         const divider = document.createElement('div');
                         divider.className = 'divider';
                         divider.innerHTML = `
-                            <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b58d4a" stroke-width="1.4" /><circle cx="17" cy="5" r="2.6" fill="#b58d4a" /></svg>
-                            <div class="line"></div>
-                        `;
+                                <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b58d4a" stroke-width="1.4" /><circle cx="17" cy="5" r="2.6" fill="#b58d4a" /></svg>
+                                <div class="line"></div>
+                            `;
                         menuContainer.appendChild(divider);
                     }
                     catIndex++;
@@ -1223,21 +1247,36 @@
 
             function loadDefaultMenu() {
                 const defaultData = [
-                    { id: '1', name: 'Espresso', desc: 'Single shot, pekat dan singkat.', price: 18000, category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '2', name: 'Americano', desc: 'Espresso dengan air panas, bisa juga dingin.', price: 20000, category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '3', name: 'Cappuccino', desc: 'Espresso, susu, dan busa tebal.', price: 25000, category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '4', name: 'Caffe Latte', desc: 'Lebih banyak susu, tekstur lembut.', price: 26000, category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '5', name: 'Kopi Susu Gula Aren', desc: 'Kopi hitam, susu segar, gula aren asli.', price: 24000, category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '6', name: 'Flora Latte', desc: 'Bunga telang, vanila, dan espresso — berlapis biru ke krem.', price: 30000, category: 'signature', tag: 'Favorit', image: '' },
-                    { id: '7', name: 'Honey Oat Latte', desc: 'Susu oat, madu hutan, dua shot espresso.', price: 29000, category: 'signature', tag: '', image: '' },
-                    { id: '8', name: 'Aren Macchiato', desc: 'Foam susu manis di atas, kopi gula aren di bawah.', price: 28000, category: 'signature', tag: '', image: '' },
-                    { id: '9', name: 'Matcha Latte', desc: 'Matcha grade upacara, susu segar.', price: 27000, category: 'non-kopi', tag: '', image: '' },
-                    { id: '10', name: 'Taro Latte', desc: 'Manis, gurih, warna ungu lembut.', price: 26000, category: 'non-kopi', tag: '', image: '' },
-                    { id: '11', name: 'Coklat Susu', desc: 'Dark chocolate leleh dengan susu segar.', price: 25000, category: 'non-kopi', tag: '', image: '' },
-                    { id: '12', name: 'Lemon Tea', desc: 'Teh hitam, perasan lemon segar.', price: 20000, category: 'non-kopi', tag: '', image: '' },
-                    { id: '13', name: 'Croissant Butter', desc: 'Dipanggang setiap pagi, renyah di luar.', price: 22000, category: 'camilan', tag: '', image: '' },
-                    { id: '14', name: 'Banana Bread', desc: 'Lembab, dengan taburan kenari.', price: 20000, category: 'camilan', tag: '', image: '' },
-                    { id: '15', name: 'Cookies Dark Choco', desc: 'Renyah di pinggir, lumer di tengah.', price: 15000, category: 'camilan', tag: '', image: '' }
+                    { id: '1', name: 'Espresso', desc: 'Single shot, pekat dan singkat.', price: 18000, category: 'kopi-klasik',
+                        tag: '', image: '' },
+                    { id: '2', name: 'Americano', desc: 'Espresso dengan air panas, bisa juga dingin.', price: 20000,
+                        category: 'kopi-klasik', tag: '', image: '' },
+                    { id: '3', name: 'Cappuccino', desc: 'Espresso, susu, dan busa tebal.', price: 25000,
+                        category: 'kopi-klasik', tag: '', image: '' },
+                    { id: '4', name: 'Caffe Latte', desc: 'Lebih banyak susu, tekstur lembut.', price: 26000,
+                        category: 'kopi-klasik', tag: '', image: '' },
+                    { id: '5', name: 'Kopi Susu Gula Aren', desc: 'Kopi hitam, susu segar, gula aren asli.', price: 24000,
+                        category: 'kopi-klasik', tag: '', image: '' },
+                    { id: '6', name: 'Flora Latte', desc: 'Bunga telang, vanila, dan espresso — berlapis biru ke krem.',
+                        price: 30000, category: 'signature', tag: 'Favorit', image: '' },
+                    { id: '7', name: 'Honey Oat Latte', desc: 'Susu oat, madu hutan, dua shot espresso.', price: 29000,
+                        category: 'signature', tag: '', image: '' },
+                    { id: '8', name: 'Aren Macchiato', desc: 'Foam susu manis di atas, kopi gula aren di bawah.', price: 28000,
+                        category: 'signature', tag: '', image: '' },
+                    { id: '9', name: 'Matcha Latte', desc: 'Matcha grade upacara, susu segar.', price: 27000,
+                        category: 'non-kopi', tag: '', image: '' },
+                    { id: '10', name: 'Taro Latte', desc: 'Manis, gurih, warna ungu lembut.', price: 26000,
+                        category: 'non-kopi', tag: '', image: '' },
+                    { id: '11', name: 'Coklat Susu', desc: 'Dark chocolate leleh dengan susu segar.', price: 25000,
+                        category: 'non-kopi', tag: '', image: '' },
+                    { id: '12', name: 'Lemon Tea', desc: 'Teh hitam, perasan lemon segar.', price: 20000,
+                        category: 'non-kopi', tag: '', image: '' },
+                    { id: '13', name: 'Croissant Butter', desc: 'Dipanggang setiap pagi, renyah di luar.', price: 22000,
+                        category: 'camilan', tag: '', image: '' },
+                    { id: '14', name: 'Banana Bread', desc: 'Lembab, dengan taburan kenari.', price: 20000,
+                        category: 'camilan', tag: '', image: '' },
+                    { id: '15', name: 'Cookies Dark Choco', desc: 'Renyah di pinggir, lumer di tengah.', price: 15000,
+                        category: 'camilan', tag: '', image: '' }
                 ];
                 defaultData.forEach(item => {
                     db.collection('menu').doc(item.id).set(item).catch(() => {});
@@ -1246,15 +1285,21 @@
                 loadingState.style.display = 'none';
             }
 
+            let menuUnsubscribe = null;
+
             function loadMenu() {
                 loadingState.style.display = 'block';
-                db.collection('menu').orderBy('name').onSnapshot(snapshot => {
+                if (menuUnsubscribe) menuUnsubscribe();
+                menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(snapshot => {
                     if (snapshot.empty) { loadDefaultMenu(); return; }
                     let data = [];
                     snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
                     renderMenu(data);
                     loadingState.style.display = 'none';
-                    if (isAdmin) renderAdminMenu(data);
+                    // Update admin menu if logged in
+                    if (adminContent.classList.contains('admin-hidden') === false) {
+                        renderAdminMenu(data);
+                    }
                 }, error => {
                     console.error('Error loading menu:', error);
                     loadDefaultMenu();
@@ -1275,22 +1320,23 @@
                     const div = document.createElement('div');
                     div.className = 'menu-item';
                     let tags = '';
-                    if (item.tag) tags += `<span class="tag tag-${item.tag === 'Favorit' ? 'favorit' : 'promo'}">${item.tag}</span>`;
+                    if (item.tag) tags +=
+                        `<span class="tag tag-${item.tag === 'Favorit' ? 'favorit' : 'promo'}">${item.tag}</span>`;
                     if (item.stock === 0) tags += `<span class="tag tag-habis">⛔ Habis</span>`;
                     if (item.promoPrice) tags += `<span class="tag tag-promo">🔥 Promo</span>`;
                     const priceDisplay = item.promoPrice ?
                         `<span style="text-decoration:line-through;color:#95a5a6;">Rp${item.price.toLocaleString()}</span> Rp${item.promoPrice.toLocaleString()}` :
                         `Rp${item.price.toLocaleString()}`;
                     div.innerHTML = `
-                        <div class="name">${item.name} ${tags}</div>
-                        <div style="font-size:14px;">${priceDisplay}</div>
-                        <div style="font-size:12px;color:#7f8c8d;">📂 ${item.category} | 📦 Stok: ${item.stock ?? '∞'}</div>
-                        ${item.image ? `<img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-top:4px;" />` : ''}
-                        <div class="actions">
-                            <button class="btn btn-warning btn-sm" onclick="editMenuAdmin('${item.id}')">✏️</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteMenuAdmin('${item.id}')">🗑️</button>
-                        </div>
-                    `;
+                            <div class="name">${item.name} ${tags}</div>
+                            <div style="font-size:14px;">${priceDisplay}</div>
+                            <div style="font-size:12px;color:#7f8c8d;">📂 ${item.category} | 📦 Stok: ${item.stock ?? '∞'}</div>
+                            ${item.image ? `<img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-top:4px;" />` : ''}
+                            <div class="actions">
+                                <button class="btn btn-warning btn-sm" onclick="editMenuAdmin('${item.id}')">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteMenuAdmin('${item.id}')">🗑️</button>
+                            </div>
+                        `;
                     adminMenuGrid.appendChild(div);
                 });
             }
@@ -1412,61 +1458,31 @@
             // ============================================
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    isAdmin = true;
-                    adminSection.classList.remove('admin-hidden');
+                    // User logged in - show admin content
+                    loginWrapper.style.display = 'none';
+                    adminContent.classList.remove('admin-hidden');
                     adminUserEmail.textContent = user.email;
-                    loadMenu();
-                    // Reload admin menu
+                    // Load admin menu
                     db.collection('menu').orderBy('name').onSnapshot(snapshot => {
                         let data = [];
                         snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
                         renderAdminMenu(data);
+                        loadingMenu.classList.add('hidden');
                     });
                 } else {
-                    isAdmin = false;
-                    adminSection.classList.add('admin-hidden');
+                    // User logged out - show login button
+                    loginWrapper.style.display = 'block';
+                    adminContent.classList.add('admin-hidden');
                     adminUserEmail.textContent = '';
-                    loadMenu();
+                    adminMenuGrid.innerHTML = '';
                 }
             });
 
-            // ============================================
-            // AUTH BUTTONS
-            // ============================================
-            // Login button will be shown in the admin section
-            // For first time, we need a login button
-            const loginBtn = document.createElement('button');
-            loginBtn.className = 'btn';
-            loginBtn.textContent = '🔑 Login Admin';
-            loginBtn.style.marginTop = '12px';
             loginBtn.addEventListener('click', () => {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 auth.signInWithPopup(provider).catch(err => {
                     alert('❌ Login gagal: ' + err.message);
                 });
-            });
-
-            // Add login button to admin section
-            const adminSection2 = document.getElementById('adminSection');
-            const loginWrapper = document.createElement('div');
-            loginWrapper.id = 'loginWrapper';
-            loginWrapper.style.textAlign = 'center';
-            loginWrapper.style.padding = '30px 0';
-            loginWrapper.innerHTML = `
-                <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin-bottom:8px;">🔐 Login Admin</h3>
-                <p style="color:var(--text-muted);margin-bottom:16px;">Gunakan akun Google untuk mengelola menu</p>
-            `;
-            loginWrapper.appendChild(loginBtn);
-            adminSection2.prepend(loginWrapper);
-
-            // Show/hide login wrapper based on auth state
-            const loginWrapperEl = document.getElementById('loginWrapper');
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    loginWrapperEl.style.display = 'none';
-                } else {
-                    loginWrapperEl.style.display = 'block';
-                }
             });
 
             logoutBtn.addEventListener('click', () => auth.signOut());
