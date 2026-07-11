@@ -43,10 +43,6 @@
             --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
             --skeleton-bg: #ececec;
             --skeleton-shine: rgba(255, 255, 255, 0.6);
-            --qty-btn-bg: #2a4230;
-            --qty-btn-color: #f6f2e9;
-            --qty-btn-hover: #b58d4a;
-            --qty-border: rgba(30, 42, 30, 0.12);
             transition: background 0.3s ease, color 0.3s ease;
         }
 
@@ -74,25 +70,50 @@
             --cart-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             --skeleton-bg: #2a3a2e;
             --skeleton-shine: rgba(255, 255, 255, 0.08);
-            --qty-btn-bg: #8aa88e;
-            --qty-btn-color: #1a2a1e;
-            --qty-btn-hover: #dabf7a;
-            --qty-border: rgba(232, 228, 218, 0.2);
 
+            /* ===== PERBAIKAN HEADER DARK MODE ===== */
             h1.brand,
-            h1.brand em { color: #ffffff !important; }
-            header.hero .tagline { color: rgba(255, 255, 255, 0.9) !important; }
-            header.hero .hero-meta { color: rgba(255, 255, 255, 0.8) !important; }
-            header.hero .hero-meta strong { color: #ffffff !important; }
-            .eyebrow { color: var(--gold-light) !important; }
-            .eyebrow::before { background: var(--gold-light) !important; }
-            .hero-btn-map { color: rgba(255, 255, 255, 0.9) !important; border-color: rgba(255, 255, 255, 0.3) !important; }
-            .hero-btn-map:hover { background: rgba(255, 255, 255, 0.2) !important; }
-            .hero-btn-map svg .cls-1 { fill: #ffffff !important; }
-            .hero-btn-map svg .cls-2 { fill: #ef4136 !important; }
-            .theme-toggle { background: var(--brass); color: var(--leaf-deep); }
-            .admin-section { background: rgba(26, 42, 30, 0.85) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; }
-            .qty-controls .qty-value { color: #e8e4da !important; }
+            h1.brand em {
+                color: #ffffff !important;
+            }
+            header.hero .tagline {
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+            header.hero .hero-meta {
+                color: rgba(255, 255, 255, 0.8) !important;
+            }
+            header.hero .hero-meta strong {
+                color: #ffffff !important;
+            }
+            .eyebrow {
+                color: var(--gold-light) !important;
+            }
+            .eyebrow::before {
+                background: var(--gold-light) !important;
+            }
+            .hero-btn-map {
+                color: rgba(255, 255, 255, 0.9) !important;
+                border-color: rgba(255, 255, 255, 0.3) !important;
+            }
+            .hero-btn-map:hover {
+                background: rgba(255, 255, 255, 0.2) !important;
+            }
+            /* Warna icon maps di dark mode */
+            .hero-btn-map svg .cls-1 {
+                fill: #ffffff !important;
+            }
+            .hero-btn-map svg .cls-2 {
+                fill: #ef4136 !important;
+            }
+            .theme-toggle {
+                background: var(--brass);
+                color: var(--leaf-deep);
+            }
+            .admin-section {
+                background: rgba(26, 42, 30, 0.85) !important;
+                backdrop-filter: blur(12px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            }
         }
 
         /* ===== RESET ===== */
@@ -157,6 +178,7 @@
         .btn-wa { background: #25D366; color: #fff; }
         .btn-wa:hover { box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
 
+        /* Style untuk SVG di tombol */
         .btn svg,
         .hero-btn svg {
             display: inline-block;
@@ -171,30 +193,21 @@
             right: 24px;
             z-index: 100;
             background: var(--toggle-bg);
+            color: var(--toggle-dot);
             border: none;
             border-radius: 50%;
             width: 52px;
             height: 52px;
+            font-size: 24px;
             cursor: pointer;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
         }
         .theme-toggle:hover { transform: scale(1.1) rotate(12deg); }
         .theme-toggle:active { transform: scale(0.92); }
-        .theme-toggle svg {
-            width: 28px;
-            height: 28px;
-            display: block;
-        }
-        .theme-toggle svg path,
-        .theme-toggle svg circle {
-            fill: var(--toggle-dot);
-            stroke: var(--toggle-dot);
-        }
 
         /* ===== FLOATING WHATSAPP ===== */
         .floating-wa {
@@ -427,11 +440,19 @@
             position: absolute;
             inset: 0;
             transform: translateX(-100%);
-            background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--skeleton-shine),
+                transparent
+            );
             animation: shimmer 1.4s infinite;
         }
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
 
+        /* ===== LOADING ===== */
         .loading { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 15px; }
         .loading span { display: inline-block; animation: pulse 1.2s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
@@ -443,7 +464,14 @@
 
         .cat-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
         .cat-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--brass); font-weight: 500; }
-        .cat-head h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 30px; color: var(--leaf-deep); letter-spacing: -0.01em; transition: color 0.3s ease; }
+        .cat-head h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 30px;
+            color: var(--leaf-deep);
+            letter-spacing: -0.01em;
+            transition: color 0.3s ease;
+        }
         [data-theme="dark"] .cat-head h2 { color: var(--gold-light); }
         .cat-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; padding-left: 40px; }
 
@@ -523,7 +551,7 @@
         .badge-habis { font-size: 10px; background: #95a5a6; color: white; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
         .price-original { text-decoration: line-through; color: #95a5a6; font-size: 13px; margin-right: 6px; }
 
-        /* ===== QUANTITY CONTROLS ===== */
+        /* ===== QUANTITY ===== */
         .qty-controls {
             grid-column: 4;
             display: flex;
@@ -532,38 +560,34 @@
             background: var(--search-bg);
             border-radius: 100px;
             padding: 2px 4px;
-            border: 1px solid var(--qty-border);
-            transition: all 0.2s ease;
+            border: 1px solid var(--search-border);
         }
-        .item:hover .qty-controls { border-color: var(--brass); }
         .qty-controls button {
-            width: 28px; height: 28px;
+            width: 28px;
+            height: 28px;
             border: none;
             border-radius: 50%;
-            background: var(--qty-btn-bg);
-            color: var(--qty-btn-color);
+            background: var(--leaf-deep);
+            color: var(--ivory);
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1;
         }
-        .qty-controls button:hover:not(:disabled) { transform: scale(1.12); background: var(--qty-btn-hover); }
-        .qty-controls button:active:not(:disabled) { transform: scale(0.88); }
-        .qty-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .qty-controls button:hover:not(:disabled) { transform: scale(1.08); background: var(--brass); }
+        .qty-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
         .qty-controls .qty-value {
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             min-width: 24px;
             text-align: center;
             color: var(--ink);
-            transition: color 0.3s ease;
         }
-        .qty-controls .qty-value.zero { opacity: 0.35; }
+        .qty-controls .qty-value.zero { opacity: 0.3; }
 
         /* ===== CART ===== */
         .cart-summary {
@@ -589,6 +613,7 @@
         .cart-total span { color: var(--brass); }
         .cart-detail { font-size: 13px; color: var(--text-muted); }
 
+        /* ===== DIVIDER ===== */
         .divider {
             display: flex;
             align-items: center;
@@ -622,7 +647,9 @@
             transition: color 0.3s ease;
             position: relative;
         }
-        .secret-trigger:hover { color: var(--brass); }
+        .secret-trigger:hover {
+            color: var(--brass);
+        }
         .secret-trigger::after {
             content: '🔑';
             font-size: 10px;
@@ -630,7 +657,9 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .secret-trigger:hover::after { opacity: 1; }
+        .secret-trigger:hover::after {
+            opacity: 1;
+        }
 
         /* ===== ADMIN PANEL ===== */
         .admin-section {
@@ -641,7 +670,13 @@
             border: 2px solid var(--brass);
             box-shadow: var(--shadow-sm);
         }
-        .admin-section h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 24px; color: var(--leaf-deep); margin-bottom: 16px; }
+        .admin-section h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: 24px;
+            color: var(--leaf-deep);
+            margin-bottom: 16px;
+        }
         .admin-section .form-group { margin-bottom: 14px; }
         .admin-section .form-group label { display: block; font-weight: 500; margin-bottom: 4px; font-size: 14px; }
         .admin-section .form-group input,
@@ -692,6 +727,7 @@
         .progress-bar .progress { height: 100%; background: var(--leaf-deep); width: 0%; transition: width 0.3s; }
         .admin-hidden { display: none !important; }
 
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -707,6 +743,7 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
+        /* ===== ADMIN USER BADGE ===== */
         .admin-badge {
             display: inline-block;
             background: var(--brass);
@@ -718,9 +755,11 @@
             margin-left: 8px;
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             .wrap { padding: 0 18px; }
             .cat-desc { padding-left: 0; }
+
             .item {
                 display: grid;
                 grid-template-columns: auto auto 1fr auto;
@@ -728,22 +767,63 @@
                 padding: 12px 6px;
                 align-items: center;
             }
-            .item-checkbox { grid-column: 1; grid-row: 1 / 3; align-self: center; margin-right: 4px; width: 18px; height: 18px; }
-            .item-image { grid-column: 2; grid-row: 1 / 3; width: 44px; height: 44px; border-radius: 10px; object-fit: cover; display: block; margin-right: 4px; }
+
+            .item-checkbox {
+                grid-column: 1;
+                grid-row: 1 / 3;
+                align-self: center;
+                margin-right: 4px;
+                width: 18px;
+                height: 18px;
+            }
+
+            .item-image {
+                grid-column: 2;
+                grid-row: 1 / 3;
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                object-fit: cover;
+                display: block;
+                margin-right: 4px;
+            }
             .item-image.show { display: block; }
-            .item-info { grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+            .item-info {
+                grid-column: 3;
+                grid-row: 1 / 3;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                min-width: 0;
+            }
+
             .item-name { font-size: 16px; gap: 4px; flex-wrap: wrap; }
             .item-desc { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .item-price { grid-column: 4; grid-row: 1; font-size: 13px; font-weight: 600; padding: 2px 8px; justify-self: end; white-space: nowrap; }
-            .qty-controls { grid-column: 4; grid-row: 2; justify-self: end; padding: 2px 4px; }
+
+            .item-price {
+                grid-column: 4;
+                grid-row: 1;
+                font-size: 13px;
+                font-weight: 600;
+                padding: 2px 8px;
+                justify-self: end;
+                white-space: nowrap;
+            }
+
+            .qty-controls {
+                grid-column: 4;
+                grid-row: 2;
+                justify-self: end;
+                padding: 2px 4px;
+            }
             .qty-controls button { width: 24px; height: 24px; font-size: 14px; }
             .qty-controls .qty-value { font-size: 12px; min-width: 20px; }
 
             nav.cats .wrap { padding: 12px 18px; }
             header.hero { padding: 48px 0 40px; }
             .hero-meta { gap: 18px; font-size: 11px; }
-            .theme-toggle { width: 44px; height: 44px; bottom: 16px; right: 16px; }
-            .theme-toggle svg { width: 22px; height: 22px; }
+            .theme-toggle { width: 44px; height: 44px; font-size: 20px; bottom: 16px; right: 16px; }
             .floating-wa { width: 48px; height: 48px; bottom: 76px; right: 16px; }
             .floating-wa svg { width: 24px; height: 24px; }
             .scroll-top { bottom: 132px; right: 16px; width: 38px; height: 38px; font-size: 16px; }
@@ -754,6 +834,7 @@
             .hero-btn { font-size: 11px; padding: 8px 16px; }
             .cart-summary .wrap { flex-direction: column; align-items: stretch; gap: 8px; }
             .cart-summary .btn-wa { justify-content: center; }
+
             .admin-section .form-row { grid-template-columns: 1fr; }
             .admin-section .menu-grid { grid-template-columns: 1fr; }
             .admin-section { padding: 16px; }
@@ -783,7 +864,7 @@
 </head>
 <body>
 
-    <!-- DARK MODE TOGGLE (Versi Sederhana dengan Emoji) -->
+    <!-- DARK MODE TOGGLE -->
     <button class="theme-toggle" id="themeToggle">🌙</button>
 
     <!-- FLOATING WHATSAPP -->
@@ -875,12 +956,19 @@
             </div>
         </div>
 
+        <!-- LOADING STATE (hidden when skeleton is shown) -->
         <div class="loading" id="loadingState" style="display:none;"><span>☕</span><br>Memuat menu...</div>
+
+        <!-- NO RESULT -->
         <div class="no-result" id="noResult" style="display:none;"><span>🔍</span> Menu tidak ditemukan. Coba kata kunci lain!</div>
+
+        <!-- MENU CONTAINER -->
         <div id="menuContainer"></div>
 
-        <!-- ===== ADMIN PANEL ===== -->
+        <!-- ===== ADMIN PANEL (Hidden by default) ===== -->
         <div class="admin-section admin-hidden" id="adminSection">
+
+            <!-- ADMIN CONTENT (muncul saat sudah login) -->
             <div id="adminContent">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                     <h2>☕ Admin Panel</h2>
@@ -891,6 +979,7 @@
                     </div>
                 </div>
 
+                <!-- Form -->
                 <div id="formCard">
                     <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
                     <div class="form-row">
@@ -952,6 +1041,7 @@
                     </div>
                 </div>
 
+                <!-- Daftar Menu Admin -->
                 <div style="margin-top:24px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                         <h3>📋 Semua Menu</h3>
@@ -1074,6 +1164,7 @@
             const menuContainer = document.getElementById('menuContainer');
             const skeletonContainer = document.getElementById('skeletonContainer');
 
+            // Admin
             const adminSection = document.getElementById('adminSection');
             const adminContent = document.getElementById('adminContent');
             const logoutBtn = document.getElementById('logoutBtn');
@@ -1096,7 +1187,10 @@
             const inputPromo = document.getElementById('inputPromo');
             const inputImage = document.getElementById('inputImage');
 
+            // Secret Trigger
             const secretTrigger = document.getElementById('secretAdminTrigger');
+
+            // Others
             const themeToggle = document.getElementById('themeToggle');
             const scrollBtn = document.getElementById('scrollTop');
             const html = document.documentElement;
@@ -1106,7 +1200,7 @@
             let isAdmin = false;
 
             // ============================================
-            // 6. DARK MODE (Versi Sederhana)
+            // 6. DARK MODE
             // ============================================
             const savedTheme = localStorage.getItem('flora-theme');
             if (savedTheme === 'dark') {
@@ -1290,6 +1384,7 @@
 
                         const activePrice = item.promoPrice ? item.promoPrice : item.price;
                         itemDiv.setAttribute('data-price', activePrice);
+
                         itemDiv.setAttribute('data-id', item.id);
 
                         // Image
@@ -1672,7 +1767,7 @@
             });
 
             // ============================================
-            // 13. AUTHENTICATION
+            // 13. AUTHENTICATION (DENGAN VALIDASI EMAIL)
             // ============================================
             auth.onAuthStateChanged(async (user) => {
 
@@ -1684,6 +1779,7 @@
                     return;
                 }
 
+                // 🔥 VALIDASI: Cek apakah email terdaftar sebagai admin
                 if (!ADMIN_EMAILS.includes(user.email)) {
                     alert('❌ Anda bukan administrator. Akses ditolak!');
                     await auth.signOut();
@@ -1694,10 +1790,12 @@
                     return;
                 }
 
+                // ✅ Admin valid
                 isAdmin = true;
                 adminSection.classList.remove('admin-hidden');
                 adminUserEmail.textContent = user.email;
 
+                // Load admin menu
                 db.collection('menu').orderBy('name').onSnapshot(snapshot => {
                     let data = [];
                     snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
