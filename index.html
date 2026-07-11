@@ -43,6 +43,11 @@
             --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
             --skeleton-bg: #ececec;
             --skeleton-shine: rgba(255, 255, 255, 0.6);
+            /* Warna tombol + dan - di light mode */
+            --qty-btn-bg: #2a4230;
+            --qty-btn-color: #f6f2e9;
+            --qty-btn-hover: #b58d4a;
+            --qty-border: rgba(30, 42, 30, 0.12);
             transition: background 0.3s ease, color 0.3s ease;
         }
 
@@ -70,6 +75,11 @@
             --cart-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             --skeleton-bg: #2a3a2e;
             --skeleton-shine: rgba(255, 255, 255, 0.08);
+            /* 🔥 PERBAIKAN: Warna tombol + dan - di dark mode */
+            --qty-btn-bg: #8aa88e;
+            --qty-btn-color: #1a2a1e;
+            --qty-btn-hover: #dabf7a;
+            --qty-border: rgba(232, 228, 218, 0.2);
 
             /* ===== PERBAIKAN HEADER DARK MODE ===== */
             h1.brand,
@@ -98,7 +108,6 @@
             .hero-btn-map:hover {
                 background: rgba(255, 255, 255, 0.2) !important;
             }
-            /* Warna icon maps di dark mode */
             .hero-btn-map svg .cls-1 {
                 fill: #ffffff !important;
             }
@@ -113,6 +122,10 @@
                 background: rgba(26, 42, 30, 0.85) !important;
                 backdrop-filter: blur(12px) !important;
                 border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            }
+            /* 🔥 PERBAIKAN: Warna qty-value di dark mode */
+            .qty-controls .qty-value {
+                color: #e8e4da !important;
             }
         }
 
@@ -198,16 +211,31 @@
             border-radius: 50%;
             width: 52px;
             height: 52px;
-            font-size: 24px;
             cursor: pointer;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 0;
         }
         .theme-toggle:hover { transform: scale(1.1) rotate(12deg); }
         .theme-toggle:active { transform: scale(0.92); }
+        .theme-toggle svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+        .theme-toggle svg path,
+        .theme-toggle svg circle {
+            fill: var(--toggle-dot);
+            stroke: var(--toggle-dot);
+        }
+        [data-theme="dark"] .theme-toggle svg path,
+        [data-theme="dark"] .theme-toggle svg circle {
+            fill: var(--toggle-dot);
+            stroke: var(--toggle-dot);
+        }
 
         /* ===== FLOATING WHATSAPP ===== */
         .floating-wa {
@@ -551,7 +579,7 @@
         .badge-habis { font-size: 10px; background: #95a5a6; color: white; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
         .price-original { text-decoration: line-through; color: #95a5a6; font-size: 13px; margin-right: 6px; }
 
-        /* ===== QUANTITY ===== */
+        /* ===== QUANTITY CONTROLS ===== */
         .qty-controls {
             grid-column: 4;
             display: flex;
@@ -560,34 +588,47 @@
             background: var(--search-bg);
             border-radius: 100px;
             padding: 2px 4px;
-            border: 1px solid var(--search-border);
+            border: 1px solid var(--qty-border);
+            transition: all 0.2s ease;
+        }
+        .item:hover .qty-controls {
+            border-color: var(--brass);
         }
         .qty-controls button {
             width: 28px;
             height: 28px;
             border: none;
             border-radius: 50%;
-            background: var(--leaf-deep);
-            color: var(--ivory);
+            background: var(--qty-btn-bg);
+            color: var(--qty-btn-color);
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
         }
-        .qty-controls button:hover:not(:disabled) { transform: scale(1.08); background: var(--brass); }
-        .qty-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .qty-controls button:hover:not(:disabled) {
+            transform: scale(1.12);
+            background: var(--qty-btn-hover);
+        }
+        .qty-controls button:active:not(:disabled) { transform: scale(0.88); }
+        .qty-controls button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
         .qty-controls .qty-value {
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             min-width: 24px;
             text-align: center;
             color: var(--ink);
+            transition: color 0.3s ease;
         }
-        .qty-controls .qty-value.zero { opacity: 0.3; }
+        .qty-controls .qty-value.zero { opacity: 0.35; }
 
         /* ===== CART ===== */
         .cart-summary {
@@ -824,6 +865,7 @@
             header.hero { padding: 48px 0 40px; }
             .hero-meta { gap: 18px; font-size: 11px; }
             .theme-toggle { width: 44px; height: 44px; font-size: 20px; bottom: 16px; right: 16px; }
+            .theme-toggle svg { width: 22px; height: 22px; }
             .floating-wa { width: 48px; height: 48px; bottom: 76px; right: 16px; }
             .floating-wa svg { width: 24px; height: 24px; }
             .scroll-top { bottom: 132px; right: 16px; width: 38px; height: 38px; font-size: 16px; }
@@ -865,7 +907,21 @@
 <body>
 
     <!-- DARK MODE TOGGLE -->
-    <button class="theme-toggle" id="themeToggle">🌙</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+            <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                <path d="M 45 68 c -12.682 0 -23 -10.317 -23 -23 c 0 -12.682 10.318 -23 23 -23 c 12.683 0 23 10.318 23 23 C 68 57.683 57.683 68 45 68 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 45 17.556 c -1.657 0 -3 -1.343 -3 -3 V 3 c 0 -1.657 1.343 -3 3 -3 c 1.657 0 3 1.343 3 3 v 11.556 C 48 16.212 46.657 17.556 45 17.556 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 45 90 c -1.657 0 -3 -1.343 -3 -3 V 75.444 c 0 -1.657 1.343 -3 3 -3 c 1.657 0 3 1.343 3 3 V 87 C 48 88.657 46.657 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 14.556 48 H 3 c -1.657 0 -3 -1.343 -3 -3 c 0 -1.657 1.343 -3 3 -3 h 11.556 c 1.657 0 3 1.343 3 3 C 17.556 46.657 16.212 48 14.556 48 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 87 48 H 75.444 c -1.657 0 -3 -1.343 -3 -3 c 0 -1.657 1.343 -3 3 -3 H 87 c 1.657 0 3 1.343 3 3 C 90 46.657 88.657 48 87 48 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 66.527 26.473 c -0.768 0 -1.535 -0.293 -2.121 -0.878 c -1.172 -1.172 -1.172 -3.071 0 -4.243 l 8.171 -8.171 c 1.172 -1.172 3.07 -1.171 4.242 0 c 1.172 1.172 1.172 3.071 0 4.243 l -8.171 8.171 C 68.063 26.18 67.295 26.473 66.527 26.473 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 15.302 77.698 c -0.768 0 -1.536 -0.293 -2.121 -0.879 c -1.172 -1.171 -1.172 -3.071 0 -4.242 l 8.171 -8.171 c 1.171 -1.172 3.071 -1.172 4.242 0 c 1.172 1.171 1.172 3.071 0 4.242 l -8.171 8.171 C 16.837 77.405 16.069 77.698 15.302 77.698 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 23.473 26.473 c -0.768 0 -1.536 -0.293 -2.121 -0.878 l -8.171 -8.171 c -1.172 -1.172 -1.172 -3.071 0 -4.243 c 1.172 -1.172 3.072 -1.171 4.243 0 l 8.171 8.171 c 1.172 1.172 1.172 3.071 0 4.243 C 25.008 26.18 24.24 26.473 23.473 26.473 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                <path d="M 74.698 77.698 c -0.768 0 -1.535 -0.293 -2.121 -0.879 l -8.171 -8.171 c -1.172 -1.171 -1.172 -3.071 0 -4.242 c 1.172 -1.172 3.07 -1.172 4.242 0 l 8.171 8.171 c 1.172 1.171 1.172 3.071 0 4.242 C 76.233 77.405 75.466 77.698 74.698 77.698 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+            </g>
+        </svg>
+    </button>
 
     <!-- FLOATING WHATSAPP -->
     <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee" target="_blank" class="floating-wa" aria-label="Chat via WhatsApp">
@@ -956,7 +1012,7 @@
             </div>
         </div>
 
-        <!-- LOADING STATE (hidden when skeleton is shown) -->
+        <!-- LOADING STATE -->
         <div class="loading" id="loadingState" style="display:none;"><span>☕</span><br>Memuat menu...</div>
 
         <!-- NO RESULT -->
@@ -965,10 +1021,8 @@
         <!-- MENU CONTAINER -->
         <div id="menuContainer"></div>
 
-        <!-- ===== ADMIN PANEL (Hidden by default) ===== -->
+        <!-- ===== ADMIN PANEL ===== -->
         <div class="admin-section admin-hidden" id="adminSection">
-
-            <!-- ADMIN CONTENT (muncul saat sudah login) -->
             <div id="adminContent">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                     <h2>☕ Admin Panel</h2>
@@ -979,7 +1033,6 @@
                     </div>
                 </div>
 
-                <!-- Form -->
                 <div id="formCard">
                     <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
                     <div class="form-row">
@@ -1041,7 +1094,6 @@
                     </div>
                 </div>
 
-                <!-- Daftar Menu Admin -->
                 <div style="margin-top:24px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                         <h3>📋 Semua Menu</h3>
@@ -1200,12 +1252,35 @@
             let isAdmin = false;
 
             // ============================================
-            // 6. DARK MODE
+            // 6. DARK MODE (dengan SVG)
             // ============================================
+            // SVG Moon untuk dark mode
+            const moonSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="256" height="256" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>`;
+
+            // SVG Sun (dari yang kamu kirim)
+            const sunSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+                <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                    <path d="M 45 68 c -12.682 0 -23 -10.317 -23 -23 c 0 -12.682 10.318 -23 23 -23 c 12.683 0 23 10.318 23 23 C 68 57.683 57.683 68 45 68 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 45 17.556 c -1.657 0 -3 -1.343 -3 -3 V 3 c 0 -1.657 1.343 -3 3 -3 c 1.657 0 3 1.343 3 3 v 11.556 C 48 16.212 46.657 17.556 45 17.556 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 45 90 c -1.657 0 -3 -1.343 -3 -3 V 75.444 c 0 -1.657 1.343 -3 3 -3 c 1.657 0 3 1.343 3 3 V 87 C 48 88.657 46.657 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 14.556 48 H 3 c -1.657 0 -3 -1.343 -3 -3 c 0 -1.657 1.343 -3 3 -3 h 11.556 c 1.657 0 3 1.343 3 3 C 17.556 46.657 16.212 48 14.556 48 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 87 48 H 75.444 c -1.657 0 -3 -1.343 -3 -3 c 0 -1.657 1.343 -3 3 -3 H 87 c 1.657 0 3 1.343 3 3 C 90 46.657 88.657 48 87 48 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 66.527 26.473 c -0.768 0 -1.535 -0.293 -2.121 -0.878 c -1.172 -1.172 -1.172 -3.071 0 -4.243 l 8.171 -8.171 c 1.172 -1.172 3.07 -1.171 4.242 0 c 1.172 1.172 1.172 3.071 0 4.243 l -8.171 8.171 C 68.063 26.18 67.295 26.473 66.527 26.473 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 15.302 77.698 c -0.768 0 -1.536 -0.293 -2.121 -0.879 c -1.172 -1.171 -1.172 -3.071 0 -4.242 l 8.171 -8.171 c 1.171 -1.172 3.071 -1.172 4.242 0 c 1.172 1.171 1.172 3.071 0 4.242 l -8.171 8.171 C 16.837 77.405 16.069 77.698 15.302 77.698 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 23.473 26.473 c -0.768 0 -1.536 -0.293 -2.121 -0.878 l -8.171 -8.171 c -1.172 -1.172 -1.172 -3.071 0 -4.243 c 1.172 -1.172 3.072 -1.171 4.243 0 l 8.171 8.171 c 1.172 1.172 1.172 3.071 0 4.243 C 25.008 26.18 24.24 26.473 23.473 26.473 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                    <path d="M 74.698 77.698 c -0.768 0 -1.535 -0.293 -2.121 -0.879 l -8.171 -8.171 c -1.172 -1.171 -1.172 -3.071 0 -4.242 c 1.172 -1.172 3.07 -1.172 4.242 0 l 8.171 8.171 c 1.172 1.171 1.172 3.071 0 4.242 C 76.233 77.405 75.466 77.698 74.698 77.698 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(244,177,44); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round"/>
+                </g>
+            </svg>`;
+
+            // Cek saved theme
             const savedTheme = localStorage.getItem('flora-theme');
             if (savedTheme === 'dark') {
                 html.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '☀️';
+                themeToggle.innerHTML = moonSVG;
+            } else {
+                themeToggle.innerHTML = sunSVG;
             }
 
             themeToggle.addEventListener('click', function() {
@@ -1213,11 +1288,11 @@
                 if (isDark) {
                     html.removeAttribute('data-theme');
                     localStorage.setItem('flora-theme', 'light');
-                    themeToggle.textContent = '🌙';
+                    themeToggle.innerHTML = sunSVG;
                 } else {
                     html.setAttribute('data-theme', 'dark');
                     localStorage.setItem('flora-theme', 'dark');
-                    themeToggle.textContent = '☀️';
+                    themeToggle.innerHTML = moonSVG;
                 }
             });
 
