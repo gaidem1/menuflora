@@ -483,7 +483,31 @@
         footer h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; margin-bottom: 8px; }
         footer p { font-size: 14px; color: rgba(247, 243, 233, 0.75); max-width: 42ch; margin-bottom: 24px; }
         .footer-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .foot-note { margin-top: 32px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(247, 243, 233, 0.4); }
+        .foot-note { 
+            margin-top: 32px; 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 11px; 
+            color: rgba(247, 243, 233, 0.4); 
+            text-align: center;
+        }
+        .secret-trigger { 
+            cursor: pointer; 
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .secret-trigger:hover { 
+            color: var(--brass); 
+        }
+        .secret-trigger::after {
+            content: '🔑';
+            font-size: 10px;
+            margin-left: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .secret-trigger:hover::after {
+            opacity: 1;
+        }
 
         /* ===== SCROLL TOP ===== */
         .scroll-top {
@@ -573,20 +597,6 @@
         .progress-bar { width: 100%; height: 4px; background: #eee; border-radius: 4px; margin-top: 6px; overflow: hidden; }
         .progress-bar .progress { height: 100%; background: var(--leaf-deep); width: 0%; transition: width 0.3s; }
         .admin-hidden { display: none !important; }
-        .login-wrapper {
-            text-align: center;
-            padding: 30px 0;
-        }
-        .login-wrapper h3 {
-            font-family: 'Fraunces', serif;
-            font-weight: 500;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        .login-wrapper p {
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
 
         /* ===== TOAST ===== */
         .toast {
@@ -603,6 +613,18 @@
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* ===== ADMIN USER BADGE ===== */
+        .admin-badge {
+            display: inline-block;
+            background: var(--brass);
+            color: var(--leaf-deep);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 100px;
+            margin-left: 8px;
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
@@ -634,6 +656,7 @@
             .admin-section .form-row { grid-template-columns: 1fr; }
             .admin-section .menu-grid { grid-template-columns: 1fr; }
             .admin-section { padding: 16px; }
+            .secret-trigger::after { opacity: 0.5; }
         }
 
         @media (max-width: 400px) {
@@ -727,19 +750,13 @@
         <!-- ===== ADMIN PANEL (Hidden by default) ===== -->
         <div class="admin-section admin-hidden" id="adminSection">
 
-            <!-- LOGIN WRAPPER (muncul saat belum login) -->
-            <div class="login-wrapper" id="loginWrapper">
-                <h3>🔐 Login Admin</h3>
-                <p>Gunakan akun Google untuk mengelola menu Flora Coffee</p>
-                <button class="btn" id="loginBtn">🔑 Login dengan Google</button>
-            </div>
-
             <!-- ADMIN CONTENT (muncul saat sudah login) -->
-            <div id="adminContent" class="admin-hidden">
+            <div id="adminContent">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                     <h2>☕ Admin Panel</h2>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span id="adminUserEmail" style="font-size:13px;color:var(--text-muted);"></span>
+                        <span class="admin-badge">🔐 Admin</span>
                         <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
                     </div>
                 </div>
@@ -840,7 +857,11 @@
                 <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" class="btn btn-wa">💬 Pesan via WhatsApp</a>
                 <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);">📍 Lihat di Maps</a>
             </div>
-            <div class="foot-note">Flora Coffee — Kesugihan, Cilacap</div>
+            <div class="foot-note">
+                Flora Coffee — 
+                <span class="secret-trigger" id="secretAdminTrigger">Kesugihan, Cilacap</span>
+                <span style="display:block;font-size:10px;opacity:0.3;margin-top:4px;">Klik lokasi untuk akses admin</span>
+            </div>
         </div>
     </footer>
 
@@ -886,9 +907,7 @@
 
             // Admin
             const adminSection = document.getElementById('adminSection');
-            const loginWrapper = document.getElementById('loginWrapper');
             const adminContent = document.getElementById('adminContent');
-            const loginBtn = document.getElementById('loginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
             const adminUserEmail = document.getElementById('adminUserEmail');
             const adminMenuGrid = document.getElementById('adminMenuGrid');
@@ -909,6 +928,9 @@
             const inputPromo = document.getElementById('inputPromo');
             const inputImage = document.getElementById('inputImage');
 
+            // Secret Trigger
+            const secretTrigger = document.getElementById('secretAdminTrigger');
+
             // Others
             const themeToggle = document.getElementById('themeToggle');
             const scrollBtn = document.getElementById('scrollTop');
@@ -916,6 +938,7 @@
 
             let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
             let editingId = null;
+            let isAdmin = false;
 
             // ============================================
             // DARK MODE
@@ -1297,7 +1320,7 @@
                     renderMenu(data);
                     loadingState.style.display = 'none';
                     // Update admin menu if logged in
-                    if (adminContent.classList.contains('admin-hidden') === false) {
+                    if (isAdmin) {
                         renderAdminMenu(data);
                     }
                 }, error => {
@@ -1454,13 +1477,35 @@
             });
 
             // ============================================
+            // SECRET ADMIN TRIGGER
+            // ============================================
+            secretTrigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!isAdmin) {
+                    // Jika belum login, munculkan popup Google
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    auth.signInWithPopup(provider).catch(err => {
+                        alert('❌ Login gagal: ' + err.message);
+                    });
+                } else {
+                    // Jika sudah login, langsung scroll ke panel admin
+                    adminSection.scrollIntoView({ behavior: 'smooth' });
+                    // Flash effect
+                    adminSection.style.transition = 'box-shadow 0.3s ease';
+                    adminSection.style.boxShadow = '0 0 0 4px var(--brass)';
+                    setTimeout(() => {
+                        adminSection.style.boxShadow = '';
+                    }, 1500);
+                }
+            });
+
+            // ============================================
             // AUTHENTICATION
             // ============================================
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    // User logged in - show admin content
-                    loginWrapper.style.display = 'none';
-                    adminContent.classList.remove('admin-hidden');
+                    isAdmin = true;
+                    adminSection.classList.remove('admin-hidden');
                     adminUserEmail.textContent = user.email;
                     // Load admin menu
                     db.collection('menu').orderBy('name').onSnapshot(snapshot => {
@@ -1469,23 +1514,19 @@
                         renderAdminMenu(data);
                         loadingMenu.classList.add('hidden');
                     });
+                    showToast('👋 Selamat datang, Admin!');
                 } else {
-                    // User logged out - show login button
-                    loginWrapper.style.display = 'block';
-                    adminContent.classList.add('admin-hidden');
+                    isAdmin = false;
+                    adminSection.classList.add('admin-hidden');
                     adminUserEmail.textContent = '';
                     adminMenuGrid.innerHTML = '';
                 }
             });
 
-            loginBtn.addEventListener('click', () => {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(provider).catch(err => {
-                    alert('❌ Login gagal: ' + err.message);
-                });
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut();
+                showToast('👋 Logout berhasil!');
             });
-
-            logoutBtn.addEventListener('click', () => auth.signOut());
 
             // ============================================
             // TOAST
