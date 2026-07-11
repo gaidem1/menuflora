@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flora Coffee — Menu Kesugihan, Cilacap</title>
-    <meta name="description" content="Menu Flora Coffee: kopi seduh dari biji lokal pilihan di Kesugihan, Cilacap. Buka 11.00–23.00 setiap hari, dine-in & takeaway.">
+    <meta name="description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie di Kesugihan, Cilacap. Buka setiap hari, harga terjangkau.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="restaurant.menu">
     <meta property="og:site_name" content="Flora Coffee">
     <meta property="og:title" content="Flora Coffee — Menu">
-    <meta property="og:description" content="Kopi seduh dari biji lokal pilihan, disajikan di Kesugihan, Cilacap. Buka 11.00–23.00 setiap hari.">
+    <meta property="og:description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie. Harga mulai Rp2.500.">
     <meta property="og:image" content="https://menu-flora.vercel.app/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Flora Coffee — Menu">
-    <meta name="twitter:description" content="Kopi seduh dari biji lokal pilihan, disajikan di Kesugihan, Cilacap.">
+    <meta name="twitter:description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie. Harga mulai Rp2.500.">
     <meta name="twitter:image" content="https://menu-flora.vercel.app/og-image.png">
 
     <!-- Structured Data (SEO) -->
@@ -32,8 +32,8 @@
         "image": "https://menu-flora.vercel.app/og-image.png",
         "url": "https://menu-flora.vercel.app/",
         "telephone": "+6285175012418",
-        "priceRange": "Rp15.000–Rp30.000",
-        "servesCuisine": "Coffee",
+        "priceRange": "Rp2.500–Rp8.000",
+        "servesCuisine": "Coffee, Snacks, Noodles",
         "address": {
             "@type": "PostalAddress",
             "addressLocality": "Kesugihan",
@@ -54,11 +54,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- ===== FIREBASE SDK (TANPA defer, agar langsung tersedia) ===== -->
+    <!-- ===== FIREBASE SDK ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <!-- ============================================================= -->
+    <!-- ============================================ -->
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
 
@@ -91,7 +91,6 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* ===== DARK MODE ===== */
         [data-theme="dark"] {
             --ink: #e8e4da;
             --ivory: #1e2a1e;
@@ -116,7 +115,6 @@
             --skeleton-bg: #2a3a2e;
             --skeleton-shine: rgba(255, 255, 255, 0.08);
 
-            /* ===== PERBAIKAN HEADER DARK MODE ===== */
             h1.brand,
             h1.brand em {
                 color: #ffffff !important;
@@ -143,7 +141,6 @@
             .hero-btn-map:hover {
                 background: rgba(255, 255, 255, 0.2) !important;
             }
-            /* Warna icon maps di dark mode */
             .hero-btn-map svg .cls-1 {
                 fill: #ffffff !important;
             }
@@ -223,7 +220,6 @@
         .btn-wa { background: #25D366; color: #fff; }
         .btn-wa:hover { box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
 
-        /* Style untuk SVG di tombol */
         .btn svg,
         .hero-btn svg {
             display: inline-block;
@@ -488,19 +484,11 @@
             position: absolute;
             inset: 0;
             transform: translateX(-100%);
-            background: linear-gradient(
-                90deg,
-                transparent,
-                var(--skeleton-shine),
-                transparent
-            );
+            background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
             animation: shimmer 1.4s infinite;
         }
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
-        }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-        /* ===== LOADING ===== */
         .loading { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 15px; }
         .loading span { display: inline-block; animation: pulse 1.2s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
@@ -717,9 +705,7 @@
             transition: color 0.3s ease;
             position: relative;
         }
-        .secret-trigger:hover {
-            color: var(--brass);
-        }
+        .secret-trigger:hover { color: var(--brass); }
         .secret-trigger::after {
             content: '🔑';
             font-size: 10px;
@@ -727,9 +713,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .secret-trigger:hover::after {
-            opacity: 1;
-        }
+        .secret-trigger:hover::after { opacity: 1; }
 
         /* ===== ADMIN PANEL ===== */
         .admin-section {
@@ -798,7 +782,6 @@
         .progress-bar .progress { height: 100%; background: var(--leaf-deep); width: 0%; transition: width 0.3s; }
         .admin-hidden { display: none !important; }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -814,7 +797,6 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-        /* ===== ADMIN USER BADGE ===== */
         .admin-badge {
             display: inline-block;
             background: var(--brass);
@@ -978,7 +960,7 @@
         <div class="wrap">
             <div class="eyebrow">Menu · <span id="openStatus">Buka Setiap Hari</span></div>
             <h1 class="brand">Flora<br><em>Coffee</em></h1>
-            <p class="tagline">Kopi seduh dari biji lokal pilihan, disajikan pelan-pelan di tengah taman kecil kami.</p>
+            <p class="tagline">Kopi, camilan, dan mie — semua tersedia di sini.</p>
             <div class="hero-meta">
                 <div><strong>11.00 – 23.00</strong><br>Senin–Minggu</div>
                 <div><strong>Kesugihan, Cilacap</strong><br>Dine-in & Takeaway</div>
@@ -1009,10 +991,10 @@
     <nav class="cats">
         <div class="wrap">
             <button type="button" class="cat-filter-btn active" data-filter="all">Semua</button>
-            <button type="button" class="cat-filter-btn" data-filter="kopi-klasik">Kopi Klasik</button>
-            <button type="button" class="cat-filter-btn" data-filter="signature">Signature</button>
-            <button type="button" class="cat-filter-btn" data-filter="non-kopi">Non-Kopi</button>
-            <button type="button" class="cat-filter-btn" data-filter="camilan">Camilan</button>
+            <button type="button" class="cat-filter-btn" data-filter="kopi-klasik">☕ Kopi</button>
+            <button type="button" class="cat-filter-btn" data-filter="non-kopi">🍵 Non Kopi</button>
+            <button type="button" class="cat-filter-btn" data-filter="camilan">🍽️ Camilan</button>
+            <button type="button" class="cat-filter-btn" data-filter="mie">🍜 Mie & Topping</button>
         </div>
     </nav>
 
@@ -1021,7 +1003,7 @@
         <div class="wrap">
             <div class="search-box">
                 <span class="icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Cari menu... (contoh: latte, croissant)" aria-label="Cari menu">
+                <input type="text" id="searchInput" placeholder="Cari menu... (contoh: kopi, yakult, indomie)" aria-label="Cari menu">
                 <button class="clear-btn" id="clearSearch">✕</button>
             </div>
         </div>
@@ -1068,25 +1050,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nama Menu *</label>
-                            <input type="text" id="inputName" placeholder="Espresso">
+                            <input type="text" id="inputName" placeholder="Contoh: Ice Rost Latte">
                         </div>
                         <div class="form-group">
                             <label>Harga (Rp) *</label>
-                            <input type="number" id="inputPrice" placeholder="18000">
+                            <input type="number" id="inputPrice" placeholder="7000">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Deskripsi</label>
-                        <textarea id="inputDesc" rows="2" placeholder="Single shot, pekat dan singkat."></textarea>
+                        <textarea id="inputDesc" rows="2" placeholder="Kopi dingin dengan rasa yang segar."></textarea>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Kategori</label>
                             <select id="inputCategory">
-                                <option value="kopi-klasik">☕ Kopi Klasik</option>
-                                <option value="signature">🌸 Signature</option>
-                                <option value="non-kopi">🍵 Non-Kopi</option>
-                                <option value="camilan">🥐 Camilan</option>
+                                <option value="kopi-klasik">☕ Kopi</option>
+                                <option value="non-kopi">🍵 Non Kopi</option>
+                                <option value="camilan">🍽️ Camilan</option>
+                                <option value="mie">🍜 Mie & Topping</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1105,7 +1087,7 @@
                         </div>
                         <div class="form-group">
                             <label>Harga Promo</label>
-                            <input type="number" id="inputPromo" placeholder="23000">
+                            <input type="number" id="inputPromo" placeholder="5000">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1315,7 +1297,7 @@
             });
 
             // ============================================
-            // 7b. STATUS BUKA/TUTUP (real-time, zona waktu Asia/Jakarta)
+            // 7b. STATUS BUKA/TUTUP
             // ============================================
             function updateOpenStatus() {
                 const el = document.getElementById('openStatus');
@@ -1414,7 +1396,7 @@
             });
 
             // ============================================
-            // 9. CART (localStorage)
+            // 9. CART
             // ============================================
             function saveCart() {
                 localStorage.setItem('flora-cart', JSON.stringify(cartData));
@@ -1465,25 +1447,72 @@
             // ============================================
             // 10. LOAD MENU
             // ============================================
-            const categories = ['kopi-klasik', 'signature', 'non-kopi', 'camilan'];
+            const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
             const categoryNames = {
-                'kopi-klasik': 'Kopi Klasik',
-                'signature': 'Signature',
-                'non-kopi': 'Non-Kopi',
-                'camilan': 'Camilan'
+                'kopi-klasik': '☕ Kopi',
+                'non-kopi': '🍵 Non Kopi',
+                'camilan': '🍽️ Camilan',
+                'mie': '🍜 Mie & Topping'
             };
             const categoryDescs = {
-                'kopi-klasik': 'Untuk yang suka rasa kopi apa adanya.',
-                'signature': 'Racikan khas Flora, tidak ada di tempat lain.',
-                'non-kopi': 'Untuk yang sedang menghindari kafein, atau memang tidak suka kopi.',
-                'camilan': 'Teman ngobrol sambil menunggu kopi diseduh.'
+                'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
+                'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
+                'camilan': 'Camilan gurih untuk mengisi perut.',
+                'mie': 'Mie instan dengan berbagai topping pilihan.'
             };
             const categoryIcons = {
                 'kopi-klasik': '☕',
-                'signature': '🌸',
                 'non-kopi': '🍵',
-                'camilan': '🥐'
+                'camilan': '🍽️',
+                'mie': '🍜'
             };
+
+            // ===== DATA MENU DEFAULT (18 Menu) =====
+            const defaultMenuData = [
+                // KOPI SERIES (3)
+                { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
+                    category: 'kopi-klasik', tag: '', image: '' },
+                { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
+                    category: 'kopi-klasik', tag: '', image: '' },
+                { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
+                    tag: '', image: '' },
+
+                // NON COFFEE SERIES (6)
+                { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
+                    image: '' },
+                { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
+                    category: 'non-kopi', tag: '', image: '' },
+                { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
+                    category: 'non-kopi', tag: '', image: '' },
+                { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
+                    category: 'non-kopi', tag: '', image: '' },
+                { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
+                    tag: '', image: '' },
+                { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
+                    category: 'non-kopi', tag: '', image: '' },
+
+                // CAMILAN (5)
+                { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
+                    category: 'camilan', tag: '', image: '' },
+                { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
+                    tag: '', image: '' },
+                { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
+                    tag: '', image: '' },
+                { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
+                    tag: '', image: '' },
+                { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
+                    tag: '', image: '' },
+
+                // MIE & TOPPING (4)
+                { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
+                    tag: '', image: '' },
+                { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
+                    category: 'mie', tag: '', image: '' },
+                { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
+                    tag: '', image: '' },
+                { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
+                    tag: '', image: '' }
+            ];
 
             function renderMenu(data) {
                 skeletonContainer.style.display = 'none';
@@ -1526,7 +1555,6 @@
 
                         const activePrice = item.promoPrice ? item.promoPrice : item.price;
                         itemDiv.setAttribute('data-price', activePrice);
-
                         itemDiv.setAttribute('data-id', item.id);
 
                         // Photo or placeholder
@@ -1707,7 +1735,8 @@
                                     "@type": "Offer",
                                     "price": String(item.promoPrice || item.price || 0),
                                     "priceCurrency": "IDR",
-                                    "availability": item.stock === 0 ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"
+                                    "availability": item.stock === 0 ? "https://schema.org/OutOfStock" :
+                                        "https://schema.org/InStock"
                                 }
                             }))
                     }));
@@ -1752,42 +1781,10 @@
             }
 
             function loadDefaultMenu() {
-                const defaultData = [
-                    { id: '1', name: 'Espresso', desc: 'Single shot, pekat dan singkat.', price: 18000, category: 'kopi-klasik',
-                        tag: '', image: '' },
-                    { id: '2', name: 'Americano', desc: 'Espresso dengan air panas, bisa juga dingin.', price: 20000,
-                        category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '3', name: 'Cappuccino', desc: 'Espresso, susu, dan busa tebal.', price: 25000,
-                        category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '4', name: 'Caffe Latte', desc: 'Lebih banyak susu, tekstur lembut.', price: 26000,
-                        category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '5', name: 'Kopi Susu Gula Aren', desc: 'Kopi hitam, susu segar, gula aren asli.', price: 24000,
-                        category: 'kopi-klasik', tag: '', image: '' },
-                    { id: '6', name: 'Flora Latte', desc: 'Bunga telang, vanila, dan espresso — berlapis biru ke krem.',
-                        price: 30000, category: 'signature', tag: 'Favorit', image: '' },
-                    { id: '7', name: 'Honey Oat Latte', desc: 'Susu oat, madu hutan, dua shot espresso.', price: 29000,
-                        category: 'signature', tag: '', image: '' },
-                    { id: '8', name: 'Aren Macchiato', desc: 'Foam susu manis di atas, kopi gula aren di bawah.', price: 28000,
-                        category: 'signature', tag: '', image: '' },
-                    { id: '9', name: 'Matcha Latte', desc: 'Matcha grade upacara, susu segar.', price: 27000,
-                        category: 'non-kopi', tag: '', image: '' },
-                    { id: '10', name: 'Taro Latte', desc: 'Manis, gurih, warna ungu lembut.', price: 26000,
-                        category: 'non-kopi', tag: '', image: '' },
-                    { id: '11', name: 'Coklat Susu', desc: 'Dark chocolate leleh dengan susu segar.', price: 25000,
-                        category: 'non-kopi', tag: '', image: '' },
-                    { id: '12', name: 'Lemon Tea', desc: 'Teh hitam, perasan lemon segar.', price: 20000,
-                        category: 'non-kopi', tag: '', image: '' },
-                    { id: '13', name: 'Croissant Butter', desc: 'Dipanggang setiap pagi, renyah di luar.', price: 22000,
-                        category: 'camilan', tag: '', image: '' },
-                    { id: '14', name: 'Banana Bread', desc: 'Lembab, dengan taburan kenari.', price: 20000,
-                        category: 'camilan', tag: '', image: '' },
-                    { id: '15', name: 'Cookies Dark Choco', desc: 'Renyah di pinggir, lumer di tengah.', price: 15000,
-                        category: 'camilan', tag: '', image: '' }
-                ];
-                defaultData.forEach(item => {
+                defaultMenuData.forEach(item => {
                     db.collection('menu').doc(item.id).set(item).catch(() => {});
                 });
-                renderMenu(defaultData);
+                renderMenu(defaultMenuData);
                 loadingState.style.display = 'none';
             }
 
@@ -1933,7 +1930,6 @@
                     const file = e.target.files[0];
                     if (!file) return;
 
-                    // Preview lokal
                     const reader = new FileReader();
                     reader.onload = function(ev) {
                         previewImage.src = ev.target.result;
@@ -1941,7 +1937,6 @@
                     };
                     reader.readAsDataURL(file);
 
-                    // Upload ke Cloudinary
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
