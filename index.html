@@ -3,17 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flora Coffee</title>
+    <title>Flora Coffee — Menu Kesugihan, Cilacap</title>
+    <meta name="description" content="Menu Flora Coffee: kopi seduh dari biji lokal pilihan di Kesugihan, Cilacap. Buka 11.00–23.00 setiap hari, dine-in & takeaway.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="restaurant.menu">
+    <meta property="og:site_name" content="Flora Coffee">
+    <meta property="og:title" content="Flora Coffee — Menu">
+    <meta property="og:description" content="Kopi seduh dari biji lokal pilihan, disajikan di Kesugihan, Cilacap. Buka 11.00–23.00 setiap hari.">
+    <meta property="og:image" content="https://menu-flora.vercel.app/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://menu-flora.vercel.app/">
+    <meta property="og:locale" content="id_ID">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Flora Coffee — Menu">
+    <meta name="twitter:description" content="Kopi seduh dari biji lokal pilihan, disajikan di Kesugihan, Cilacap.">
+    <meta name="twitter:image" content="https://menu-flora.vercel.app/og-image.png">
+
+    <!-- Structured Data (SEO) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CafeOrCoffeeShop",
+        "name": "Flora Coffee",
+        "image": "https://menu-flora.vercel.app/og-image.png",
+        "url": "https://menu-flora.vercel.app/",
+        "telephone": "+6285175012418",
+        "priceRange": "Rp15.000–Rp30.000",
+        "servesCuisine": "Coffee",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Kesugihan",
+            "addressRegion": "Cilacap, Jawa Tengah",
+            "addressCountry": "ID"
+        },
+        "openingHoursSpecification": [{
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+            "opens": "11:00",
+            "closes": "23:00"
+        }]
+    }
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Firebase SDK (defer = doesn't block first paint; order is preserved) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
 
@@ -364,7 +408,7 @@
             scrollbar-width: none;
         }
         nav.cats .wrap::-webkit-scrollbar { display: none; }
-        nav.cats a {
+        nav.cats .cat-filter-btn {
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
             letter-spacing: 0.06em;
@@ -377,8 +421,11 @@
             color: var(--leaf-mid);
             transition: all 0.2s ease;
             font-weight: 500;
+            cursor: pointer;
+            outline: none;
         }
-        nav.cats a:hover { background: var(--leaf-deep); color: var(--ivory); border-color: var(--leaf-deep); transform: translateY(-1px); }
+        nav.cats .cat-filter-btn:hover { background: var(--leaf-deep); color: var(--ivory); border-color: var(--leaf-deep); transform: translateY(-1px); }
+        nav.cats .cat-filter-btn.active { background: var(--brass); color: var(--leaf-deep); border-color: var(--brass); }
 
         /* ===== SEARCH ===== */
         .search-wrap {
@@ -459,7 +506,14 @@
 
         /* ===== CATEGORY ===== */
         main { padding: 8px 0 20px; }
-        section.category { margin-bottom: 56px; scroll-margin-top: 120px; }
+        section.category {
+            margin-bottom: 56px;
+            scroll-margin-top: 120px;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        section.category.revealed { opacity: 1; transform: translateY(0); }
         section.category.hidden { display: none; }
 
         .cat-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
@@ -478,7 +532,7 @@
         /* ===== ITEM ===== */
         .item {
             display: grid;
-            grid-template-columns: auto 1fr auto auto;
+            grid-template-columns: auto auto 1fr auto auto;
             gap: 2px 12px;
             padding: 18px 0;
             border-bottom: 1px solid var(--line);
@@ -494,6 +548,8 @@
 
         .item-checkbox {
             grid-column: 1;
+            grid-row: 1 / 3;
+            align-self: center;
             width: 18px;
             height: 18px;
             accent-color: var(--brass);
@@ -502,7 +558,9 @@
         }
         .item-checkbox:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .item-info { grid-column: 2; display: flex; flex-direction: column; }
+        .item-thumb { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+
+        .item-info { grid-column: 3; display: flex; flex-direction: column; }
         .item-name {
             font-family: 'Fraunces', serif;
             font-weight: 500;
@@ -527,6 +585,8 @@
         }
         .item-desc { font-size: 13.5px; color: var(--text-muted); margin-top: 2px; }
         .item-price {
+            grid-column: 4;
+            grid-row: 1;
             font-family: 'JetBrains Mono', monospace;
             font-size: 15px;
             font-weight: 500;
@@ -540,12 +600,20 @@
             height: 48px;
             border-radius: 12px;
             object-fit: cover;
-            grid-column: 1;
-            grid-row: 1 / 3;
-            align-self: center;
             display: none;
         }
         .item-image.show { display: block; }
+        .item-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--tag-bg);
+            border: 1px solid var(--line);
+        }
 
         .badge-promo { font-size: 10px; background: #e74c3c; color: white; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
         .badge-habis { font-size: 10px; background: #95a5a6; color: white; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
@@ -553,7 +621,8 @@
 
         /* ===== QUANTITY ===== */
         .qty-controls {
-            grid-column: 4;
+            grid-column: 5;
+            grid-row: 1;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -777,17 +846,27 @@
                 height: 18px;
             }
 
+            .item-thumb { grid-column: 2; grid-row: 1 / 3; align-self: center; margin-right: 4px; }
+
             .item-image {
-                grid-column: 2;
-                grid-row: 1 / 3;
                 width: 44px;
                 height: 44px;
                 border-radius: 10px;
                 object-fit: cover;
-                display: block;
-                margin-right: 4px;
+                display: none;
             }
             .item-image.show { display: block; }
+            .item-placeholder {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                background: var(--tag-bg);
+                border: 1px solid var(--line);
+            }
 
             .item-info {
                 grid-column: 3;
@@ -849,6 +928,7 @@
             }
             .item-checkbox { width: 16px; height: 16px; }
             .item-image { width: 36px; height: 36px; }
+            .item-placeholder { width: 36px; height: 36px; font-size: 16px; }
             .item-name { font-size: 14px; }
             .item-desc { font-size: 11px; }
             .item-price { font-size: 12px; }
@@ -865,17 +945,17 @@
 <body>
 
     <!-- DARK MODE TOGGLE -->
-    <button class="theme-toggle" id="themeToggle">🌙</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Ubah tema terang/gelap">🌙</button>
 
     <!-- FLOATING WHATSAPP -->
-    <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee" target="_blank" class="floating-wa" aria-label="Chat via WhatsApp">
+    <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee" target="_blank" rel="noopener" class="floating-wa" aria-label="Chat via WhatsApp">
         <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" fill="white">
             <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
         </svg>
     </a>
 
     <!-- SCROLL TO TOP -->
-    <button class="scroll-top" id="scrollTop">⬆</button>
+    <button class="scroll-top" id="scrollTop" aria-label="Kembali ke atas">⬆</button>
 
     <!-- ===== HERO ===== -->
     <header class="hero">
@@ -894,7 +974,7 @@
         </svg>
 
         <div class="wrap">
-            <div class="eyebrow">Menu · Buka Setiap Hari</div>
+            <div class="eyebrow">Menu · <span id="openStatus">Buka Setiap Hari</span></div>
             <h1 class="brand">Flora<br><em>Coffee</em></h1>
             <p class="tagline">Kopi seduh dari biji lokal pilihan, disajikan pelan-pelan di tengah taman kecil kami.</p>
             <div class="hero-meta">
@@ -902,13 +982,13 @@
                 <div><strong>Kesugihan, Cilacap</strong><br>Dine-in & Takeaway</div>
             </div>
             <div class="hero-buttons">
-                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" class="hero-btn hero-btn-wa">
+                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="hero-btn hero-btn-wa">
                     <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="16" height="16" fill="white">
                         <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
                     </svg>
                     Pesan via WhatsApp
                 </a>
-                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="hero-btn hero-btn-map">
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener" class="hero-btn hero-btn-map">
                     <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
                         <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
                         <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
@@ -916,6 +996,9 @@
                     </svg>
                     Lihat di Maps
                 </a>
+                <button type="button" id="shareBtn" class="hero-btn hero-btn-map">
+                    🔗 Bagikan Menu
+                </button>
             </div>
         </div>
     </header>
@@ -923,10 +1006,11 @@
     <!-- ===== NAV ===== -->
     <nav class="cats">
         <div class="wrap">
-            <a href="#kopi-klasik">Kopi Klasik</a>
-            <a href="#signature">Signature</a>
-            <a href="#non-kopi">Non-Kopi</a>
-            <a href="#camilan">Camilan</a>
+            <button type="button" class="cat-filter-btn active" data-filter="all">Semua</button>
+            <button type="button" class="cat-filter-btn" data-filter="kopi-klasik">Kopi Klasik</button>
+            <button type="button" class="cat-filter-btn" data-filter="signature">Signature</button>
+            <button type="button" class="cat-filter-btn" data-filter="non-kopi">Non-Kopi</button>
+            <button type="button" class="cat-filter-btn" data-filter="camilan">Camilan</button>
         </div>
     </nav>
 
@@ -935,7 +1019,7 @@
         <div class="wrap">
             <div class="search-box">
                 <span class="icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Cari menu... (contoh: latte, croissant)">
+                <input type="text" id="searchInput" placeholder="Cari menu... (contoh: latte, croissant)" aria-label="Cari menu">
                 <button class="clear-btn" id="clearSearch">✕</button>
             </div>
         </div>
@@ -1046,6 +1130,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                         <h3>📋 Semua Menu</h3>
                         <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
+                        <button class="btn btn-outline" id="backupBtn">⬇️ Backup JSON</button>
                     </div>
                     <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
                     <div class="menu-grid" id="adminMenuGrid"></div>
@@ -1062,7 +1147,7 @@
                 <div class="cart-total">Total: <span id="cartTotal">Rp0</span></div>
                 <div class="cart-detail" id="cartDetail">Belum ada pesanan</div>
             </div>
-            <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" class="btn btn-wa" id="orderBtn">
+            <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="btn btn-wa" id="orderBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="18" height="18" fill="white">
                     <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
                 </svg>
@@ -1077,13 +1162,13 @@
             <h3>Mau pesan?</h3>
             <p>Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.</p>
             <div class="footer-buttons">
-                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" class="btn btn-wa">
+                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="btn btn-wa">
                     <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="18" height="18" fill="white">
                         <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
                     </svg>
                     Pesan via WhatsApp
                 </a>
-                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
                     <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
                         <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
                         <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
@@ -1095,12 +1180,11 @@
             <div class="foot-note">
                 Flora Coffee —
                 <span class="secret-trigger" id="secretAdminTrigger">Kesugihan, Cilacap</span>
-                <span style="display:block;font-size:10px;opacity:0.3;margin-top:4px;">Klik lokasi untuk akses admin</span>
             </div>
         </div>
     </footer>
 
-    <script>
+    <script defer>
         (function() {
             'use strict';
 
@@ -1175,6 +1259,7 @@
             const saveBtn = document.getElementById('saveBtn');
             const cancelBtn = document.getElementById('cancelBtn');
             const newMenuBtn = document.getElementById('newMenuBtn');
+            const backupBtn = document.getElementById('backupBtn');
             const fileInput = document.getElementById('fileInput');
             const previewImage = document.getElementById('previewImage');
             const progressBar = document.getElementById('progressBar');
@@ -1232,44 +1317,97 @@
             });
 
             // ============================================
+            // 7b. STATUS BUKA/TUTUP (real-time, zona waktu Asia/Jakarta)
+            // ============================================
+            function updateOpenStatus() {
+                const el = document.getElementById('openStatus');
+                if (!el) return;
+                const jakartaHour = parseInt(
+                    new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false })
+                );
+                const isOpen = jakartaHour >= 11 && jakartaHour < 23;
+                el.textContent = isOpen ? '🟢 Buka Sekarang' : '🔴 Tutup — Buka lagi 11.00';
+            }
+            updateOpenStatus();
+            setInterval(updateOpenStatus, 60000);
+
+            // ============================================
+            // 7c. BAGIKAN MENU
+            // ============================================
+            const shareBtn = document.getElementById('shareBtn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', async function() {
+                    const shareData = {
+                        title: 'Flora Coffee — Menu',
+                        text: 'Cek menu Flora Coffee di sini!',
+                        url: window.location.href
+                    };
+                    if (navigator.share) {
+                        try { await navigator.share(shareData); } catch (e) { /* dibatalkan pengguna */ }
+                    } else if (navigator.clipboard) {
+                        try {
+                            await navigator.clipboard.writeText(shareData.url);
+                            showToast('🔗 Link menu disalin ke clipboard!');
+                        } catch (e) {
+                            alert('Gagal menyalin link. Salin manual dari address bar ya.');
+                        }
+                    }
+                });
+            }
+
+            // ============================================
             // 8. SEARCH
             // ============================================
+            let activeCategoryFilter = 'all';
+
             function filterMenu() {
                 const keyword = searchInput.value.toLowerCase().trim();
                 const items = document.querySelectorAll('.item');
                 const categories = document.querySelectorAll('.category');
                 const noResult = document.getElementById('noResult');
 
-                let hasVisible = false;
                 items.forEach(item => {
                     const name = item.getAttribute('data-name') || '';
                     const desc = item.getAttribute('data-desc') || '';
-                    const match = name.includes(keyword) || desc.includes(keyword);
-                    if (keyword === '') {
+                    const cat = item.getAttribute('data-category') || '';
+                    const matchKeyword = keyword === '' || name.includes(keyword) || desc.includes(keyword);
+                    const matchCategory = activeCategoryFilter === 'all' || cat === activeCategoryFilter;
+                    if (matchKeyword && matchCategory) {
                         item.classList.remove('hidden');
                     } else {
-                        if (match) {
-                            item.classList.remove('hidden');
-                            hasVisible = true;
-                        } else {
-                            item.classList.add('hidden');
-                        }
+                        item.classList.add('hidden');
                     }
                 });
 
                 categories.forEach(cat => {
+                    const matchCategory = activeCategoryFilter === 'all' || cat.id === activeCategoryFilter;
                     const visibleItems = cat.querySelectorAll('.item:not(.hidden)');
-                    if (visibleItems.length === 0 && keyword !== '') {
+                    if (!matchCategory || visibleItems.length === 0) {
                         cat.classList.add('hidden');
                     } else {
                         cat.classList.remove('hidden');
                     }
                 });
 
-                noResult.style.display = (keyword !== '' && document.querySelectorAll('.item:not(.hidden)').length === 0) ? 'block' :
-                'none';
+                // Dividers only make sense when browsing all categories at once
+                document.querySelectorAll('.divider').forEach(d => {
+                    d.style.display = (activeCategoryFilter === 'all') ? '' : 'none';
+                });
+
+                const anyVisible = document.querySelectorAll('.item:not(.hidden)').length > 0;
+                noResult.style.display = !anyVisible ? 'block' : 'none';
                 clearBtn.classList.toggle('show', keyword.length > 0);
             }
+
+            const catFilterBtns = document.querySelectorAll('.cat-filter-btn');
+            catFilterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    activeCategoryFilter = this.getAttribute('data-filter');
+                    catFilterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterMenu();
+                });
+            });
 
             searchInput.addEventListener('input', filterMenu);
             clearBtn.addEventListener('click', function() {
@@ -1303,7 +1441,7 @@
                     if (checkbox.checked && qty > 0) {
                         const subtotal = price * qty;
                         total += subtotal;
-                        orderList.push(`${name} x${qty} (Rp${(price * qty).toLocaleString()})`);
+                        orderList.push(`${name} x${qty} (Rp${(price * qty).toLocaleString('id-ID')})`);
                         hasOrder = true;
                         newCart[id] = { name, qty, price };
                     }
@@ -1314,12 +1452,12 @@
 
                 if (hasOrder) {
                     cartSummary.classList.add('show');
-                    cartTotal.textContent = 'Rp' + total.toLocaleString();
+                    cartTotal.textContent = 'Rp' + total.toLocaleString('id-ID');
                     cartDetail.textContent = orderList.join(' · ') || 'Belum ada pesanan';
                     const message = encodeURIComponent(
                         'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
                         orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
-                        '\n\nTotal: Rp' + total.toLocaleString()
+                        '\n\nTotal: Rp' + total.toLocaleString('id-ID')
                     );
                     orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
                 } else {
@@ -1342,6 +1480,12 @@
                 'signature': 'Racikan khas Flora, tidak ada di tempat lain.',
                 'non-kopi': 'Untuk yang sedang menghindari kafein, atau memang tidak suka kopi.',
                 'camilan': 'Teman ngobrol sambil menunggu kopi diseduh.'
+            };
+            const categoryIcons = {
+                'kopi-klasik': '☕',
+                'signature': '🌸',
+                'non-kopi': '🍵',
+                'camilan': '🥐'
             };
 
             function renderMenu(data) {
@@ -1381,20 +1525,32 @@
                         itemDiv.className = 'item';
                         itemDiv.setAttribute('data-name', item.name.toLowerCase());
                         itemDiv.setAttribute('data-desc', item.desc.toLowerCase());
+                        itemDiv.setAttribute('data-category', item.category || '');
 
                         const activePrice = item.promoPrice ? item.promoPrice : item.price;
                         itemDiv.setAttribute('data-price', activePrice);
 
                         itemDiv.setAttribute('data-id', item.id);
 
-                        // Image
-                        const img = document.createElement('img');
+                        // Photo (or a consistent placeholder icon when the item has no photo yet)
+                        const thumb = document.createElement('div');
+                        thumb.className = 'item-thumb';
                         const hasImage = item.image && item.image.trim() !== '';
-                        img.className = 'item-image' + (hasImage ? ' show' : '');
-                        img.src = hasImage ? item.image : '';
-                        if (hasImage) { img.alt = item.name;
-                            img.loading = 'lazy'; }
-                        itemDiv.appendChild(img);
+                        if (hasImage) {
+                            const img = document.createElement('img');
+                            img.className = 'item-image show';
+                            img.src = item.image;
+                            img.alt = item.name;
+                            img.loading = 'lazy';
+                            thumb.appendChild(img);
+                        } else {
+                            const placeholder = document.createElement('div');
+                            placeholder.className = 'item-placeholder';
+                            placeholder.textContent = categoryIcons[item.category] || '☕';
+                            placeholder.setAttribute('aria-hidden', 'true');
+                            thumb.appendChild(placeholder);
+                        }
+                        itemDiv.appendChild(thumb);
 
                         // Checkbox
                         const checkbox = document.createElement('input');
@@ -1443,13 +1599,13 @@
                         if (item.promoPrice) {
                             const original = document.createElement('span');
                             original.className = 'price-original';
-                            original.textContent = 'Rp' + Number(item.price).toLocaleString();
+                            original.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
                             priceSpan.appendChild(original);
                             const promoPrice = document.createElement('span');
-                            promoPrice.textContent = 'Rp' + Number(item.promoPrice).toLocaleString();
+                            promoPrice.textContent = 'Rp' + Number(item.promoPrice).toLocaleString('id-ID');
                             priceSpan.appendChild(promoPrice);
                         } else {
-                            priceSpan.textContent = 'Rp' + Number(item.price).toLocaleString();
+                            priceSpan.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
                         }
                         itemDiv.appendChild(priceSpan);
 
@@ -1531,6 +1687,70 @@
 
                 updateCart();
                 filterMenu();
+                setupScrollReveal();
+                updateMenuJsonLd(data);
+            }
+
+            // ============================================
+            // 9b. DYNAMIC MENU STRUCTURED DATA (SEO)
+            // ============================================
+            function updateMenuJsonLd(data) {
+                const sections = categories
+                    .filter(catKey => data.some(item => item.category === catKey))
+                    .map(catKey => ({
+                        "@type": "MenuSection",
+                        "name": categoryNames[catKey] || catKey,
+                        "hasMenuItem": data
+                            .filter(item => item.category === catKey)
+                            .map(item => ({
+                                "@type": "MenuItem",
+                                "name": item.name,
+                                "description": item.desc || undefined,
+                                "offers": {
+                                    "@type": "Offer",
+                                    "price": String(item.promoPrice || item.price || 0),
+                                    "priceCurrency": "IDR",
+                                    "availability": item.stock === 0 ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"
+                                }
+                            }))
+                    }));
+
+                const menuJsonLd = {
+                    "@context": "https://schema.org",
+                    "@type": "Menu",
+                    "name": "Menu Flora Coffee",
+                    "hasMenuSection": sections
+                };
+
+                let tag = document.getElementById('menu-jsonld');
+                if (!tag) {
+                    tag = document.createElement('script');
+                    tag.type = 'application/ld+json';
+                    tag.id = 'menu-jsonld';
+                    document.head.appendChild(tag);
+                }
+                tag.textContent = JSON.stringify(menuJsonLd);
+            }
+
+            // ============================================
+            // 10b. SCROLL REVEAL (fade-in as sections enter view)
+            // ============================================
+            let revealObserver = null;
+            function setupScrollReveal() {
+                if (!('IntersectionObserver' in window)) {
+                    document.querySelectorAll('.category').forEach(el => el.classList.add('revealed'));
+                    return;
+                }
+                if (revealObserver) revealObserver.disconnect();
+                revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                document.querySelectorAll('.category').forEach(el => revealObserver.observe(el));
             }
 
             function loadDefaultMenu() {
@@ -1618,14 +1838,15 @@
                     if (item.stock === 0) tags += `<span class="tag tag-habis">⛔ Habis</span>`;
                     if (item.promoPrice) tags += `<span class="tag tag-promo">🔥 Promo</span>`;
                     const priceDisplay = item.promoPrice ?
-                        `<span style="text-decoration:line-through;color:#95a5a6;">Rp${item.price.toLocaleString()}</span> Rp${item.promoPrice.toLocaleString()}` :
-                        `Rp${item.price.toLocaleString()}`;
+                        `<span style="text-decoration:line-through;color:#95a5a6;">Rp${item.price.toLocaleString('id-ID')}</span> Rp${item.promoPrice.toLocaleString('id-ID')}` :
+                        `Rp${item.price.toLocaleString('id-ID')}`;
                     div.innerHTML = `
                             <div class="name">${item.name} ${tags}</div>
                             <div style="font-size:14px;">${priceDisplay}</div>
                             <div style="font-size:12px;color:#7f8c8d;">📂 ${item.category} | 📦 Stok: ${item.stock ?? '∞'}</div>
                             ${item.image ? `<img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-top:4px;" />` : ''}
                             <div class="actions">
+                                <button class="btn btn-sm" style="background:${item.stock === 0 ? '#27ae60' : '#7f8c8d'};color:#fff;" onclick="toggleStockAdmin('${item.id}', ${item.stock ?? 10})">${item.stock === 0 ? '✅ Tersedia' : '⛔ Habis'}</button>
                                 <button class="btn btn-warning btn-sm" onclick="editMenuAdmin('${item.id}')">✏️</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteMenuAdmin('${item.id}')">🗑️</button>
                             </div>
@@ -1661,6 +1882,30 @@
                 }
             };
 
+            window.toggleStockAdmin = function(id, currentStock) {
+                const newStock = currentStock === 0 ? 10 : 0;
+                db.collection('menu').doc(id).update({ stock: newStock }).then(() => {
+                    showToast(newStock === 0 ? '⛔ Menu ditandai habis' : '✅ Menu tersedia lagi');
+                }).catch(err => alert('❌ Gagal update stok: ' + err.message));
+            };
+
+            window.backupMenuData = function() {
+                db.collection('menu').get().then(snapshot => {
+                    const data = [];
+                    snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'flora-menu-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                    showToast('✅ Backup berhasil diunduh!');
+                }).catch(err => alert('❌ Gagal backup: ' + err.message));
+            };
+
             function resetForm() {
                 editingId = null;
                 formTitle.textContent = '📝 Tambah Menu Baru';
@@ -1680,6 +1925,7 @@
 
             cancelBtn.addEventListener('click', resetForm);
             newMenuBtn.addEventListener('click', resetForm);
+            backupBtn.addEventListener('click', backupMenuData);
 
             // Upload Cloudinary
             fileInput.addEventListener('change', function(e) {
