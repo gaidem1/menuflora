@@ -98,6 +98,13 @@
             .hero-btn-map:hover {
                 background: rgba(255, 255, 255, 0.2) !important;
             }
+            /* Warna icon maps di dark mode */
+            .hero-btn-map svg .cls-1 {
+                fill: #ffffff !important;
+            }
+            .hero-btn-map svg .cls-2 {
+                fill: #ef4136 !important;
+            }
             .theme-toggle {
                 background: var(--brass);
                 color: var(--leaf-deep);
@@ -205,9 +212,9 @@
         /* ===== FLOATING WHATSAPP ===== */
         .floating-wa {
             position: fixed;
-            bottom: 88px;
+            bottom: 100px;
             right: 24px;
-            z-index: 98;
+            z-index: 99;
             background: #25D366;
             color: white;
             width: 56px;
@@ -230,6 +237,33 @@
             width: 28px;
             height: 28px;
         }
+
+        /* ===== SCROLL TOP ===== */
+        .scroll-top {
+            position: fixed;
+            bottom: 164px;
+            right: 24px;
+            z-index: 99;
+            background: var(--leaf-deep);
+            color: var(--ivory);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+        }
+        .scroll-top.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .scroll-top:hover { transform: translateY(-3px) scale(1.05); }
 
         /* ===== HERO ===== */
         header.hero {
@@ -627,29 +661,6 @@
             opacity: 1;
         }
 
-        /* ===== SCROLL TOP ===== */
-        .scroll-top {
-            position: fixed;
-            bottom: 88px;
-            right: 24px;
-            z-index: 99;
-            background: var(--leaf-deep);
-            color: var(--ivory);
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(12px);
-            pointer-events: none;
-        }
-        .scroll-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .scroll-top:hover { transform: translateY(-3px) scale(1.05); }
-
         /* ===== ADMIN PANEL ===== */
         .admin-section {
             margin-top: 32px;
@@ -815,7 +826,7 @@
             .theme-toggle { width: 44px; height: 44px; font-size: 20px; bottom: 16px; right: 16px; }
             .floating-wa { width: 48px; height: 48px; bottom: 76px; right: 16px; }
             .floating-wa svg { width: 24px; height: 24px; }
-            .scroll-top { bottom: 76px; right: 16px; width: 38px; height: 38px; font-size: 16px; }
+            .scroll-top { bottom: 132px; right: 16px; width: 38px; height: 38px; font-size: 16px; }
             .search-wrap { top: 44px; padding: 14px 0 8px; }
             .search-box { padding: 8px 16px; }
             .search-box input { font-size: 13px; }
@@ -897,7 +908,14 @@
                     </svg>
                     Pesan via WhatsApp
                 </a>
-                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="hero-btn hero-btn-map">📍 Lihat di Maps</a>
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="hero-btn hero-btn-map">
+                    <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
+                        <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
+                        <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
+                        <path class="cls-2" d="M70.19,82.78A69.18,69.18,0,0,1,55.08,95.29a2.14,2.14,0,0,1-2.43.07,85,85,0,0,1-21-18.76C24,67,19.13,56.34,17.48,46.07s-.11-20.42,5.07-28.56a35,35,0,0,1,7.83-8.68C37.68,3,46-.06,54.34,0A34.89,34.89,0,0,1,83.15,16.68c5.57,9.17,6.77,20.87,4.33,32.72A71.93,71.93,0,0,1,70.19,82.75v0ZM52.76,18.51A17.88,17.88,0,1,1,34.88,36.38,17.87,17.87,0,0,1,52.76,18.51Z"/>
+                    </svg>
+                    Lihat di Maps
+                </a>
             </div>
         </div>
     </header>
@@ -1065,7 +1083,14 @@
                     </svg>
                     Pesan via WhatsApp
                 </a>
-                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);">📍 Lihat di Maps</a>
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
+                    <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
+                        <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
+                        <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
+                        <path class="cls-2" d="M70.19,82.78A69.18,69.18,0,0,1,55.08,95.29a2.14,2.14,0,0,1-2.43.07,85,85,0,0,1-21-18.76C24,67,19.13,56.34,17.48,46.07s-.11-20.42,5.07-28.56a35,35,0,0,1,7.83-8.68C37.68,3,46-.06,54.34,0A34.89,34.89,0,0,1,83.15,16.68c5.57,9.17,6.77,20.87,4.33,32.72A71.93,71.93,0,0,1,70.19,82.75v0ZM52.76,18.51A17.88,17.88,0,1,1,34.88,36.38,17.87,17.87,0,0,1,52.76,18.51Z"/>
+                    </svg>
+                    Lihat di Maps
+                </a>
             </div>
             <div class="foot-note">
                 Flora Coffee —
