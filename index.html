@@ -1,443 +1,1183 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Flora Coffee</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora Coffee — Menu</title>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, sans-serif; background: #f6f2e9; color: #1e2a1e; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; background: #2a4230; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,66,48,0.3); }
-        .btn-danger { background: #c0392b; }
-        .btn-danger:hover { box-shadow: 0 4px 12px rgba(192,57,43,0.3); }
-        .btn-warning { background: #f39c12; }
-        .btn-warning:hover { box-shadow: 0 4px 12px rgba(243,156,18,0.3); }
-        .btn-outline { background: transparent; border: 2px solid #2a4230; color: #2a4230; }
-        .btn-outline:hover { background: #2a4230; color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 16px; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .menu-item { background: white; padding: 16px; border-radius: 12px; border: 1px solid #e0dcd3; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s; }
-        .menu-item:hover { border-color: #b58d4a; }
-        .menu-item .name { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .menu-item .price { color: #4f3422; font-weight: 500; }
-        .menu-item .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-        .menu-item .actions button { flex: 1; padding: 6px 12px; font-size: 12px; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-weight: 500; margin-bottom: 4px; font-size: 14px; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; transition: border 0.2s; }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #b58d4a; outline: none; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .tag { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
-        .tag-favorit { background: #f1c40f; color: #1e2a1e; }
-        .tag-promo { background: #e74c3c; color: white; }
-        .tag-habis { background: #95a5a6; color: white; }
-        .hidden { display: none !important; }
-        #loginSection { text-align: center; padding: 60px 0; }
-        #loginSection .btn { font-size: 18px; padding: 14px 40px; }
-        .upload-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-top: 8px; border: 2px solid #ddd; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2a4230; color: white; padding: 12px 24px; border-radius: 100px; font-family: system-ui; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 999; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
-        .loading { text-align: center; padding: 40px 0; color: #5b6356; }
-        .user-email { font-size: 14px; color: #5b6356; }
-        .progress-bar { width: 100%; height: 4px; background: #eee; border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .progress-bar .progress { height: 100%; background: #2a4230; width: 0%; transition: width 0.3s; }
-        .menu-image-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-top: 4px; }
-        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .menu-grid { grid-template-columns: 1fr; } }
-    </style>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+
+  <style>
+    /* ----- ROOT (LIGHT MODE) ----- */
+    :root {
+      --ink: #1e2a1e;
+      --ivory: #f6f2e9;
+      --leaf-deep: #2a4230;
+      --leaf-mid: #54745a;
+      --brass: #b58d4a;
+      --gold-light: #dabf7a;
+      --coffee-brown: #4f3422;
+      --line: rgba(30, 42, 30, 0.12);
+      --card: #fffcf7;
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
+      --bg-body: #f6f2e9;
+      --bg-nav: rgba(246, 242, 233, 0.92);
+      --text-muted: #5b6356;
+      --tag-bg: rgba(181, 141, 74, 0.1);
+      --price-bg: rgba(79, 52, 34, 0.04);
+      --search-bg: #ffffff;
+      --search-border: rgba(30, 42, 30, 0.12);
+      --search-text: #1e2a1e;
+      --toggle-bg: #2a4230;
+      --toggle-dot: #f6f2e9;
+      --cart-bg: #ffffff;
+      --cart-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* ----- DARK MODE ----- */
+    [data-theme="dark"] {
+      --ink: #e8e4da;
+      --ivory: #1e2a1e;
+      --leaf-deep: #1a2a1e;
+      --leaf-mid: #8aa88e;
+      --brass: #dabf7a;
+      --gold-light: #b58d4a;
+      --coffee-brown: #d4b8a0;
+      --line: rgba(232, 228, 218, 0.12);
+      --card: #2a3a2e;
+      --bg-body: #1a2a1e;
+      --bg-nav: rgba(26, 42, 30, 0.92);
+      --text-muted: #a8b8a4;
+      --tag-bg: rgba(218, 191, 122, 0.15);
+      --price-bg: rgba(212, 184, 160, 0.08);
+      --search-bg: #2a3a2e;
+      --search-border: rgba(232, 228, 218, 0.15);
+      --search-text: #e8e4da;
+      --toggle-bg: #b58d4a;
+      --toggle-dot: #1e2a1e;
+      --cart-bg: #2a3a2e;
+      --cart-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-body);
+      color: var(--ink);
+      font-family: 'Work Sans', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(30, 42, 30, 0.03) 1px, transparent 1px);
+      background-size: 4px 4px;
+      z-index: 0;
+    }
+
+    [data-theme="dark"] body::before {
+      background-image: radial-gradient(rgba(232, 228, 218, 0.03) 1px, transparent 1px);
+    }
+
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ----- DARK MODE TOGGLE ----- */
+    .theme-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      background: var(--toggle-bg);
+      color: var(--toggle-dot);
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover { transform: scale(1.1) rotate(12deg); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+    .theme-toggle:active { transform: scale(0.92); }
+
+    /* ----- HERO ----- */
+    header.hero {
+      background: var(--leaf-deep);
+      color: var(--ivory);
+      position: relative;
+      overflow: hidden;
+      padding: 72px 0 60px;
+      border-bottom: 4px solid var(--brass);
+      transition: background 0.3s ease;
+    }
+
+    header.hero .branch {
+      position: absolute;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    header.hero .branch.tl { top: -20px; left: -40px; width: 200px; transform: rotate(-10deg); }
+    header.hero .branch.br { bottom: -30px; right: -50px; width: 240px; transform: rotate(170deg); }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--gold-light); display: inline-block; }
+
+    h1.brand {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: clamp(48px, 10vw, 80px);
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+    }
+    h1.brand em { font-style: italic; font-weight: 400; color: var(--brass); }
+
+    .tagline { margin-top: 18px; max-width: 38ch; font-size: 16px; color: rgba(247,243,233,0.8); }
+
+    .hero-meta {
+      margin-top: 34px;
+      display: flex;
+      gap: 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: rgba(247,243,233,0.6);
+      flex-wrap: wrap;
+    }
+    .hero-meta strong { color: var(--ivory); font-weight: 500; }
+
+    .hero-buttons {
+      margin-top: 28px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .hero-btn-wa { background: #25D366; color: #fff; }
+    .hero-btn-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.35); }
+    .hero-btn-map { background: rgba(255,255,255,0.15); color: var(--ivory); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); }
+    .hero-btn-map:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .hero-btn:active { transform: scale(0.95); }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 15px; }
+    .loading span { display: inline-block; animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* ----- NAV ----- */
+    nav.cats {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg-nav);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      transition: background 0.3s ease;
+    }
+    nav.cats .wrap {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 14px 28px;
+      scrollbar-width: none;
+    }
+    nav.cats .wrap::-webkit-scrollbar { display: none; }
+    nav.cats a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      color: var(--leaf-mid);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    nav.cats a:hover,
+    nav.cats a:focus { background: var(--leaf-deep); color: var(--ivory); border-color: var(--leaf-deep); transform: translateY(-1px); }
+    nav.cats a:active { transform: scale(0.97); }
+
+    /* ----- SEARCH ----- */
+    .search-wrap {
+      padding: 20px 0 12px;
+      position: sticky;
+      top: 52px;
+      z-index: 9;
+      background: var(--bg-body);
+      transition: background 0.3s ease;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--search-bg);
+      border: 1.5px solid var(--search-border);
+      border-radius: 100px;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus-within { border-color: var(--brass); box-shadow: 0 0 0 4px rgba(181,141,74,0.15); }
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 14px;
+      color: var(--search-text);
+    }
+    .search-box input::placeholder { color: var(--text-muted); opacity: 0.6; }
+    .search-box .icon { font-size: 18px; opacity: 0.5; color: var(--ink); }
+    .search-box .clear-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 0 4px;
+      display: none;
+    }
+    .search-box .clear-btn.show { display: block; }
+    .search-box .clear-btn:hover { color: var(--ink); }
+
+    /* ----- MAIN ----- */
+    main { padding: 8px 0 20px; }
+
+    section.category { margin-bottom: 56px; scroll-margin-top: 120px; }
+    section.category.hidden { display: none; }
+
+    .cat-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
+    .cat-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--brass); font-weight: 500; }
+    .cat-head h2 {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 30px;
+      color: var(--leaf-deep);
+      letter-spacing: -0.01em;
+      transition: color 0.3s ease;
+    }
+    [data-theme="dark"] .cat-head h2 { color: var(--gold-light); }
+    .cat-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; padding-left: 40px; }
+
+    /* ----- ITEM ----- */
+    .item {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 2px 12px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+      transition: background 0.15s ease, opacity 0.3s ease;
+      border-radius: 8px;
+      padding-left: 8px;
+      padding-right: 8px;
+      cursor: default;
+    }
+    .item.hidden { display: none; }
+    .item:hover { background: rgba(255,255,255,0.15); }
+    .item:last-child { border-bottom: none; }
+
+    .item-checkbox {
+      grid-column: 1;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--brass);
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    .item-checkbox:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .item-info { grid-column: 2; display: flex; flex-direction: column; }
+    .item-name {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 19px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .item-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brass);
+      background: var(--tag-bg);
+      border: 1px solid var(--brass);
+      border-radius: 100px;
+      padding: 2px 10px;
+    }
+    .item-desc { font-size: 13.5px; color: var(--text-muted); margin-top: 2px; }
+    .item-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--coffee-brown);
+      background: var(--price-bg);
+      padding: 2px 12px;
+      border-radius: 100px;
+      transition: color 0.3s ease, background 0.3s ease;
+    }
+
+    .item-image {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: cover;
+      grid-column: 1;
+      grid-row: 1 / 3;
+      align-self: center;
+      display: none;
+    }
+    .item-image.show { display: block; }
+
+    /* Badge */
+    .badge-promo {
+      font-size: 10px;
+      background: #e74c3c;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-weight: 600;
+    }
+    .badge-habis {
+      font-size: 10px;
+      background: #95a5a6;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-weight: 600;
+    }
+    .price-original { text-decoration: line-through; color: #95a5a6; font-size: 13px; margin-right: 6px; }
+
+    /* ----- QUANTITY ----- */
+    .qty-controls {
+      grid-column: 4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--search-bg);
+      border-radius: 100px;
+      padding: 2px 4px;
+      border: 1px solid var(--search-border);
+    }
+    .qty-controls button {
+      width: 28px; height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: var(--leaf-deep);
+      color: var(--ivory);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-controls button:hover:not(:disabled) { transform: scale(1.08); background: var(--brass); }
+    .qty-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .qty-controls button:active:not(:disabled) { transform: scale(0.92); }
+    .qty-controls .qty-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      min-width: 24px;
+      text-align: center;
+      color: var(--ink);
+    }
+    .qty-controls .qty-value.zero { opacity: 0.3; }
+
+    /* ----- CART ----- */
+    .cart-summary {
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      background: var(--cart-bg);
+      border-top: 2px solid var(--brass);
+      padding: 16px 0;
+      box-shadow: var(--cart-shadow);
+      transition: background 0.3s ease;
+      display: none;
+    }
+    .cart-summary.show { display: block; }
+    .cart-summary .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .cart-total { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; }
+    .cart-total span { color: var(--brass); }
+    .cart-detail { font-size: 13px; color: var(--text-muted); }
+    .cart-summary .hero-btn-wa { font-size: 13px; padding: 12px 24px; }
+
+    /* ----- DIVIDER ----- */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 48px 0 40px;
+      color: var(--leaf-mid);
+    }
+    .divider svg { flex-shrink: 0; width: 36px; height: 22px; }
+    .divider .line { flex: 1; height: 1.5px; background: var(--line); }
+
+    /* ----- FOOTER ----- */
+    footer {
+      background: var(--leaf-deep);
+      color: var(--ivory);
+      padding: 56px 0 44px;
+      margin-top: 24px;
+      border-top: 4px solid var(--brass);
+      transition: background 0.3s ease;
+    }
+    footer h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; margin-bottom: 8px; }
+    footer p { font-size: 14px; color: rgba(247,243,233,0.75); max-width: 42ch; margin-bottom: 24px; }
+    .footer-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .wa-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(37,211,102,0.3); }
+    .wa-btn:active { transform: scale(0.97); }
+    .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.12);
+      color: var(--ivory);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+    }
+    .map-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    .map-btn:active { transform: scale(0.97); }
+    .foot-note { margin-top: 32px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(247,243,233,0.4); }
+
+    /* Scroll top */
+    .scroll-top {
+      position: fixed;
+      bottom: 88px;
+      right: 24px;
+      z-index: 99;
+      background: var(--leaf-deep);
+      color: var(--ivory);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+    }
+    .scroll-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .scroll-top:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .scroll-top:active { transform: scale(0.92); }
+
+    /* ----- RESPONSIVE ----- */
+    @media (max-width: 600px) {
+      .wrap { padding: 0 18px; }
+      .cat-desc { padding-left: 0; }
+      .item {
+        grid-template-columns: auto 1fr auto;
+        gap: 2px 8px;
+        padding: 14px 4px;
+      }
+      .item-checkbox { grid-row: 1 / 3; align-self: center; }
+      .item-info { grid-column: 2; }
+      .item-price { grid-column: 3; grid-row: 1; font-size: 13px; padding: 0 8px; }
+      .qty-controls { grid-column: 3; grid-row: 2; justify-self: end; }
+      .qty-controls button { width: 24px; height: 24px; font-size: 14px; }
+      .qty-controls .qty-value { font-size: 12px; min-width: 20px; }
+      .item-image { width: 40px; height: 40px; grid-row: 1 / 4; }
+      nav.cats .wrap { padding: 12px 18px; }
+      header.hero { padding: 48px 0 40px; }
+      .hero-meta { gap: 18px; font-size: 11px; }
+      .theme-toggle { width: 44px; height: 44px; font-size: 20px; bottom: 16px; right: 16px; }
+      .scroll-top { bottom: 76px; right: 16px; width: 38px; height: 38px; font-size: 16px; }
+      .search-wrap { top: 44px; padding: 14px 0 8px; }
+      .search-box { padding: 8px 16px; }
+      .search-box input { font-size: 13px; }
+      .hero-buttons { gap: 8px; }
+      .hero-btn { font-size: 11px; padding: 8px 16px; }
+      .cart-summary .wrap { flex-direction: column; align-items: stretch; gap: 8px; }
+      .cart-summary .hero-btn-wa { justify-content: center; }
+    }
+
+    @media (max-width: 400px) {
+      .item {
+        grid-template-columns: auto 1fr;
+        gap: 2px 6px;
+      }
+      .item-price { grid-column: 2; grid-row: 2; justify-self: start; }
+      .qty-controls { grid-column: 2; grid-row: 3; justify-self: start; }
+      .item-checkbox { grid-row: 1 / 4; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
 </head>
 <body>
-<div class="container" id="app">
-    <header>
-        <h1>☕ Admin Flora Coffee</h1>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <span class="user-email" id="userEmail"></span>
-            <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
-        </div>
-    </header>
 
-    <!-- Login Section -->
-    <div id="loginSection">
-        <h2>🔐 Login Admin</h2>
-        <p style="margin: 12px 0 24px; color: #5b6356;">Gunakan akun Google untuk mengelola menu Flora Coffee</p>
-        <button class="btn" id="loginBtn">🔑 Login dengan Google</button>
+  <!-- DARK MODE TOGGLE -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+
+  <!-- SCROLL TO TOP -->
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">⬆</button>
+
+  <header class="hero">
+    <svg class="branch tl" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4" />
+      <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2" />
+      <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.6" />
+      <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.6" />
+      <ellipse cx="40" cy="150" rx="9" ry="4.5" transform="rotate(-50 40 150)" fill="#f7f3e9" opacity="0.5" />
+    </svg>
+    <svg class="branch br" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4" />
+      <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2" />
+      <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.5" />
+      <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.5" />
+    </svg>
+
+    <div class="wrap">
+      <div class="eyebrow">Menu · Buka Setiap Hari</div>
+      <h1 class="brand">Flora<br /><em>Coffee</em></h1>
+      <p class="tagline">Kopi seduh dari biji lokal pilihan, disajikan pelan-pelan di tengah taman kecil kami.</p>
+      <div class="hero-meta">
+        <div><strong>11.00 – 23.00</strong><br />Senin–Minggu</div>
+        <div><strong>Kesugihan, Cilacap</strong><br />Dine-in & Takeaway</div>
+      </div>
+      <div class="hero-buttons">
+        <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="hero-btn hero-btn-wa">💬 Pesan via WhatsApp</a>
+        <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener" class="hero-btn hero-btn-map">📍 Lihat di Maps</a>
+      </div>
     </div>
+  </header>
 
-    <!-- Admin Content -->
-    <div id="adminContent" class="hidden">
-        <!-- Form Tambah/Edit -->
-        <div class="card" id="formCard">
-            <h3 id="formTitle" style="margin-bottom:16px;">📝 Tambah Menu Baru</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Nama Menu *</label>
-                    <input type="text" id="inputName" placeholder="Contoh: Espresso" />
-                </div>
-                <div class="form-group">
-                    <label>Harga (Rp) *</label>
-                    <input type="number" id="inputPrice" placeholder="18000" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea id="inputDesc" rows="2" placeholder="Single shot, pekat dan singkat."></textarea>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Kategori</label>
-                    <select id="inputCategory">
-                        <option value="kopi-klasik">☕ Kopi Klasik</option>
-                        <option value="signature">🌸 Signature</option>
-                        <option value="non-kopi">🍵 Non-Kopi</option>
-                        <option value="camilan">🥐 Camilan</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Tag (opsional)</label>
-                    <select id="inputTag">
-                        <option value="">Tidak ada</option>
-                        <option value="Favorit">⭐ Favorit</option>
-                        <option value="Promo">🔥 Promo</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Stok (0 = Habis)</label>
-                    <input type="number" id="inputStock" placeholder="10" value="10" />
-                </div>
-                <div class="form-group">
-                    <label>Harga Promo (kosongkan jika tidak ada)</label>
-                    <input type="number" id="inputPromo" placeholder="23000" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label>URL Gambar (atau upload di bawah)</label>
-                <input type="text" id="inputImage" placeholder="https://..." />
-            </div>
-            <div class="form-group">
-                <label>📤 Upload Gambar (Cloudinary)</label>
-                <input type="file" id="fileInput" accept="image/*" />
-                <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
-                <img id="previewImage" class="upload-preview hidden" />
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="btn" id="saveBtn">💾 Simpan Menu</button>
-                <button class="btn btn-outline" id="cancelBtn">Batal</button>
-            </div>
-        </div>
-
-        <!-- Daftar Menu -->
-        <div id="menuList">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-                <h3>📋 Semua Menu</h3>
-                <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
-            </div>
-            <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
-            <div class="menu-grid" id="menuGrid"></div>
-        </div>
+  <nav class="cats">
+    <div class="wrap">
+      <a href="#kopi-klasik">Kopi Klasik</a>
+      <a href="#signature">Signature</a>
+      <a href="#non-kopi">Non-Kopi</a>
+      <a href="#camilan">Camilan</a>
     </div>
-</div>
+  </nav>
 
-<script>
-    // ============================================
-    // FIREBASE KONFIGURASI
-    // ============================================
-    const firebaseConfig = {
+  <!-- SEARCH BAR -->
+  <div class="search-wrap">
+    <div class="wrap">
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Cari menu... (contoh: latte, croissant)" />
+        <button class="clear-btn" id="clearSearch">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <!-- LOADING STATE -->
+    <div class="loading" id="loadingState"><span>☕</span><br />Memuat menu...</div>
+
+    <!-- NO RESULT -->
+    <div class="no-result" id="noResult" style="display:none;"><span>🔍</span> Menu tidak ditemukan. Coba kata kunci lain!</div>
+
+    <!-- MENU CONTAINER -->
+    <div id="menuContainer"></div>
+
+  </main>
+
+  <!-- CART / ORDER SUMMARY -->
+  <div class="cart-summary" id="cartSummary">
+    <div class="wrap">
+      <div>
+        <div class="cart-total">Total: <span id="cartTotal">Rp0</span></div>
+        <div class="cart-detail" id="cartDetail">Belum ada pesanan</div>
+      </div>
+      <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="hero-btn hero-btn-wa" id="orderBtn">🛒 Pesan Sekarang</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <h3>Mau pesan?</h3>
+      <p>Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.</p>
+      <div class="footer-buttons">
+        <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="wa-btn">💬 Pesan via WhatsApp</a>
+        <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener" class="map-btn">📍 Lihat di Maps</a>
+      </div>
+      <div class="foot-note">Flora Coffee — Kesugihan, Cilacap</div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================
+      // 1. FIREBASE KONFIGURASI
+      // ============================================
+      const firebaseConfig = {
         apiKey: "AIzaSyB-0wDqKOm1bZphQ4Qglmto6O3hsvduZoA",
         authDomain: "menuflora-5d08a.firebaseapp.com",
         projectId: "menuflora-5d08a",
         storageBucket: "menuflora-5d08a.firebasestorage.app",
         messagingSenderId: "219274188593",
         appId: "1:219274188593:web:c25a9599b0ab3a88e64210"
-    };
+      };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-    // ============================================
-    // CLOUDINARY KONFIGURASI (GANTI DENGAN MILIKMU)
-    // ============================================
-    const CLOUDINARY = {
-        cloudName: 'vmny1hra',          // Ganti dengan Cloud Name kamu
-        uploadPreset: 'flora-menu'      // Ganti dengan Upload Preset kamu
-    };
+      // ============================================
+      // 2. DARK MODE
+      // ============================================
+      const themeToggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
 
-    // ============================================
-    // STATE
-    // ============================================
-    let editingId = null;
+      const savedTheme = localStorage.getItem('flora-theme');
+      if (savedTheme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '☀️';
+      }
 
-    // DOM Elements
-    const loginSection = document.getElementById('loginSection');
-    const adminContent = document.getElementById('adminContent');
-    const userEmail = document.getElementById('userEmail');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const menuGrid = document.getElementById('menuGrid');
-    const loadingMenu = document.getElementById('loadingMenu');
-    const formCard = document.getElementById('formCard');
-    const formTitle = document.getElementById('formTitle');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const newMenuBtn = document.getElementById('newMenuBtn');
-    const fileInput = document.getElementById('fileInput');
-    const previewImage = document.getElementById('previewImage');
-    const progressBar = document.getElementById('progressBar');
-    const inputName = document.getElementById('inputName');
-    const inputPrice = document.getElementById('inputPrice');
-    const inputDesc = document.getElementById('inputDesc');
-    const inputCategory = document.getElementById('inputCategory');
-    const inputTag = document.getElementById('inputTag');
-    const inputStock = document.getElementById('inputStock');
-    const inputPromo = document.getElementById('inputPromo');
-    const inputImage = document.getElementById('inputImage');
-
-    // ============================================
-    // AUTHENTICATION
-    // ============================================
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            loginSection.classList.add('hidden');
-            adminContent.classList.remove('hidden');
-            userEmail.textContent = user.email;
-            loadMenu();
+      themeToggle.addEventListener('click', function() {
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('flora-theme', 'light');
+          themeToggle.textContent = '🌙';
         } else {
-            loginSection.classList.remove('hidden');
-            adminContent.classList.add('hidden');
-            userEmail.textContent = '';
-            menuGrid.innerHTML = '';
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('flora-theme', 'dark');
+          themeToggle.textContent = '☀️';
         }
-    });
+      });
 
-    loginBtn.addEventListener('click', () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(err => {
-            alert('❌ Login gagal: ' + err.message);
-        });
-    });
+      // ============================================
+      // 3. SEARCH
+      // ============================================
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearch');
 
-    logoutBtn.addEventListener('click', () => auth.signOut());
+      function filterMenu() {
+        const keyword = searchInput.value.toLowerCase().trim();
+        const items = document.querySelectorAll('.item');
+        const categories = document.querySelectorAll('.category');
+        const noResult = document.getElementById('noResult');
 
-    // ============================================
-    // LOAD MENU (REALTIME)
-    // ============================================
-    function loadMenu() {
-        loadingMenu.classList.remove('hidden');
-        db.collection('menu').orderBy('name').onSnapshot(snapshot => {
-            loadingMenu.classList.add('hidden');
-            menuGrid.innerHTML = '';
-            if (snapshot.empty) {
-                menuGrid.innerHTML = '<p style="text-align:center;color:#95a5a6;padding:40px;">Belum ada menu. Tambahkan sekarang!</p>';
-                return;
-            }
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const div = document.createElement('div');
-                div.className = 'menu-item';
+        let hasVisible = false;
 
-                let tags = '';
-                if (data.tag) tags += `<span class="tag tag-${data.tag === 'Favorit' ? 'favorit' : 'promo'}">${data.tag}</span>`;
-                if (data.stock === 0) tags += `<span class="tag tag-habis">⛔ Habis</span>`;
-                if (data.promoPrice) tags += `<span class="tag tag-promo">🔥 Promo</span>`;
+        items.forEach(item => {
+          const name = item.getAttribute('data-name') || '';
+          const desc = item.getAttribute('data-desc') || '';
+          const match = name.includes(keyword) || desc.includes(keyword);
 
-                const priceDisplay = data.promoPrice ?
-                    `<span style="text-decoration:line-through;color:#95a5a6;font-size:13px;">Rp${data.price.toLocaleString()}</span> <strong>Rp${data.promoPrice.toLocaleString()}</strong>` :
-                    `Rp${data.price.toLocaleString()}`;
-
-                div.innerHTML = `
-                    <div class="name">${data.name} ${tags}</div>
-                    <div class="price">${priceDisplay}</div>
-                    <div style="font-size:13px;color:#5b6356;">${data.desc || ''}</div>
-                    <div style="font-size:12px;color:#7f8c8d;">📂 ${data.category} | 📦 Stok: ${data.stock ?? '∞'}</div>
-                    ${data.image ? `<img src="${data.image}" class="menu-image-preview" />` : ''}
-                    <div class="actions">
-                        <button class="btn btn-warning btn-sm" onclick="editMenu('${doc.id}')">✏️ Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMenu('${doc.id}')">🗑️ Hapus</button>
-                    </div>
-                `;
-                menuGrid.appendChild(div);
-            });
-        }, error => {
-            loadingMenu.classList.add('hidden');
-            console.error('Error:', error);
-            menuGrid.innerHTML = '<p style="text-align:center;color:#e74c3c;padding:20px;">❌ Gagal memuat menu: ' + error.message + '</p>';
-        });
-    }
-
-    // ============================================
-    // EDIT MENU
-    // ============================================
-    window.editMenu = function(id) {
-        db.collection('menu').doc(id).get().then(doc => {
-            if (!doc.exists) return;
-            const data = doc.data();
-            editingId = id;
-            formTitle.textContent = '✏️ Edit Menu';
-            inputName.value = data.name || '';
-            inputPrice.value = data.price || '';
-            inputDesc.value = data.desc || '';
-            inputCategory.value = data.category || 'kopi-klasik';
-            inputTag.value = data.tag || '';
-            inputStock.value = data.stock ?? 10;
-            inputPromo.value = data.promoPrice || '';
-            inputImage.value = data.image || '';
-            saveBtn.textContent = '💾 Update Menu';
-            formCard.scrollIntoView({ behavior: 'smooth' });
-        });
-    };
-
-    // ============================================
-    // DELETE MENU
-    // ============================================
-    window.deleteMenu = function(id) {
-        if (confirm('⚠️ Yakin hapus menu ini?')) {
-            db.collection('menu').doc(id).delete().then(() => {
-                showToast('✅ Menu dihapus!');
-            }).catch(err => alert('❌ Gagal hapus: ' + err.message));
-        }
-    };
-
-    // ============================================
-    // RESET FORM
-    // ============================================
-    function resetForm() {
-        editingId = null;
-        formTitle.textContent = '📝 Tambah Menu Baru';
-        inputName.value = '';
-        inputPrice.value = '';
-        inputDesc.value = '';
-        inputCategory.value = 'kopi-klasik';
-        inputTag.value = '';
-        inputStock.value = '10';
-        inputPromo.value = '';
-        inputImage.value = '';
-        fileInput.value = '';
-        previewImage.classList.add('hidden');
-        progressBar.style.width = '0%';
-        saveBtn.textContent = '💾 Simpan Menu';
-    }
-
-    cancelBtn.addEventListener('click', resetForm);
-    newMenuBtn.addEventListener('click', resetForm);
-
-    // ============================================
-    // UPLOAD GAMBAR KE CLOUDINARY
-    // ============================================
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Preview
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            previewImage.src = ev.target.result;
-            previewImage.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-
-        // Upload ke Cloudinary
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', CLOUDINARY.uploadPreset);
-        formData.append('folder', 'menu-images');
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, true);
-
-        xhr.upload.addEventListener('progress', function(e) {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                progressBar.style.width = percent + '%';
-            }
-        });
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                inputImage.value = response.secure_url;
-                showToast('✅ Gambar berhasil diupload ke Cloudinary!');
-                progressBar.style.width = '100%';
-                setTimeout(() => progressBar.style.width = '0%', 2000);
+          if (keyword === '') {
+            item.classList.remove('hidden');
+          } else {
+            if (match) {
+              item.classList.remove('hidden');
+              hasVisible = true;
             } else {
-                alert('❌ Upload gagal: ' + xhr.statusText);
-                progressBar.style.width = '0%';
+              item.classList.add('hidden');
             }
-        };
+          }
+        });
 
-        xhr.onerror = function() {
-            alert('❌ Upload gagal! Periksa koneksi internet.');
-            progressBar.style.width = '0%';
-        };
+        categories.forEach(cat => {
+          const visibleItems = cat.querySelectorAll('.item:not(.hidden)');
+          if (visibleItems.length === 0 && keyword !== '') {
+            cat.classList.add('hidden');
+          } else {
+            cat.classList.remove('hidden');
+          }
+        });
 
-        xhr.send(formData);
-    });
-
-    // ============================================
-    // SAVE MENU
-    // ============================================
-    saveBtn.addEventListener('click', function() {
-        const name = inputName.value.trim();
-        const price = parseInt(inputPrice.value);
-        const desc = inputDesc.value.trim();
-        const category = inputCategory.value;
-        const tag = inputTag.value;
-        const stock = parseInt(inputStock.value) || 0;
-        const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
-        const image = inputImage.value.trim();
-
-        if (!name || !price) {
-            alert('⚠️ Nama dan Harga harus diisi!');
-            return;
+        if (keyword !== '') {
+          const anyVisible = document.querySelectorAll('.item:not(.hidden)').length > 0;
+          noResult.style.display = anyVisible ? 'none' : 'block';
+        } else {
+          noResult.style.display = 'none';
         }
 
-        if (promoPrice && promoPrice >= price) {
-            alert('⚠️ Harga promo harus lebih rendah dari harga asli!');
-            return;
+        clearBtn.classList.toggle('show', keyword.length > 0);
+      }
+
+      searchInput.addEventListener('input', filterMenu);
+
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        filterMenu();
+        searchInput.focus();
+      });
+
+      // ============================================
+      // 4. SCROLL TO TOP
+      // ============================================
+      const scrollBtn = document.getElementById('scrollTop');
+
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 400) {
+          scrollBtn.classList.add('show');
+        } else {
+          scrollBtn.classList.remove('show');
         }
+      });
 
-        const data = { name, price, desc, category, tag, stock, promoPrice, image };
-        const ref = editingId ? db.collection('menu').doc(editingId) : db.collection('menu').doc();
+      scrollBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
 
-        ref.set(data, { merge: true }).then(() => {
-            showToast(editingId ? '✅ Menu diupdate!' : '✅ Menu ditambahkan!');
-            resetForm();
-        }).catch(err => alert('❌ Gagal simpan: ' + err.message));
-    });
+      // ============================================
+      // 5. CART / ORDER SYSTEM (localStorage)
+      // ============================================
+      const cartSummary = document.getElementById('cartSummary');
+      const cartTotal = document.getElementById('cartTotal');
+      const cartDetail = document.getElementById('cartDetail');
+      const orderBtn = document.getElementById('orderBtn');
 
-    // ============================================
-    // TOAST NOTIFICATION
-    // ============================================
-    function showToast(msg) {
-        const existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = msg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+      let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
 
-    // ============================================
-    // KEYBOARD SHORTCUT: Escape untuk batal
-    // ============================================
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') resetForm();
-    });
-</script>
+      function saveCart() {
+        localStorage.setItem('flora-cart', JSON.stringify(cartData));
+      }
+
+      function updateCart() {
+        const allItems = document.querySelectorAll('.item');
+        let total = 0;
+        let orderList = [];
+        let hasOrder = false;
+        let newCart = {};
+
+        allItems.forEach(item => {
+          const checkbox = item.querySelector('.item-checkbox');
+          const qtySpan = item.querySelector('.qty-value');
+          const qty = parseInt(qtySpan.textContent) || 0;
+          const price = parseInt(item.getAttribute('data-price')) || 0;
+          const name = item.querySelector('.item-name').textContent.trim();
+          const id = item.getAttribute('data-id') || name;
+
+          if (checkbox.checked && qty > 0) {
+            const subtotal = price * qty;
+            total += subtotal;
+            orderList.push(`${name} x${qty} (Rp${(price * qty).toLocaleString()})`);
+            hasOrder = true;
+            newCart[id] = { name, qty, price };
+          }
+        });
+
+        cartData = newCart;
+        saveCart();
+
+        if (hasOrder) {
+          cartSummary.classList.add('show');
+          cartTotal.textContent = 'Rp' + total.toLocaleString();
+          cartDetail.textContent = orderList.join(' · ') || 'Belum ada pesanan';
+
+          const message = encodeURIComponent(
+            'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
+            orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
+            '\n\nTotal: Rp' + total.toLocaleString()
+          );
+          orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
+        } else {
+          cartSummary.classList.remove('show');
+        }
+      }
+
+      // ============================================
+      // 6. LOAD DATA DARI FIRESTORE (REALTIME)
+      // ============================================
+      const loadingState = document.getElementById('loadingState');
+      const menuContainer = document.getElementById('menuContainer');
+      const categories = ['kopi-klasik', 'signature', 'non-kopi', 'camilan'];
+      const categoryNames = {
+        'kopi-klasik': 'Kopi Klasik',
+        'signature': 'Signature',
+        'non-kopi': 'Non-Kopi',
+        'camilan': 'Camilan'
+      };
+      const categoryDescs = {
+        'kopi-klasik': 'Untuk yang suka rasa kopi apa adanya.',
+        'signature': 'Racikan khas Flora, tidak ada di tempat lain.',
+        'non-kopi': 'Untuk yang sedang menghindari kafein, atau memang tidak suka kopi.',
+        'camilan': 'Teman ngobrol sambil menunggu kopi diseduh.'
+      };
+
+      let menuData = [];
+
+      function loadMenu() {
+        loadingState.style.display = 'block';
+
+        db.collection('menu').orderBy('name').onSnapshot(snapshot => {
+          if (snapshot.empty) {
+            loadDefaultMenu();
+            return;
+          }
+
+          let data = [];
+          snapshot.forEach(doc => {
+            data.push({ id: doc.id, ...doc.data() });
+          });
+
+          renderMenu(data);
+          loadingState.style.display = 'none';
+        }, error => {
+          console.error('Error loading menu:', error);
+          loadDefaultMenu();
+        });
+      }
+
+      function loadDefaultMenu() {
+        const defaultData = [
+          { id: '1', name: 'Espresso', desc: 'Single shot, pekat dan singkat.', price: 18000, category: 'kopi-klasik', tag: '', image: '' },
+          { id: '2', name: 'Americano', desc: 'Espresso dengan air panas, bisa juga dingin.', price: 20000, category: 'kopi-klasik', tag: '', image: '' },
+          { id: '3', name: 'Cappuccino', desc: 'Espresso, susu, dan busa tebal.', price: 25000, category: 'kopi-klasik', tag: '', image: '' },
+          { id: '4', name: 'Caffe Latte', desc: 'Lebih banyak susu, tekstur lembut.', price: 26000, category: 'kopi-klasik', tag: '', image: '' },
+          { id: '5', name: 'Kopi Susu Gula Aren', desc: 'Kopi hitam, susu segar, gula aren asli.', price: 24000, category: 'kopi-klasik', tag: '', image: '' },
+          { id: '6', name: 'Flora Latte', desc: 'Bunga telang, vanila, dan espresso — berlapis biru ke krem.', price: 30000, category: 'signature', tag: 'Favorit', image: '' },
+          { id: '7', name: 'Honey Oat Latte', desc: 'Susu oat, madu hutan, dua shot espresso.', price: 29000, category: 'signature', tag: '', image: '' },
+          { id: '8', name: 'Aren Macchiato', desc: 'Foam susu manis di atas, kopi gula aren di bawah.', price: 28000, category: 'signature', tag: '', image: '' },
+          { id: '9', name: 'Matcha Latte', desc: 'Matcha grade upacara, susu segar.', price: 27000, category: 'non-kopi', tag: '', image: '' },
+          { id: '10', name: 'Taro Latte', desc: 'Manis, gurih, warna ungu lembut.', price: 26000, category: 'non-kopi', tag: '', image: '' },
+          { id: '11', name: 'Coklat Susu', desc: 'Dark chocolate leleh dengan susu segar.', price: 25000, category: 'non-kopi', tag: '', image: '' },
+          { id: '12', name: 'Lemon Tea', desc: 'Teh hitam, perasan lemon segar.', price: 20000, category: 'non-kopi', tag: '', image: '' },
+          { id: '13', name: 'Croissant Butter', desc: 'Dipanggang setiap pagi, renyah di luar.', price: 22000, category: 'camilan', tag: '', image: '' },
+          { id: '14', name: 'Banana Bread', desc: 'Lembab, dengan taburan kenari.', price: 20000, category: 'camilan', tag: '', image: '' },
+          { id: '15', name: 'Cookies Dark Choco', desc: 'Renyah di pinggir, lumer di tengah.', price: 15000, category: 'camilan', tag: '', image: '' }
+        ];
+
+        defaultData.forEach(item => {
+          db.collection('menu').doc(item.id).set(item).catch(() => {});
+        });
+
+        renderMenu(defaultData);
+        loadingState.style.display = 'none';
+      }
+
+      function renderMenu(data) {
+        menuContainer.innerHTML = '';
+        menuData = data;
+
+        const grouped = {};
+        data.forEach(item => {
+          if (!grouped[item.category]) grouped[item.category] = [];
+          grouped[item.category].push(item);
+        });
+
+        let catIndex = 1;
+        categories.forEach(catKey => {
+          if (!grouped[catKey]) return;
+
+          const section = document.createElement('section');
+          section.className = 'category';
+          section.id = catKey;
+
+          const head = document.createElement('div');
+          head.className = 'cat-head';
+          head.innerHTML = `
+            <span class="cat-num">${String(catIndex).padStart(2, '0')}</span>
+            <h2>${categoryNames[catKey] || catKey}</h2>
+          `;
+          section.appendChild(head);
+
+          const desc = document.createElement('p');
+          desc.className = 'cat-desc';
+          desc.textContent = categoryDescs[catKey] || '';
+          section.appendChild(desc);
+
+          grouped[catKey].forEach((item) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.setAttribute('data-name', item.name.toLowerCase());
+            itemDiv.setAttribute('data-desc', item.desc.toLowerCase());
+            itemDiv.setAttribute('data-price', item.price);
+            itemDiv.setAttribute('data-id', item.id);
+
+            // Image
+            const img = document.createElement('img');
+            const hasImage = item.image && item.image.trim() !== '';
+            img.className = 'item-image' + (hasImage ? ' show' : '');
+            img.src = hasImage ? item.image : '';
+            if (hasImage) {
+              img.alt = item.name;
+              img.loading = 'lazy';
+            }
+            itemDiv.appendChild(img);
+
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'item-checkbox';
+            itemDiv.appendChild(checkbox);
+
+            // Info
+            const info = document.createElement('div');
+            info.className = 'item-info';
+
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'item-name';
+            nameSpan.textContent = item.name;
+
+            // Tag
+            if (item.tag) {
+              const tag = document.createElement('span');
+              tag.className = 'item-tag';
+              tag.textContent = item.tag;
+              nameSpan.appendChild(tag);
+            }
+
+            // Badge Promo
+            if (item.promoPrice) {
+              const promo = document.createElement('span');
+              promo.className = 'badge-promo';
+              promo.textContent = '🔥 Promo';
+              nameSpan.appendChild(promo);
+            }
+
+            // Badge Habis
+            if (item.stock === 0) {
+              const habis = document.createElement('span');
+              habis.className = 'badge-habis';
+              habis.textContent = '⛔ Habis';
+              nameSpan.appendChild(habis);
+              checkbox.disabled = true;
+              checkbox.style.opacity = '0.4';
+            }
+
+            info.appendChild(nameSpan);
+
+            const descSpan = document.createElement('div');
+            descSpan.className = 'item-desc';
+            descSpan.textContent = item.desc;
+            info.appendChild(descSpan);
+            itemDiv.appendChild(info);
+
+            // Price
+            const priceSpan = document.createElement('div');
+            priceSpan.className = 'item-price';
+
+            if (item.promoPrice) {
+              const original = document.createElement('span');
+              original.className = 'price-original';
+              original.textContent = 'Rp' + Number(item.price).toLocaleString();
+              priceSpan.appendChild(original);
+              const promoPrice = document.createElement('span');
+              promoPrice.textContent = 'Rp' + Number(item.promoPrice).toLocaleString();
+              priceSpan.appendChild(promoPrice);
+            } else {
+              priceSpan.textContent = 'Rp' + Number(item.price).toLocaleString();
+            }
+
+            itemDiv.appendChild(priceSpan);
+
+            // Quantity controls
+            const qtyDiv = document.createElement('div');
+            qtyDiv.className = 'qty-controls';
+
+            const minusBtn = document.createElement('button');
+            minusBtn.className = 'qty-minus';
+            minusBtn.textContent = '−';
+            if (item.stock === 0) minusBtn.disabled = true;
+            qtyDiv.appendChild(minusBtn);
+
+            const qtySpan = document.createElement('span');
+            qtySpan.className = 'qty-value zero';
+            qtySpan.textContent = '0';
+            qtyDiv.appendChild(qtySpan);
+
+            const plusBtn = document.createElement('button');
+            plusBtn.className = 'qty-plus';
+            plusBtn.textContent = '+';
+            if (item.stock === 0) plusBtn.disabled = true;
+            qtyDiv.appendChild(plusBtn);
+
+            itemDiv.appendChild(qtyDiv);
+
+            // Restore from localStorage
+            const saved = cartData[item.id];
+            if (saved && saved.qty > 0 && item.stock !== 0) {
+              checkbox.checked = true;
+              qtySpan.textContent = saved.qty;
+              qtySpan.classList.remove('zero');
+            }
+
+            // Event: checkbox
+            checkbox.addEventListener('change', function() {
+              if (item.stock === 0) return;
+              const qty = parseInt(qtySpan.textContent) || 0;
+              if (!this.checked) {
+                qtySpan.textContent = '0';
+                qtySpan.classList.add('zero');
+              } else if (qty === 0) {
+                qtySpan.textContent = '1';
+                qtySpan.classList.remove('zero');
+              }
+              updateCart();
+            });
+
+            // Event: quantity
+            function updateQty(change) {
+              if (item.stock === 0) return;
+              let val = parseInt(qtySpan.textContent) || 0;
+              val = Math.max(0, val + change);
+              qtySpan.textContent = val;
+              qtySpan.classList.toggle('zero', val === 0);
+
+              if (val > 0) {
+                checkbox.checked = true;
+              } else {
+                checkbox.checked = false;
+              }
+
+              updateCart();
+            }
+
+            minusBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              updateQty(-1);
+            });
+
+            plusBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              updateQty(1);
+            });
+
+            qtySpan.addEventListener('click', function() {
+              updateQty(-parseInt(qtySpan.textContent) || 0);
+            });
+
+            section.appendChild(itemDiv);
+          });
+
+          menuContainer.appendChild(section);
+
+          if (catIndex < Object.keys(grouped).length) {
+            const divider = document.createElement('div');
+            divider.className = 'divider';
+            divider.innerHTML = `
+              <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b58d4a" stroke-width="1.4" /><circle cx="17" cy="5" r="2.6" fill="#b58d4a" /></svg>
+              <div class="line"></div>
+            `;
+            menuContainer.appendChild(divider);
+          }
+
+          catIndex++;
+        });
+
+        updateCart();
+        filterMenu();
+      }
+
+      // ============================================
+      // 7. KEYBOARD SHORTCUT
+      // ============================================
+      document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+        if (e.key === 'Escape' && document.activeElement === searchInput) {
+          searchInput.blur();
+          if (searchInput.value) {
+            searchInput.value = '';
+            filterMenu();
+          }
+        }
+      });
+
+      // ============================================
+      // 8. START
+      // ============================================
+      loadMenu();
+
+    })();
+  </script>
 </body>
 </html>

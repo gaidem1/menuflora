@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Flora Coffee</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; background: #f6f2e9; color: #1e2a1e; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; background: #2a4230; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,66,48,0.3); }
+        .btn-danger { background: #c0392b; }
+        .btn-danger:hover { box-shadow: 0 4px 12px rgba(192,57,43,0.3); }
+        .btn-warning { background: #f39c12; }
+        .btn-warning:hover { box-shadow: 0 4px 12px rgba(243,156,18,0.3); }
+        .btn-outline { background: transparent; border: 2px solid #2a4230; color: #2a4230; }
+        .btn-outline:hover { background: #2a4230; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 16px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .menu-item { background: white; padding: 16px; border-radius: 12px; border: 1px solid #e0dcd3; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s; }
+        .menu-item:hover { border-color: #b58d4a; }
+        .menu-item .name { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .menu-item .price { color: #4f3422; font-weight: 500; }
+        .menu-item .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .menu-item .actions button { flex: 1; padding: 6px 12px; font-size: 12px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 4px; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; transition: border 0.2s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #b58d4a; outline: none; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .tag-favorit { background: #f1c40f; color: #1e2a1e; }
+        .tag-promo { background: #e74c3c; color: white; }
+        .tag-habis { background: #95a5a6; color: white; }
+        .hidden { display: none !important; }
+        #loginSection { text-align: center; padding: 60px 0; }
+        #loginSection .btn { font-size: 18px; padding: 14px 40px; }
+        .upload-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-top: 8px; border: 2px solid #ddd; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2a4230; color: white; padding: 12px 24px; border-radius: 100px; font-family: system-ui; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 999; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+        .loading { text-align: center; padding: 40px 0; color: #5b6356; }
+        .user-email { font-size: 14px; color: #5b6356; }
+        .progress-bar { width: 100%; height: 4px; background: #eee; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .progress-bar .progress { height: 100%; background: #2a4230; width: 0%; transition: width 0.3s; }
+        .menu-image-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-top: 4px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .menu-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <header>
+        <h1>☕ Admin Flora Coffee</h1>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <span class="user-email" id="userEmail"></span>
+            <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <div id="loginSection">
+        <h2>🔐 Login Admin</h2>
+        <p style="margin: 12px 0 24px; color: #5b6356;">Gunakan akun Google untuk mengelola menu Flora Coffee</p>
+        <button class="btn" id="loginBtn">🔑 Login dengan Google</button>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" class="hidden">
+        <!-- Form Tambah/Edit -->
+        <div class="card" id="formCard">
+            <h3 id="formTitle" style="margin-bottom:16px;">📝 Tambah Menu Baru</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nama Menu *</label>
+                    <input type="text" id="inputName" placeholder="Contoh: Espresso" />
+                </div>
+                <div class="form-group">
+                    <label>Harga (Rp) *</label>
+                    <input type="number" id="inputPrice" placeholder="18000" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Deskripsi</label>
+                <textarea id="inputDesc" rows="2" placeholder="Single shot, pekat dan singkat."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="inputCategory">
+                        <option value="kopi-klasik">☕ Kopi Klasik</option>
+                        <option value="signature">🌸 Signature</option>
+                        <option value="non-kopi">🍵 Non-Kopi</option>
+                        <option value="camilan">🥐 Camilan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tag (opsional)</label>
+                    <select id="inputTag">
+                        <option value="">Tidak ada</option>
+                        <option value="Favorit">⭐ Favorit</option>
+                        <option value="Promo">🔥 Promo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Stok (0 = Habis)</label>
+                    <input type="number" id="inputStock" placeholder="10" value="10" />
+                </div>
+                <div class="form-group">
+                    <label>Harga Promo (kosongkan jika tidak ada)</label>
+                    <input type="number" id="inputPromo" placeholder="23000" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>URL Gambar (atau upload di bawah)</label>
+                <input type="text" id="inputImage" placeholder="https://..." />
+            </div>
+            <div class="form-group">
+                <label>📤 Upload Gambar (Cloudinary)</label>
+                <input type="file" id="fileInput" accept="image/*" />
+                <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+                <img id="previewImage" class="upload-preview hidden" />
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn" id="saveBtn">💾 Simpan Menu</button>
+                <button class="btn btn-outline" id="cancelBtn">Batal</button>
+            </div>
+        </div>
+
+        <!-- Daftar Menu -->
+        <div id="menuList">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                <h3>📋 Semua Menu</h3>
+                <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
+            </div>
+            <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
+            <div class="menu-grid" id="menuGrid"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // FIREBASE KONFIGURASI
+    // ============================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-0wDqKOm1bZphQ4Qglmto6O3hsvduZoA",
+        authDomain: "menuflora-5d08a.firebaseapp.com",
+        projectId: "menuflora-5d08a",
+        storageBucket: "menuflora-5d08a.firebasestorage.app",
+        messagingSenderId: "219274188593",
+        appId: "1:219274188593:web:c25a9599b0ab3a88e64210"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ============================================
+    // CLOUDINARY KONFIGURASI (GANTI DENGAN MILIKMU)
+    // ============================================
+    const CLOUDINARY = {
+        cloudName: 'vmny1hra',          // Ganti dengan Cloud Name kamu
+        uploadPreset: 'flora-menu'      // Ganti dengan Upload Preset kamu
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let editingId = null;
+
+    // DOM Elements
+    const loginSection = document.getElementById('loginSection');
+    const adminContent = document.getElementById('adminContent');
+    const userEmail = document.getElementById('userEmail');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const menuGrid = document.getElementById('menuGrid');
+    const loadingMenu = document.getElementById('loadingMenu');
+    const formCard = document.getElementById('formCard');
+    const formTitle = document.getElementById('formTitle');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const newMenuBtn = document.getElementById('newMenuBtn');
+    const fileInput = document.getElementById('fileInput');
+    const previewImage = document.getElementById('previewImage');
+    const progressBar = document.getElementById('progressBar');
+    const inputName = document.getElementById('inputName');
+    const inputPrice = document.getElementById('inputPrice');
+    const inputDesc = document.getElementById('inputDesc');
+    const inputCategory = document.getElementById('inputCategory');
+    const inputTag = document.getElementById('inputTag');
+    const inputStock = document.getElementById('inputStock');
+    const inputPromo = document.getElementById('inputPromo');
+    const inputImage = document.getElementById('inputImage');
+
+    // ============================================
+    // AUTHENTICATION
+    // ============================================
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            loginSection.classList.add('hidden');
+            adminContent.classList.remove('hidden');
+            userEmail.textContent = user.email;
+            loadMenu();
+        } else {
+            loginSection.classList.remove('hidden');
+            adminContent.classList.add('hidden');
+            userEmail.textContent = '';
+            menuGrid.innerHTML = '';
+        }
+    });
+
+    loginBtn.addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => {
+            alert('❌ Login gagal: ' + err.message);
+        });
+    });
+
+    logoutBtn.addEventListener('click', () => auth.signOut());
+
+    // ============================================
+    // LOAD MENU (REALTIME)
+    // ============================================
+    function loadMenu() {
+        loadingMenu.classList.remove('hidden');
+        db.collection('menu').orderBy('name').onSnapshot(snapshot => {
+            loadingMenu.classList.add('hidden');
+            menuGrid.innerHTML = '';
+            if (snapshot.empty) {
+                menuGrid.innerHTML = '<p style="text-align:center;color:#95a5a6;padding:40px;">Belum ada menu. Tambahkan sekarang!</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const div = document.createElement('div');
+                div.className = 'menu-item';
+
+                let tags = '';
+                if (data.tag) tags += `<span class="tag tag-${data.tag === 'Favorit' ? 'favorit' : 'promo'}">${data.tag}</span>`;
+                if (data.stock === 0) tags += `<span class="tag tag-habis">⛔ Habis</span>`;
+                if (data.promoPrice) tags += `<span class="tag tag-promo">🔥 Promo</span>`;
+
+                const priceDisplay = data.promoPrice ?
+                    `<span style="text-decoration:line-through;color:#95a5a6;font-size:13px;">Rp${data.price.toLocaleString()}</span> <strong>Rp${data.promoPrice.toLocaleString()}</strong>` :
+                    `Rp${data.price.toLocaleString()}`;
+
+                div.innerHTML = `
+                    <div class="name">${data.name} ${tags}</div>
+                    <div class="price">${priceDisplay}</div>
+                    <div style="font-size:13px;color:#5b6356;">${data.desc || ''}</div>
+                    <div style="font-size:12px;color:#7f8c8d;">📂 ${data.category} | 📦 Stok: ${data.stock ?? '∞'}</div>
+                    ${data.image ? `<img src="${data.image}" class="menu-image-preview" />` : ''}
+                    <div class="actions">
+                        <button class="btn btn-warning btn-sm" onclick="editMenu('${doc.id}')">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMenu('${doc.id}')">🗑️ Hapus</button>
+                    </div>
+                `;
+                menuGrid.appendChild(div);
+            });
+        }, error => {
+            loadingMenu.classList.add('hidden');
+            console.error('Error:', error);
+            menuGrid.innerHTML = '<p style="text-align:center;color:#e74c3c;padding:20px;">❌ Gagal memuat menu: ' + error.message + '</p>';
+        });
+    }
+
+    // ============================================
+    // EDIT MENU
+    // ============================================
+    window.editMenu = function(id) {
+        db.collection('menu').doc(id).get().then(doc => {
+            if (!doc.exists) return;
+            const data = doc.data();
+            editingId = id;
+            formTitle.textContent = '✏️ Edit Menu';
+            inputName.value = data.name || '';
+            inputPrice.value = data.price || '';
+            inputDesc.value = data.desc || '';
+            inputCategory.value = data.category || 'kopi-klasik';
+            inputTag.value = data.tag || '';
+            inputStock.value = data.stock ?? 10;
+            inputPromo.value = data.promoPrice || '';
+            inputImage.value = data.image || '';
+            saveBtn.textContent = '💾 Update Menu';
+            formCard.scrollIntoView({ behavior: 'smooth' });
+        });
+    };
+
+    // ============================================
+    // DELETE MENU
+    // ============================================
+    window.deleteMenu = function(id) {
+        if (confirm('⚠️ Yakin hapus menu ini?')) {
+            db.collection('menu').doc(id).delete().then(() => {
+                showToast('✅ Menu dihapus!');
+            }).catch(err => alert('❌ Gagal hapus: ' + err.message));
+        }
+    };
+
+    // ============================================
+    // RESET FORM
+    // ============================================
+    function resetForm() {
+        editingId = null;
+        formTitle.textContent = '📝 Tambah Menu Baru';
+        inputName.value = '';
+        inputPrice.value = '';
+        inputDesc.value = '';
+        inputCategory.value = 'kopi-klasik';
+        inputTag.value = '';
+        inputStock.value = '10';
+        inputPromo.value = '';
+        inputImage.value = '';
+        fileInput.value = '';
+        previewImage.classList.add('hidden');
+        progressBar.style.width = '0%';
+        saveBtn.textContent = '💾 Simpan Menu';
+    }
+
+    cancelBtn.addEventListener('click', resetForm);
+    newMenuBtn.addEventListener('click', resetForm);
+
+    // ============================================
+    // UPLOAD GAMBAR KE CLOUDINARY
+    // ============================================
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Preview
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            previewImage.src = ev.target.result;
+            previewImage.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+
+        // Upload ke Cloudinary
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY.uploadPreset);
+        formData.append('folder', 'menu-images');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, true);
+
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + '%';
+            }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                inputImage.value = response.secure_url;
+                showToast('✅ Gambar berhasil diupload ke Cloudinary!');
+                progressBar.style.width = '100%';
+                setTimeout(() => progressBar.style.width = '0%', 2000);
+            } else {
+                alert('❌ Upload gagal: ' + xhr.statusText);
+                progressBar.style.width = '0%';
+            }
+        };
+
+        xhr.onerror = function() {
+            alert('❌ Upload gagal! Periksa koneksi internet.');
+            progressBar.style.width = '0%';
+        };
+
+        xhr.send(formData);
+    });
+
+    // ============================================
+    // SAVE MENU
+    // ============================================
+    saveBtn.addEventListener('click', function() {
+        const name = inputName.value.trim();
+        const price = parseInt(inputPrice.value);
+        const desc = inputDesc.value.trim();
+        const category = inputCategory.value;
+        const tag = inputTag.value;
+        const stock = parseInt(inputStock.value) || 0;
+        const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
+        const image = inputImage.value.trim();
+
+        if (!name || !price) {
+            alert('⚠️ Nama dan Harga harus diisi!');
+            return;
+        }
+
+        if (promoPrice && promoPrice >= price) {
+            alert('⚠️ Harga promo harus lebih rendah dari harga asli!');
+            return;
+        }
+
+        const data = { name, price, desc, category, tag, stock, promoPrice, image };
+        const ref = editingId ? db.collection('menu').doc(editingId) : db.collection('menu').doc();
+
+        ref.set(data, { merge: true }).then(() => {
+            showToast(editingId ? '✅ Menu diupdate!' : '✅ Menu ditambahkan!');
+            resetForm();
+        }).catch(err => alert('❌ Gagal simpan: ' + err.message));
+    });
+
+    // ============================================
+    // TOAST NOTIFICATION
+    // ============================================
+    function showToast(msg) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUT: Escape untuk batal
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') resetForm();
+    });
+</script>
+</body>
+</html>
