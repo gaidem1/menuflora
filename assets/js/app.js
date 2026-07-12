@@ -2,6 +2,210 @@
     'use strict';
 
     // ============================================
+    // 🔥 FASE 2 — MULTI-LANGUAGE
+    // ============================================
+
+    // ============================================
+    // TRANSLATIONS
+    // ============================================
+    const translations = {
+        'id': {
+            // Hero
+            eyebrow: 'Menu · ',
+            open: '🟢 Buka Sekarang',
+            closed: '🔴 Tutup — Buka lagi 11.00',
+            brand: 'Flora',
+            brandEm: 'Coffee',
+            tagline: 'Kopi, camilan, dan mie — semua tersedia di sini.',
+            hours: '11.00 – 23.00',
+            days: 'Senin–Minggu',
+            location: 'Kesugihan, Cilacap',
+            dinein: 'Dine-in & Takeaway',
+            wa: 'Pesan via WhatsApp',
+            maps: 'Lihat di Maps',
+            share: 'Bagikan Menu',
+            print: 'Cetak Menu',
+            // Nav
+            all: 'Semua',
+            coffee: 'Kopi',
+            nonCoffee: 'Non Kopi',
+            snacks: 'Camilan',
+            noodles: 'Mie & Topping',
+            // Search & Result
+            search: 'Cari menu...',
+            noResult: 'Menu tidak ditemukan. Coba kata kunci lain!',
+            // Cart
+            total: 'Total',
+            emptyCart: 'Belum ada pesanan',
+            orderNow: 'Pesan Sekarang',
+            // Footer
+            footerTitle: 'Mau pesan?',
+            footerDesc: 'Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.',
+            waFooter: 'Pesan via WhatsApp',
+            mapsFooter: 'Lihat di Maps',
+            printFooter: 'Cetak Menu',
+            // Menu of the Day
+            menuOfTheDay: '🌟 Hari ini rekomendasi: '
+        },
+        'en': {
+            // Hero
+            eyebrow: 'Menu · ',
+            open: '🟢 Open Now',
+            closed: '🔴 Closed — Opens at 11.00',
+            brand: 'Flora',
+            brandEm: 'Coffee',
+            tagline: 'Coffee, snacks, and noodles — all available here.',
+            hours: '11.00 – 23.00',
+            days: 'Monday–Sunday',
+            location: 'Kesugihan, Cilacap',
+            dinein: 'Dine-in & Takeaway',
+            wa: 'Order via WhatsApp',
+            maps: 'View on Maps',
+            share: 'Share Menu',
+            print: 'Print Menu',
+            // Nav
+            all: 'All',
+            coffee: 'Coffee',
+            nonCoffee: 'Non Coffee',
+            snacks: 'Snacks',
+            noodles: 'Noodles & Topping',
+            // Search & Result
+            search: 'Search menu...',
+            noResult: 'Menu not found. Try another keyword!',
+            // Cart
+            total: 'Total',
+            emptyCart: 'No order yet',
+            orderNow: 'Order Now',
+            // Footer
+            footerTitle: 'Want to order?',
+            footerDesc: 'Send a message via WhatsApp, mention the menu and quantity — we\'ll prepare it for you.',
+            waFooter: 'Order via WhatsApp',
+            mapsFooter: 'View on Maps',
+            printFooter: 'Print Menu',
+            // Menu of the Day
+            menuOfTheDay: '🌟 Today\'s recommendation: '
+        }
+    };
+
+    let currentLang = 'id';
+
+    function setLang(lang) {
+        currentLang = lang;
+        // Update active button
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        // Update text
+        updateTranslations();
+        // Track language change
+        trackEvent('Language', 'switch', lang);
+        // Save preference
+        localStorage.setItem('flora-lang', lang);
+    }
+
+    function updateTranslations() {
+        const t = translations[currentLang];
+        if (!t) return;
+
+        // Hero
+        const langEyebrow = document.getElementById('langEyebrow');
+        if (langEyebrow) langEyebrow.textContent = t.eyebrow;
+        const langBrand = document.getElementById('langBrand');
+        if (langBrand) langBrand.textContent = t.brand;
+        const langBrandEm = document.getElementById('langBrandEm');
+        if (langBrandEm) langBrandEm.textContent = t.brandEm;
+        const langTagline = document.getElementById('langTagline');
+        if (langTagline) langTagline.textContent = t.tagline;
+        const langHours = document.getElementById('langHours');
+        if (langHours) langHours.textContent = t.hours;
+        const langDays = document.getElementById('langDays');
+        if (langDays) langDays.textContent = t.days;
+        const langLocation = document.getElementById('langLocation');
+        if (langLocation) langLocation.textContent = t.location;
+        const langDinein = document.getElementById('langDinein');
+        if (langDinein) langDinein.textContent = t.dinein;
+        const langWa = document.getElementById('langWa');
+        if (langWa) langWa.textContent = t.wa;
+        const langMaps = document.getElementById('langMaps');
+        if (langMaps) langMaps.textContent = t.maps;
+        const langShare = document.getElementById('langShare');
+        if (langShare) langShare.textContent = t.share;
+        const langPrint = document.getElementById('langPrint');
+        if (langPrint) langPrint.textContent = t.print;
+
+        // Nav
+        const langAll = document.getElementById('langAll');
+        if (langAll) langAll.textContent = t.all;
+        const langCoffee = document.getElementById('langCoffee');
+        if (langCoffee) langCoffee.textContent = t.coffee;
+        const langNonCoffee = document.getElementById('langNonCoffee');
+        if (langNonCoffee) langNonCoffee.textContent = t.nonCoffee;
+        const langSnacks = document.getElementById('langSnacks');
+        if (langSnacks) langSnacks.textContent = t.snacks;
+        const langNoodles = document.getElementById('langNoodles');
+        if (langNoodles) langNoodles.textContent = t.noodles;
+
+        // Search
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.placeholder = t.search;
+        const langNoResult = document.getElementById('langNoResult');
+        if (langNoResult) langNoResult.textContent = t.noResult;
+
+        // Cart
+        const langTotal = document.getElementById('langTotal');
+        if (langTotal) langTotal.textContent = t.total;
+        const langEmptyCart = document.getElementById('langEmptyCart');
+        if (langEmptyCart) langEmptyCart.textContent = t.emptyCart;
+        const langOrderNow = document.getElementById('langOrderNow');
+        if (langOrderNow) langOrderNow.textContent = t.orderNow;
+
+        // Footer
+        const langFooterTitle = document.getElementById('langFooterTitle');
+        if (langFooterTitle) langFooterTitle.textContent = t.footerTitle;
+        const langFooterDesc = document.getElementById('langFooterDesc');
+        if (langFooterDesc) langFooterDesc.textContent = t.footerDesc;
+        const langWaFooter = document.getElementById('langWaFooter');
+        if (langWaFooter) langWaFooter.textContent = t.waFooter;
+        const langMapsFooter = document.getElementById('langMapsFooter');
+        if (langMapsFooter) langMapsFooter.textContent = t.mapsFooter;
+        const langPrintFooter = document.getElementById('langPrintFooter');
+        if (langPrintFooter) langPrintFooter.textContent = t.printFooter;
+
+        // Menu of the Day
+        const langMenuOfTheDay = document.getElementById('langMenuOfTheDay');
+        if (langMenuOfTheDay) langMenuOfTheDay.textContent = t.menuOfTheDay;
+
+        // Update open status
+        updateOpenStatus();
+    }
+
+    // ============================================
+    // 🔥 FASE 2 — MENU OF THE DAY
+    // ============================================
+
+    function getMenuOfTheDay() {
+        const day = new Date().getDay();
+        const recommendations = {
+            0: "Flora's Coffee",
+            1: 'Ice Rost Latte',
+            2: 'Mango Yakult',
+            3: 'Indomie Goreng',
+            4: "Flora's Matcha",
+            5: 'Mix Plater',
+            6: 'Ice Lemon Tea'
+        };
+        return recommendations[day] || "Flora's Coffee";
+    }
+
+    function showMenuOfTheDay() {
+        const name = getMenuOfTheDay();
+        const el = document.getElementById('recommendationName');
+        if (el) {
+            el.textContent = name;
+        }
+    }
+
+    // ============================================
     // FIREBASE KONFIGURASI
     // ============================================
     const firebaseConfig = {
@@ -109,14 +313,16 @@
     });
 
     // ============================================
-    // STATUS BUKA/TUTUP
+    // STATUS BUKA/TUTUP (Multi-language ready)
     // ============================================
     function updateOpenStatus() {
         const el = document.getElementById('openStatus');
         if (!el) return;
         const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit',
             hour12: false }));
-        el.textContent = (hour >= 11 && hour < 23) ? '🟢 Buka Sekarang' : '🔴 Tutup — Buka lagi 11.00';
+        const isOpen = (hour >= 11 && hour < 23);
+        const t = translations[currentLang];
+        el.textContent = isOpen ? t.open : t.closed;
     }
     updateOpenStatus();
     setInterval(updateOpenStatus, 60000);
@@ -888,11 +1094,14 @@
     // AUTHENTICATION
     // ============================================
     auth.onAuthStateChanged(async (user) => {
+        const printBtn = document.getElementById('printBtn');
+
         if (!user) {
             isAdmin = false;
             adminSection.classList.add('admin-hidden');
             adminUserEmail.textContent = '';
             adminMenuGrid.innerHTML = '';
+            if (printBtn) printBtn.style.display = 'inline-flex'; // Tetap tampil untuk semua user
             return;
         }
 
@@ -903,12 +1112,14 @@
             adminSection.classList.add('admin-hidden');
             adminUserEmail.textContent = '';
             adminMenuGrid.innerHTML = '';
+            if (printBtn) printBtn.style.display = 'inline-flex';
             return;
         }
 
         isAdmin = true;
         adminSection.classList.remove('admin-hidden');
         adminUserEmail.textContent = user.email;
+        if (printBtn) printBtn.style.display = 'inline-flex';
 
         db.collection('menu').orderBy('name').onSnapshot(snapshot => {
             const data = [];
@@ -962,6 +1173,22 @@
         }
         if (e.key === 'Escape') resetForm();
     });
+
+    // ============================================
+    // INIT: Language & Menu of the Day
+    // ============================================
+    // Cek bahasa yang tersimpan
+    const savedLang = localStorage.getItem('flora-lang');
+    if (savedLang && translations[savedLang]) {
+        currentLang = savedLang;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === savedLang);
+        });
+    }
+    setLang(currentLang);
+
+    // Menu of the Day
+    showMenuOfTheDay();
 
     // ============================================
     // START
