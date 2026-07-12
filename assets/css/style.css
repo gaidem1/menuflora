@@ -78,6 +78,23 @@
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
+/* ===== PERBAIKAN: Tombol + dan - di dark mode ===== */
+[data-theme="dark"] .qty-controls {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .qty-controls button {
+    background: #4a6b50;
+    color: #f6f2e9;
+}
+[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .qty-controls .qty-value {
+    color: #e8e4da !important;
+}
+
 /* ===== RESET & BASE ===== */
 * {
     margin: 0;
@@ -670,7 +687,7 @@ h1.brand em {
     margin-right: 6px;
 }
 
-/* ===== QUANTITY ===== */
+/* ===== QUANTITY CONTROLS ===== */
 .qty-controls {
     grid-column: 5;
     grid-row: 1;
@@ -681,7 +698,12 @@ h1.brand em {
     border-radius: 100px;
     padding: 2px 4px;
     border: 1px solid var(--line);
+    transition: all 0.2s ease;
 }
+.item:hover .qty-controls {
+    border-color: var(--brass);
+}
+
 .qty-controls button {
     width: 28px;
     height: 28px;
@@ -690,13 +712,20 @@ h1.brand em {
     background: var(--leaf-deep);
     color: var(--ivory);
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 .qty-controls button:hover:not(:disabled) {
     transform: scale(1.12);
     background: var(--brass);
+}
+.qty-controls button:active:not(:disabled) {
+    transform: scale(0.88);
 }
 .qty-controls button:disabled {
     opacity: 0.3;
@@ -709,9 +738,10 @@ h1.brand em {
     min-width: 24px;
     text-align: center;
     color: var(--ink);
+    transition: color 0.3s ease;
 }
 .qty-controls .qty-value.zero {
-    opacity: 0.3;
+    opacity: 0.35;
 }
 
 /* ===== CART ===== */
