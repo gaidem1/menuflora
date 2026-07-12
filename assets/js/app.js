@@ -89,6 +89,9 @@
 
     let currentLang = 'id';
 
+    // ============================================
+    // LANGUAGE FUNCTIONS
+    // ============================================
     function setLang(lang) {
         currentLang = lang;
         // Update active button
@@ -98,85 +101,76 @@
         // Update text
         updateTranslations();
         // Track language change
-        trackEvent('Language', 'switch', lang);
+        if (typeof trackEvent === 'function') {
+            trackEvent('Language', 'switch', lang);
+        }
         // Save preference
         localStorage.setItem('flora-lang', lang);
+        console.log('✅ Language set to:', lang);
     }
 
     function updateTranslations() {
         const t = translations[currentLang];
-        if (!t) return;
+        if (!t) {
+            console.error('❌ Translation not found for:', currentLang);
+            return;
+        }
+
+        // Helper function
+        function updateEl(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+            } else {
+                console.warn('⚠️ Element not found:', id);
+            }
+        }
 
         // Hero
-        const langEyebrow = document.getElementById('langEyebrow');
-        if (langEyebrow) langEyebrow.textContent = t.eyebrow;
-        const langBrand = document.getElementById('langBrand');
-        if (langBrand) langBrand.textContent = t.brand;
-        const langBrandEm = document.getElementById('langBrandEm');
-        if (langBrandEm) langBrandEm.textContent = t.brandEm;
-        const langTagline = document.getElementById('langTagline');
-        if (langTagline) langTagline.textContent = t.tagline;
-        const langHours = document.getElementById('langHours');
-        if (langHours) langHours.textContent = t.hours;
-        const langDays = document.getElementById('langDays');
-        if (langDays) langDays.textContent = t.days;
-        const langLocation = document.getElementById('langLocation');
-        if (langLocation) langLocation.textContent = t.location;
-        const langDinein = document.getElementById('langDinein');
-        if (langDinein) langDinein.textContent = t.dinein;
-        const langWa = document.getElementById('langWa');
-        if (langWa) langWa.textContent = t.wa;
-        const langMaps = document.getElementById('langMaps');
-        if (langMaps) langMaps.textContent = t.maps;
-        const langShare = document.getElementById('langShare');
-        if (langShare) langShare.textContent = t.share;
-        const langPrint = document.getElementById('langPrint');
-        if (langPrint) langPrint.textContent = t.print;
+        updateEl('langEyebrow', t.eyebrow);
+        updateEl('langBrand', t.brand);
+        updateEl('langBrandEm', t.brandEm);
+        updateEl('langTagline', t.tagline);
+        updateEl('langHours', t.hours);
+        updateEl('langDays', t.days);
+        updateEl('langLocation', t.location);
+        updateEl('langDinein', t.dinein);
+        updateEl('langWa', t.wa);
+        updateEl('langMaps', t.maps);
+        updateEl('langShare', t.share);
+        updateEl('langPrint', t.print);
 
         // Nav
-        const langAll = document.getElementById('langAll');
-        if (langAll) langAll.textContent = t.all;
-        const langCoffee = document.getElementById('langCoffee');
-        if (langCoffee) langCoffee.textContent = t.coffee;
-        const langNonCoffee = document.getElementById('langNonCoffee');
-        if (langNonCoffee) langNonCoffee.textContent = t.nonCoffee;
-        const langSnacks = document.getElementById('langSnacks');
-        if (langSnacks) langSnacks.textContent = t.snacks;
-        const langNoodles = document.getElementById('langNoodles');
-        if (langNoodles) langNoodles.textContent = t.noodles;
+        updateEl('langAll', t.all);
+        updateEl('langCoffee', t.coffee);
+        updateEl('langNonCoffee', t.nonCoffee);
+        updateEl('langSnacks', t.snacks);
+        updateEl('langNoodles', t.noodles);
 
         // Search
         const searchInput = document.getElementById('searchInput');
         if (searchInput) searchInput.placeholder = t.search;
-        const langNoResult = document.getElementById('langNoResult');
-        if (langNoResult) langNoResult.textContent = t.noResult;
+        updateEl('langNoResult', t.noResult);
 
         // Cart
-        const langTotal = document.getElementById('langTotal');
-        if (langTotal) langTotal.textContent = t.total;
-        const langEmptyCart = document.getElementById('langEmptyCart');
-        if (langEmptyCart) langEmptyCart.textContent = t.emptyCart;
-        const langOrderNow = document.getElementById('langOrderNow');
-        if (langOrderNow) langOrderNow.textContent = t.orderNow;
+        updateEl('langTotal', t.total);
+        updateEl('langEmptyCart', t.emptyCart);
+        updateEl('langOrderNow', t.orderNow);
 
         // Footer
-        const langFooterTitle = document.getElementById('langFooterTitle');
-        if (langFooterTitle) langFooterTitle.textContent = t.footerTitle;
-        const langFooterDesc = document.getElementById('langFooterDesc');
-        if (langFooterDesc) langFooterDesc.textContent = t.footerDesc;
-        const langWaFooter = document.getElementById('langWaFooter');
-        if (langWaFooter) langWaFooter.textContent = t.waFooter;
-        const langMapsFooter = document.getElementById('langMapsFooter');
-        if (langMapsFooter) langMapsFooter.textContent = t.mapsFooter;
-        const langPrintFooter = document.getElementById('langPrintFooter');
-        if (langPrintFooter) langPrintFooter.textContent = t.printFooter;
+        updateEl('langFooterTitle', t.footerTitle);
+        updateEl('langFooterDesc', t.footerDesc);
+        updateEl('langWaFooter', t.waFooter);
+        updateEl('langMapsFooter', t.mapsFooter);
+        updateEl('langPrintFooter', t.printFooter);
 
         // Menu of the Day
-        const langMenuOfTheDay = document.getElementById('langMenuOfTheDay');
-        if (langMenuOfTheDay) langMenuOfTheDay.textContent = t.menuOfTheDay;
+        updateEl('langMenuOfTheDay', t.menuOfTheDay);
 
         // Update open status
         updateOpenStatus();
+
+        console.log('✅ Translations updated to:', currentLang);
     }
 
     // ============================================
@@ -537,7 +531,6 @@
             cartBadge.style.display = 'flex';
             cartBadge.textContent = totalItems;
             cartBadge.classList.remove('pulse');
-            // Trigger reflow for animation
             void cartBadge.offsetWidth;
             cartBadge.classList.add('pulse');
         } else {
@@ -1101,7 +1094,7 @@
             adminSection.classList.add('admin-hidden');
             adminUserEmail.textContent = '';
             adminMenuGrid.innerHTML = '';
-            if (printBtn) printBtn.style.display = 'inline-flex'; // Tetap tampil untuk semua user
+            if (printBtn) printBtn.style.display = 'inline-flex';
             return;
         }
 
@@ -1175,23 +1168,47 @@
     });
 
     // ============================================
-    // INIT: Language & Menu of the Day
+    // 🔥 FIX: Language Switch — EVENT LISTENER (PASTIKAN INI ADA)
     // ============================================
-    // Cek bahasa yang tersimpan
-    const savedLang = localStorage.getItem('flora-lang');
-    if (savedLang && translations[savedLang]) {
-        currentLang = savedLang;
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.lang === savedLang);
-        });
-    }
-    setLang(currentLang);
+    // Tunggu DOM siap sebelum akses elemen
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ DOM Ready — Initializing language...');
 
-    // Menu of the Day
+        // Cek bahasa yang tersimpan
+        const savedLang = localStorage.getItem('flora-lang');
+        if (savedLang && translations[savedLang]) {
+            currentLang = savedLang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === savedLang);
+            });
+            console.log('📌 Load saved language:', savedLang);
+        }
+
+        // Set bahasa awal
+        setLang(currentLang);
+        console.log('🌐 Current language set to:', currentLang);
+
+        // Event listener untuk tombol language
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.dataset.lang;
+                if (lang && translations[lang]) {
+                    console.log('🔄 Switching to:', lang);
+                    setLang(lang);
+                    showToast(`🌐 Language changed to ${lang === 'id' ? 'Indonesia' : 'English'}`);
+                }
+            });
+        });
+    });
+
+    // ============================================
+    // INIT: Menu of the Day
+    // ============================================
     showMenuOfTheDay();
 
     // ============================================
-    // START
+    // START: Load Menu dari Firebase
     // ============================================
     loadMenu();
 
