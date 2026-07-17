@@ -93,7 +93,7 @@
     <!-- DARK MODE TOGGLE -->
     <button class="theme-toggle" id="themeToggle" aria-label="Ubah tema terang/gelap">🌙</button>
 
-    <!-- ===== FLOATING WHATSAPP (Enhanced) ===== -->
+    <!-- ===== FLOATING WHATSAPP ===== -->
     <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee" target="_blank" rel="noopener" class="floating-wa" aria-label="Chat via WhatsApp">
         <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" fill="white">
             <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
@@ -101,7 +101,7 @@
         <span class="wa-status online"></span>
     </a>
 
-    <!-- ===== FLOATING CART MINI (Fase 3) ===== -->
+    <!-- ===== FLOATING CART MINI ===== -->
     <div class="cart-mini" id="cartMini" style="display:none;">
         <span class="cart-mini-icon">🛒</span>
         <span class="cart-mini-badge" id="cartMiniBadge">0</span>
@@ -167,7 +167,6 @@
                 <button type="button" onclick="window.print()" class="hero-btn hero-btn-map">
                     🖨️ <span id="langPrint">Cetak Menu</span>
                 </button>
-                <!-- ===== FASE 3: Riwayat Pesanan ===== -->
                 <button type="button" id="historyBtn" class="hero-btn hero-btn-map">
                     📋 <span id="langHistory">Riwayat</span>
                 </button>
@@ -237,11 +236,11 @@
         <!-- MENU CONTAINER -->
         <div id="menuContainer"></div>
 
-        <!-- ===== ADMIN PANEL (Dengan Dashboard) ===== -->
+        <!-- ===== ADMIN PANEL ===== -->
         <div class="admin-section admin-hidden" id="adminSection">
             <div id="adminContent">
 
-                <!-- ===== FASE 3: ADMIN DASHBOARD ===== -->
+                <!-- Admin Dashboard -->
                 <div class="dashboard-stats" id="dashboardStats">
                     <div class="stat-card">
                         <span class="stat-number" id="statMenus">0</span>
@@ -266,6 +265,7 @@
                     </div>
                 </div>
 
+                <!-- ===== FORM ADMIN DENGAN UPLOAD SEAMLESS ===== -->
                 <div id="formCard">
                     <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
                     <div class="form-row">
@@ -311,18 +311,44 @@
                             <input type="number" id="inputPromo" placeholder="5000">
                         </div>
                     </div>
+
+                    <!-- ===== UPLOAD GAMBAR SEAMLESS ===== -->
                     <div class="form-group">
-                        <label>URL Gambar</label>
-                        <input type="text" id="inputImage" placeholder="https://...">
-                    </div>
-                    <div class="form-group">
-                        <label>📤 Upload Gambar (Cloudinary)</label>
-                        <input type="file" id="fileInput" accept="image/*">
-                        <div class="progress-bar">
-                            <div class="progress" id="progressBar"></div>
+                        <label>📸 Foto Menu</label>
+                        
+                        <!-- Drop Zone -->
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-icon">📤</div>
+                            <div class="upload-text">
+                                <strong>Taruh gambar di sini</strong><br>
+                                <span>atau klik untuk memilih file</span>
+                            </div>
+                            <div class="upload-hint">JPG, PNG, WebP • Maks 5MB</div>
+                            <input type="file" id="fileInput" accept="image/*" hidden>
                         </div>
-                        <img id="previewImage" class="upload-preview hidden">
+                        
+                        <!-- Progress Bar -->
+                        <div class="upload-progress hidden" id="uploadProgress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">⏳ Mengupload... 0%</div>
+                        </div>
+                        
+                        <!-- Preview -->
+                        <div class="upload-preview-wrapper hidden" id="previewWrapper">
+                            <img id="previewImage" class="upload-preview-img" alt="Preview">
+                            <div class="preview-actions">
+                                <button type="button" class="btn btn-sm" id="removeImageBtn">✕ Hapus</button>
+                                <span class="preview-status success">✅ Upload berhasil</span>
+                            </div>
+                        </div>
+                        
+                        <!-- URL hidden (otomatis terisi) -->
+                        <input type="text" id="inputImage" hidden>
                     </div>
+                    <!-- ======================================= -->
+
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <button class="btn" id="saveBtn">💾 Simpan Menu</button>
                         <button class="btn btn-outline" id="cancelBtn">Batal</button>
@@ -366,7 +392,7 @@
         </div>
     </div>
 
-    <!-- ===== FASE 3: HISTORY MODAL ===== -->
+    <!-- ===== HISTORY MODAL ===== -->
     <div class="modal hidden" id="historyModal">
         <div class="modal-content">
             <span class="modal-close" id="historyModalClose">&times;</span>
