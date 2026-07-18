@@ -4,200 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flora Coffee — Menu Kesugihan, Cilacap</title>
-    <meta name="description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie di Kesugihan, Cilacap. Buka setiap hari, harga terjangkau.">
-    <meta name="theme-color" content="#2a4230">
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="restaurant.menu">
-    <meta property="og:site_name" content="Flora Coffee">
-    <meta property="og:title" content="Flora Coffee — Menu">
-    <meta property="og:description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie. Harga mulai Rp2.500.">
-    <meta property="og:image" content="https://menu-flora.vercel.app/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://menu-flora.vercel.app/">
-    <meta property="og:locale" content="id_ID">
+    <!-- SEO & WhatsApp Link Preview -->
+    <meta name="description" content="Flora Coffee Kesugihan, Cilacap. Kopi, camilan, dan mie segar. Pesan langsung via WhatsApp!">
+    <meta property="og:title" content="Flora Coffee — Menu & Pemesanan" />
+    <meta property="og:description" content="Kopi, camilan, dan mie — semua tersedia di sini. Buka setiap hari 11.00 - 23.00." />
+    <meta property="og:type" content="website" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Flora Coffee — Menu">
-    <meta name="twitter:description" content="Menu Flora Coffee: kopi, non-kopi, camilan, dan mie. Harga mulai Rp2.500.">
-    <meta name="twitter:image" content="https://menu-flora.vercel.app/og-image.png">
-
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQFWC7W4X"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-NEQFWC7W4X');
-    </script>
-
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-
-    <!-- Favicon -->
-    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
-
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "CafeOrCoffeeShop",
-            "name": "Flora Coffee",
-            "image": "https://menu-flora.vercel.app/og-image.png",
-            "url": "https://menu-flora.vercel.app/",
-            "telephone": "+6285175012418",
-            "priceRange": "Rp2.500–Rp8.000",
-            "servesCuisine": "Coffee, Snacks, Noodles",
-            "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Kesugihan",
-                "addressRegion": "Cilacap, Jawa Tengah",
-                "addressCountry": "ID"
-            },
-            "openingHoursSpecification": [{
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                "opens": "11:00",
-                "closes": "23:00"
-            }]
-        }
-    </script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ===== LANGUAGE SWITCH ===== -->
+    <!-- Language Switch -->
     <div class="lang-switch">
         <button class="lang-btn active" data-lang="id">🇮🇩 ID</button>
         <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
     </div>
 
-    <!-- DARK MODE TOGGLE -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Ubah tema terang/gelap">🌙</button>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle">🌙</button>
 
-    <!-- ===== FLOATING WHATSAPP ===== -->
-    <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee" target="_blank" rel="noopener" class="floating-wa" aria-label="Chat via WhatsApp">
-        <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" fill="white">
-            <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
-        </svg>
-        <span class="wa-status online"></span>
-    </a>
+    <!-- Cart Badge (Hero) -->
+    <div class="cart-badge" id="cartBadge">0</div>
 
-    <!-- ===== FLOATING CART MINI ===== -->
-    <div class="cart-mini" id="cartMini" style="display:none;">
+    <!-- Scroll Top -->
+    <button class="scroll-top" id="scrollTop">⬆</button>
+
+    <!-- Floating Cart Mini -->
+    <div class="cart-mini" id="cartMini">
         <span class="cart-mini-icon">🛒</span>
         <span class="cart-mini-badge" id="cartMiniBadge">0</span>
     </div>
 
-    <!-- SCROLL TO TOP -->
-    <button class="scroll-top" id="scrollTop" aria-label="Kembali ke atas">⬆</button>
-
     <!-- ===== HERO ===== -->
     <header class="hero">
-        <svg class="branch tl" viewBox="0 0 200 200" fill="none">
-            <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4"/>
-            <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2"/>
-            <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.6"/>
-            <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.6"/>
-            <ellipse cx="40" cy="150" rx="9" ry="4.5" transform="rotate(-50 40 150)" fill="#f7f3e9" opacity="0.5"/>
-        </svg>
-        <svg class="branch br" viewBox="0 0 200 200" fill="none">
-            <path d="M10 190C40 140 40 90 90 50C120 26 150 20 190 10" stroke="#f7f3e9" stroke-width="1.4"/>
-            <path d="M60 110C72 96 90 92 104 78" stroke="#f7f3e9" stroke-width="1.2"/>
-            <ellipse cx="76" cy="98" rx="10" ry="5" transform="rotate(-40 76 98)" fill="#f7f3e9" opacity="0.5"/>
-            <ellipse cx="118" cy="62" rx="9" ry="4.5" transform="rotate(-35 118 62)" fill="#f7f3e9" opacity="0.5"/>
-        </svg>
-
         <div class="wrap">
-            <div class="eyebrow">
-                <span id="langEyebrow">Menu · </span>
-                <span id="openStatus">🟢 Buka Sekarang</span>
-            </div>
-            <h1 class="brand">
-                <span id="langBrand">Flora</span><br>
-                <em id="langBrandEm">Coffee</em>
-            </h1>
+            <div class="eyebrow"><span id="langEyebrow">Menu · </span><span id="openStatus">🟢 Buka Sekarang</span></div>
+            <h1 class="brand"><span id="langBrand">Flora</span><em id="langBrandEm">Coffee</em></h1>
             <p class="tagline" id="langTagline">Kopi, camilan, dan mie — semua tersedia di sini.</p>
             <div class="hero-meta">
-                <div>
-                    <strong id="langHours">11.00 – 23.00</strong><br>
-                    <span id="langDays">Senin–Minggu</span>
-                </div>
-                <div>
-                    <strong id="langLocation">Kesugihan, Cilacap</strong><br>
-                    <span id="langDinein">Dine-in & Takeaway</span>
-                </div>
+                <span id="langHours">11.00 – 23.00</span>
+                <span id="langDays">Senin–Minggu</span>
+                <span id="langLocation">Kesugihan, Cilacap</span>
+                <span id="langDinein">Dine-in & Takeaway</span>
             </div>
             <div class="hero-buttons">
-                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="hero-btn hero-btn-wa">
-                    <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="16" height="16" fill="white">
-                        <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
-                    </svg>
-                    <span id="langWa">Pesan via WhatsApp</span>
-                </a>
-                
-                <!-- ✅ UPDATED MAPS LINK -->
-                <a href="https://maps.app.goo.gl/Jg89Z3by2SeyySJc9?g_st=aw" target="_blank" rel="noopener" class="hero-btn hero-btn-map">
-                    <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
-                        <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
-                        <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
-                        <path class="cls-2" d="M70.19,82.78A69.18,69.18,0,0,1,55.08,95.29a2.14,2.14,0,0,1-2.43.07,85,85,0,0,1-21-18.76C24,67,19.13,56.34,17.48,46.07s-.11-20.42,5.07-28.56a35,35,0,0,1,7.83-8.68C37.68,3,46-.06,54.34,0A34.89,34.89,0,0,1,83.15,16.68c5.57,9.17,6.77,20.87,4.33,32.72A71.93,71.93,0,0,1,70.19,82.75v0ZM52.76,18.51A17.88,17.88,0,1,1,34.88,36.38,17.87,17.87,0,0,1,52.76,18.51Z"/>
-                    </svg>
-                    <span id="langMaps">Lihat di Maps</span>
-                </a>
-                
-                <button type="button" id="shareBtn" class="hero-btn hero-btn-map">
-                    🔗 <span id="langShare">Bagikan Menu</span>
-                </button>
-                <button type="button" onclick="window.print()" class="hero-btn hero-btn-map">
-                    🖨️ <span id="langPrint">Cetak Menu</span>
-                </button>
-                <button type="button" id="historyBtn" class="hero-btn hero-btn-map">
-                    📋 <span id="langHistory">Riwayat</span>
-                </button>
+                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan"
+                   class="hero-btn hero-btn-wa" id="langWa" target="_blank" rel="noopener">Pesan via WhatsApp</a>
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener"
+                   class="hero-btn hero-btn-map" id="langMaps">Lihat di Maps</a>
+            </div>
+            <div class="hero-buttons" style="margin-top:12px;">
+                <button class="hero-btn hero-btn-map" id="shareBtn">🔗 <span id="langShare">Bagikan Menu</span></button>
+                <button class="hero-btn hero-btn-map" id="printBtn">🖨️ <span id="langPrint">Cetak Menu</span></button>
+                <button class="hero-btn hero-btn-map" id="historyBtn">📋 <span id="langHistory">Riwayat</span></button>
             </div>
         </div>
     </header>
 
-    <!-- ===== MENU OF THE DAY ===== -->
-    <div class="menu-of-the-day" id="menuOfTheDay">
-        🌟 <span id="langMenuOfTheDay">Hari ini rekomendasi: </span>
-        <strong id="recommendationName"></strong>
+    <!-- Menu of the Day -->
+    <div class="wrap">
+        <div class="menu-of-the-day">
+            <span id="langMenuOfTheDay">🌟 Hari ini rekomendasi: </span>
+            <strong id="recommendationName">Flora's Coffee</strong>
+        </div>
     </div>
 
-    <!-- ===== NAV ===== -->
+    <!-- ===== CATEGORY NAV ===== -->
     <nav class="cats">
         <div class="wrap">
-            <button type="button" class="cat-filter-btn active" data-filter="all">
-                <span id="langAll">Semua</span>
-            </button>
-            <button type="button" class="cat-filter-btn" data-filter="kopi-klasik">
-                ☕ <span id="langCoffee">Kopi</span>
-            </button>
-            <button type="button" class="cat-filter-btn" data-filter="non-kopi">
-                🍵 <span id="langNonCoffee">Non Kopi</span>
-            </button>
-            <button type="button" class="cat-filter-btn" data-filter="camilan">
-                🍽️ <span id="langSnacks">Camilan</span>
-            </button>
-            <button type="button" class="cat-filter-btn" data-filter="mie">
-                🍜 <span id="langNoodles">Mie & Topping</span>
-            </button>
+            <button class="cat-filter-btn active" data-filter="all" id="langAll">Semua</button>
+            <button class="cat-filter-btn" data-filter="kopi-klasik" id="langCoffee">☕ Kopi</button>
+            <button class="cat-filter-btn" data-filter="non-kopi" id="langNonCoffee">🍵 Non Kopi</button>
+            <button class="cat-filter-btn" data-filter="camilan" id="langSnacks">🍽️ Camilan</button>
+            <button class="cat-filter-btn" data-filter="mie" id="langNoodles">🍜 Mie & Topping</button>
         </div>
     </nav>
 
@@ -206,223 +96,184 @@
         <div class="wrap">
             <div class="search-box">
                 <span class="icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Cari menu..." aria-label="Cari menu">
+                <input type="text" id="searchInput" placeholder="Cari menu...">
                 <button class="clear-btn" id="clearSearch">✕</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== MAIN ===== -->
+    <!-- ===== MENU ===== -->
     <main class="wrap">
-
-        <!-- SKELETON LOADING -->
-        <div id="skeletonContainer">
-            <div class="skeleton-wrapper">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-            </div>
+        <div id="noResult" style="display:none;text-align:center;padding:40px 0;color:var(--text-muted);">
+            <span style="font-size:32px;">🔍</span>
+            <p id="langNoResult">Menu tidak ditemukan. Coba kata kunci lain!</p>
         </div>
 
-        <!-- NO RESULT -->
-        <div class="no-result" id="noResult" style="display:none;">
-            <span>🔍</span>
-            <span id="langNoResult">Menu tidak ditemukan. Coba kata kunci lain!</span>
+        <!-- Skeleton -->
+        <div id="skeletonContainer" class="skeleton-wrapper">
+            <div class="skeleton"></div><div class="skeleton"></div>
+            <div class="skeleton"></div><div class="skeleton"></div>
         </div>
 
-        <!-- MENU CONTAINER -->
-        <div id="menuContainer"></div>
+        <!-- Menu Container -->
+        <div id="menuContainer" style="display:none;"></div>
 
         <!-- ===== ADMIN PANEL ===== -->
-        <div class="admin-section admin-hidden" id="adminSection">
-            <div id="adminContent">
+        <section class="admin-section admin-hidden" id="adminSection" style="display:none;">
+            <h2>☕ Admin Panel</h2>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                <span>🔐 Admin: <strong id="adminUserEmail">-</strong></span>
+                <button class="btn btn-sm btn-danger" id="logoutBtn">Logout</button>
+            </div>
 
-                <!-- Admin Dashboard -->
-                <div class="dashboard-stats" id="dashboardStats">
-                    <div class="stat-card">
-                        <span class="stat-number" id="statMenus">0</span>
-                        <span class="stat-label">Total Menu</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statOrders">0</span>
-                        <span class="stat-label">Pesanan Hari Ini</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statRevenue">Rp0</span>
-                        <span class="stat-label">Pendapatan Hari Ini</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statCustomers">0</span>
-                        <span class="stat-label">Pelanggan Hari Ini</span>
-                    </div>
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="statMenus">0</span>
+                    <span class="stat-label">Total Menu</span>
                 </div>
-
-                <div style="margin:-8px 0 20px;">
-                    <button class="btn btn-outline" id="cleanGhostOrdersBtn" style="font-size:13px;padding:8px 14px;">🧹 Bersihkan Ghost Orders Lama</button>
+                <div class="stat-card">
+                    <span class="stat-number" id="statOrders">0</span>
+                    <span class="stat-label">Pesanan Hari Ini</span>
                 </div>
-
-                <!-- Quick Stats Chart -->
-                <div class="chart-container" id="chartContainer" style="margin-bottom:20px;display:none;">
-                    <h4 style="font-family:'Fraunces',serif;margin-bottom:12px;">📊 Grafik Penjualan 7 Hari</h4>
-                    <div class="chart-bars" id="chartBars"></div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statRevenue">Rp0</span>
+                    <span class="stat-label">Pendapatan Hari Ini</span>
                 </div>
-
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-                    <h2>☕ Admin Panel</h2>
-                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                        <span id="adminUserEmail" style="font-size:13px;color:var(--text-muted);"></span>
-                        <span class="admin-badge">🔐 Admin</span>
-                        <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
-                    </div>
-                </div>
-
-                <!-- Operational Status Override -->
-                <div class="form-group" style="margin-bottom:16px;">
-                    <label>🔧 Status Operasional</label>
-                    <select id="operationalStatus">
-                        <option value="auto">🔄 Otomatis (sesuai jam)</option>
-                        <option value="open">🟢 Buka (override)</option>
-                        <option value="closed">🔴 Tutup (override)</option>
-                    </select>
-                    <span style="font-size:12px;color:var(--text-muted);margin-top:4px;display:block;">
-                        Gunakan override jika kedai libur atau tutup lebih awal.
-                    </span>
-                </div>
-
-                <!-- ===== FORM ADMIN ===== -->
-                <div id="formCard">
-                    <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nama Menu *</label>
-                            <input type="text" id="inputName" placeholder="Contoh: Ice Rost Latte">
-                        </div>
-                        <div class="form-group">
-                            <label>Harga (Rp) *</label>
-                            <input type="number" id="inputPrice" placeholder="7000" min="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea id="inputDesc" rows="2" placeholder="Kopi dingin dengan rasa yang segar."></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Kategori</label>
-                            <select id="inputCategory">
-                                <option value="kopi-klasik">☕ Kopi</option>
-                                <option value="non-kopi">🍵 Non Kopi</option>
-                                <option value="camilan">🍽️ Camilan</option>
-                                <option value="mie">🍜 Mie & Topping</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Tag (opsional)</label>
-                            <select id="inputTag">
-                                <option value="">Tidak ada</option>
-                                <option value="Favorit">⭐ Favorit</option>
-                                <option value="Promo">🔥 Promo</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Stok (0 = Habis) *</label>
-                            <input type="number" id="inputStock" value="10" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Harga Promo</label>
-                            <input type="number" id="inputPromo" placeholder="5000" min="0">
-                        </div>
-                    </div>
-
-                    <!-- ===== UPLOAD GAMBAR ===== -->
-                    <div class="form-group">
-                        <label>📸 Foto Menu</label>
-                        
-                        <!-- Drop Zone -->
-                        <div class="upload-zone" id="uploadZone">
-                            <div class="upload-icon">📤</div>
-                            <div class="upload-text">
-                                <strong>Taruh gambar di sini</strong><br>
-                                <span>atau klik untuk memilih file</span>
-                            </div>
-                            <div class="upload-hint">JPG, PNG, WebP • Maks 5MB</div>
-                            <input type="file" id="fileInput" accept="image/*" hidden>
-                        </div>
-                        
-                        <!-- Progress Bar -->
-                        <div class="upload-progress hidden" id="uploadProgress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressFill"></div>
-                            </div>
-                            <div class="progress-text" id="progressText">⏳ Mengupload... 0%</div>
-                        </div>
-                        
-                        <!-- Preview -->
-                        <div class="upload-preview-wrapper hidden" id="previewWrapper">
-                            <img id="previewImage" alt="Preview gambar menu">
-                            <div class="preview-actions">
-                                <button type="button" class="btn btn-sm" id="removeImageBtn">✕ Hapus</button>
-                                <span class="preview-status" id="previewStatus">✅ Upload berhasil</span>
-                            </div>
-                        </div>
-                        
-                        <input type="text" id="inputImage" hidden>
-                        <input type="text" id="inputImagePublicId" hidden>
-                    </div>
-
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="btn" id="saveBtn">💾 Simpan Menu</button>
-                        <button class="btn btn-outline" id="cancelBtn">Batal</button>
-                    </div>
-                </div>
-
-                <div style="margin-top:24px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                        <h3>📋 Semua Menu</h3>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
-                            <button class="btn btn-outline" id="backupBtn">⬇️ Backup JSON</button>
-                            <button class="btn btn-outline" id="exportReportBtn">📊 Export Report</button>
-                        </div>
-                    </div>
-                    <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
-                    <div class="menu-grid" id="adminMenuGrid"></div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statCustomers">0</span>
+                    <span class="stat-label">Pelanggan Hari Ini</span>
                 </div>
             </div>
-        </div>
 
+            <!-- Clean Ghost Orders -->
+            <button class="btn" id="cleanGhostOrdersBtn" style="width:100%;justify-content:center;margin-bottom:16px;">
+                🧹 Bersihkan Ghost Orders Lama
+            </button>
+
+            <!-- Sales Chart -->
+            <div class="chart-container" id="chartContainer" style="display:none;margin-bottom:20px;">
+                <h3 style="font-size:16px;margin-bottom:8px;">📊 Grafik Penjualan 7 Hari</h3>
+                <div class="chart-bars" id="chartBars"></div>
+            </div>
+
+            <!-- Operational Status -->
+            <div class="form-group" style="margin-bottom:20px;">
+                <label>🔧 Status Operasional</label>
+                <select id="operationalStatus">
+                    <option value="auto">🔄 Otomatis (sesuai jam)</option>
+                    <option value="open">🟢 Buka (override)</option>
+                    <option value="closed">🔴 Tutup (override)</option>
+                </select>
+                <small style="color:var(--text-muted);">Gunakan override jika kedai libur atau tutup lebih awal.</small>
+            </div>
+
+            <!-- Form Tambah/Edit Menu -->
+            <div id="formCard" style="background:var(--bg-body);padding:20px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px;">
+                <h3 id="formTitle" style="font-size:18px;margin-bottom:12px;">📝 Tambah Menu Baru</h3>
+
+                <div class="form-group">
+                    <label>Nama Menu *</label>
+                    <input type="text" id="inputName" placeholder="Contoh: Ice Latte">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Harga (Rp) *</label>
+                        <input type="number" id="inputPrice" placeholder="8000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Stok (0 = Habis) *</label>
+                        <input type="number" id="inputStock" placeholder="10" min="0" value="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="inputDesc" rows="2" placeholder="Deskripsi singkat..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="inputCategory">
+                            <option value="kopi-klasik">☕ Kopi</option>
+                            <option value="non-kopi">🍵 Non Kopi</option>
+                            <option value="camilan">🍽️ Camilan</option>
+                            <option value="mie">🍜 Mie & Topping</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tag (opsional)</label>
+                        <select id="inputTag">
+                            <option value="">Tidak ada</option>
+                            <option value="⭐ Favorit">⭐ Favorit</option>
+                            <option value="🔥 Promo">🔥 Promo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Harga Promo</label>
+                    <input type="number" id="inputPromo" placeholder="Kosongkan jika tidak ada promo" min="0">
+                </div>
+
+                <!-- Upload Zone -->
+                <div class="form-group">
+                    <label>📸 Foto Menu</label>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">
+                            <strong>Taruh gambar di sini</strong><br>
+                            <span>atau klik untuk memilih file</span>
+                        </div>
+                        <div class="upload-hint">JPG, PNG, WebP • Maks 5MB</div>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;">
+                    </div>
+                    <div class="upload-progress hidden" id="uploadProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <div class="progress-text" id="progressText">⏳ Mengupload... 0%</div>
+                    </div>
+                    <div class="upload-preview-wrapper hidden" id="previewWrapper">
+                        <img id="previewImage" src="" alt="Preview">
+                        <div class="preview-actions">
+                            <span class="preview-status" id="previewStatus">✅ Upload berhasil</span>
+                            <button class="btn btn-sm btn-danger" id="removeImageBtn">✕ Hapus</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="inputImage">
+                    <input type="hidden" id="inputImagePublicId">
+                </div>
+
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-wa" id="saveBtn">💾 Simpan Menu</button>
+                    <button class="btn btn-outline" id="cancelBtn">Batal</button>
+                </div>
+            </div>
+
+            <!-- Admin Menu Grid -->
+            <h3>📋 Semua Menu</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                <button class="btn btn-sm" id="newMenuBtn">+ Tambah Baru</button>
+                <button class="btn btn-sm" id="backupBtn">⬇️ Backup JSON</button>
+                <button class="btn btn-sm" id="exportReportBtn">📊 Export Report</button>
+            </div>
+            <p id="loadingMenu" class="hidden">⏳ Memuat menu...</p>
+            <div class="menu-grid" id="adminMenuGrid"></div>
+        </section>
     </main>
 
-    <!-- ===== CART ===== -->
+    <!-- ===== CART SUMMARY ===== -->
     <div class="cart-summary" id="cartSummary">
         <div class="wrap">
             <div>
-                <div class="cart-total">
-                    <span id="langTotal">Total</span>: <span id="cartTotal">Rp0</span>
-                </div>
-                <div class="cart-detail" id="cartDetail">
-                    <span id="langEmptyCart">Belum ada pesanan</span>
-                </div>
+                <div class="cart-total"><span id="langTotal">Total</span>: <span id="cartTotal">Rp0</span></div>
+                <div class="cart-detail" id="cartDetail">Belum ada pesanan</div>
             </div>
-            <div style="position:relative;display:inline-block;">
-                <a href="#" target="_blank" rel="noopener" class="btn btn-wa" id="orderBtn">
-                    <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="18" height="18" fill="white">
-                        <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
-                    </svg>
-                    <span id="langOrderNow">Pesan Sekarang</span>
-                </a>
-                <span class="cart-badge" id="cartBadge">0</span>
-            </div>
+            <a href="#" id="orderBtn" class="btn btn-wa" target="_blank" rel="noopener">
+                <span id="langOrderNow">Pesan Sekarang</span>
+            </a>
         </div>
     </div>
 
     <!-- ===== HISTORY MODAL ===== -->
-    <div class="modal hidden" id="historyModal">
+    <div class="modal" id="historyModal">
         <div class="modal-content">
             <span class="modal-close" id="historyModalClose">&times;</span>
             <h3 id="langHistoryTitle">📋 Riwayat Pesanan</h3>
@@ -430,19 +281,19 @@
         </div>
     </div>
 
-    <!-- ===== KONFIRMASI PESANAN WHATSAPP ===== -->
-    <div class="modal" id="waConfirmModal">
-        <div class="modal-content" style="text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 12px;">📱</div>
-            <h3 style="margin-bottom: 8px;">Konfirmasi Pesanan</h3>
-            <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 15px;">
+    <!-- ===== WHATSAPP CONFIRM MODAL (Anti Ghost Order) ===== -->
+    <div class="modal wa-confirm-modal" id="waConfirmModal">
+        <div class="modal-content" style="text-align:center;">
+            <div style="font-size:48px;margin-bottom:12px;">📱</div>
+            <h3 style="margin-bottom:8px;">Konfirmasi Pesanan</h3>
+            <p style="color:var(--text-muted);margin-bottom:24px;font-size:15px;">
                 WhatsApp baru saja terbuka di tab lain. Pastikan Anda sudah menekan tombol <strong>Kirim</strong> di sana.
             </p>
-            <div style="display: flex; gap: 12px; flex-direction: column;">
-                <button class="btn btn-wa" id="btnAlreadySent" style="justify-content: center; width: 100%;">
+            <div style="display:flex;gap:12px;flex-direction:column;">
+                <button class="btn btn-wa" id="btnAlreadySent" style="justify-content:center;width:100%;">
                     ✅ Ya, Saya Sudah Kirim
                 </button>
-                <button class="btn btn-outline" id="btnNotYet" style="justify-content: center; width: 100%;">
+                <button class="btn btn-outline" id="btnNotYet" style="justify-content:center;width:100%;border-color:#95a5a6;color:#95a5a6;">
                     ❌ Belum, Batalkan
                 </button>
             </div>
@@ -455,45 +306,21 @@
             <h3 id="langFooterTitle">Mau pesan?</h3>
             <p id="langFooterDesc">Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.</p>
             <div class="footer-buttons">
-                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan" target="_blank" rel="noopener" class="btn btn-wa">
-                    <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459" width="18" height="18" fill="white">
-                        <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
-                    </svg>
-                    <span id="langWaFooter">Pesan via WhatsApp</span>
-                </a>
-                
-                <!-- ✅ UPDATED MAPS LINK -->
-                <a href="https://maps.app.goo.gl/Jg89Z3by2SeyySJc9?g_st=aw" target="_blank" rel="noopener" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
-                    <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.67 116.43" width="16" height="16">
-                        <defs><style>.cls-1{fill:#2b2b2b;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#ef4136;}</style></defs>
-                        <path class="cls-1" d="M84.32,80.09c13,3.68,21.35,9.56,21.35,16.19,0,11.13-23.65,20.15-52.83,20.15S0,107.41,0,96.28c0-6.79,8.79-12.79,22.27-16.44l1.48,2c1,1.37,2.13,2.73,3.26,4.06-9.43,2.28-15.47,5.8-15.47,9.75,0,6.88,18.29,12.46,40.86,12.46s40.86-5.58,40.86-12.46c0-3.67-5.24-7-13.56-9.26,1.64-2,3.18-4.14,4.62-6.3Z"/>
-                        <path class="cls-2" d="M70.19,82.78A69.18,69.18,0,0,1,55.08,95.29a2.14,2.14,0,0,1-2.43.07,85,85,0,0,1-21-18.76C24,67,19.13,56.34,17.48,46.07s-.11-20.42,5.07-28.56a35,35,0,0,1,7.83-8.68C37.68,3,46-.06,54.34,0A34.89,34.89,0,0,1,83.15,16.68c5.57,9.17,6.77,20.87,4.33,32.72A71.93,71.93,0,0,1,70.19,82.75v0ZM52.76,18.51A17.88,17.88,0,1,1,34.88,36.38,17.87,17.87,0,0,1,52.76,18.51Z"/>
-                    </svg>
-                    <span id="langMapsFooter">Lihat di Maps</span>
-                </a>
-                
-                <button type="button" onclick="window.print()" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
+                <a href="https://wa.me/6285175012418?text=Halo%20Flora%20Coffee%2C%20saya%20mau%20pesan"
+                   class="btn btn-wa" target="_blank" rel="noopener" id="langWaFooter">Pesan via WhatsApp</a>
+                <a href="https://maps.google.com/?q=Kesugihan+Cilacap" target="_blank" rel="noopener"
+                   class="btn btn-outline" style="border-color:var(--ivory);color:var(--ivory);" id="langMapsFooter">Lihat di Maps</a>
+                <button class="btn btn-outline" style="border-color:var(--ivory);color:var(--ivory);" id="printFooterBtn">
                     🖨️ <span id="langPrintFooter">Cetak Menu</span>
                 </button>
             </div>
             <div class="foot-note">
-                Flora Coffee —
-                <span class="secret-trigger" id="secretAdminTrigger">Kesugihan, Cilacap</span>
+                <span class="secret-trigger" id="secretAdminTrigger">Flora Coffee</span> —
+                Kesugihan, Cilacap
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script src="assets/js/app.js" defer></script>
-
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('✅ Service Worker registered'))
-                .catch(err => console.log('❌ SW registration failed:', err));
-        }
-    </script>
-
+    <script src="app.js"></script>
 </body>
 </html>
