@@ -2,10 +2,6 @@
     'use strict';
 
     // ============================================
-    // 🔥 FASE 2 — MULTI-LANGUAGE
-    // ============================================
-
-    // ============================================
     // TRANSLATIONS
     // ============================================
     const translations = {
@@ -101,16 +97,11 @@
 
     function updateTranslations() {
         const t = translations[currentLang];
-        if (!t) {
-            console.error('❌ Translation not found for:', currentLang);
-            return;
-        }
+        if (!t) return;
 
         function updateEl(id, value) {
             const el = document.getElementById(id);
-            if (el) {
-                el.textContent = value;
-            }
+            if (el) el.textContent = value;
         }
 
         updateEl('langEyebrow', t.eyebrow);
@@ -147,13 +138,11 @@
         if (searchInput) searchInput.placeholder = t.search;
 
         updateOpenStatus();
-        console.log('✅ Translations updated to:', currentLang);
     }
 
     // ============================================
-    // 🔥 FASE 2 — MENU OF THE DAY
+    // MENU OF THE DAY
     // ============================================
-
     function getMenuOfTheDay() {
         const day = new Date().getDay();
         const recommendations = {
@@ -169,11 +158,8 @@
     }
 
     function showMenuOfTheDay() {
-        const name = getMenuOfTheDay();
         const el = document.getElementById('recommendationName');
-        if (el) {
-            el.textContent = name;
-        }
+        if (el) el.textContent = getMenuOfTheDay();
     }
 
     // ============================================
@@ -236,6 +222,7 @@
     const cancelBtn = document.getElementById('cancelBtn');
     const newMenuBtn = document.getElementById('newMenuBtn');
     const backupBtn = document.getElementById('backupBtn');
+    const exportReportBtn = document.getElementById('exportReportBtn');
 
     // Upload elements
     const fileInput = document.getElementById('fileInput');
@@ -243,6 +230,7 @@
     const previewWrapper = document.getElementById('previewWrapper');
     const previewImage = document.getElementById('previewImage');
     const inputImage = document.getElementById('inputImage');
+    const inputImagePublicId = document.getElementById('inputImagePublicId');
     const uploadProgress = document.getElementById('uploadProgress');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
@@ -255,6 +243,7 @@
     const inputTag = document.getElementById('inputTag');
     const inputStock = document.getElementById('inputStock');
     const inputPromo = document.getElementById('inputPromo');
+    const operationalStatus = document.getElementById('operationalStatus');
 
     let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
     let editingId = null;
@@ -262,6 +251,7 @@
     let searchTimeout = null;
     let currentFile = null;
     let isUploading = false;
+    let menuUnsubscribe = null;
 
     // ============================================
     // DARK MODE
@@ -296,19 +286,66 @@
     });
 
     // ============================================
-    // STATUS BUKA/TUTUP
+    // STATUS BUKA/TUTUP (dengan override)
     // ============================================
+    let operationalOverride = null;
+
+    async function loadOperationalStatus() {
+        try {
+            const doc = await db.collection('settings').doc('operational').get();
+            if (doc.exists) {
+                operationalOverride = doc.data().status;
+                if (operationalStatus) {
+                    operationalStatus.value = operationalOverride || 'auto';
+                }
+            }
+        } catch (e) {
+            console.log('No operational setting found, using auto');
+        }
+    }
+
     function updateOpenStatus() {
         const el = document.getElementById('openStatus');
         if (!el) return;
+
+        // Check override first
+        if (operationalOverride === 'open') {
+            el.textContent = '🟢 Buka (Override)';
+            return;
+        }
+        if (operationalOverride === 'closed') {
+            el.textContent = '🔴 Tutup (Override)';
+            return;
+        }
+
+        // Auto mode
         const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit',
             hour12: false }));
         const isOpen = (hour >= 11 && hour < 23);
         const t = translations[currentLang];
         el.textContent = isOpen ? t.open : t.closed;
     }
-    updateOpenStatus();
-    setInterval(updateOpenStatus, 60000);
+
+    // Save operational status
+    if (operationalStatus) {
+        operationalStatus.addEventListener('change', async function() {
+            if (!isAdmin) return;
+            const value = this.value;
+            try {
+                await db.collection('settings').doc('operational').set({
+                    status: value,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: auth.currentUser?.email || 'unknown'
+                });
+                operationalOverride = value;
+                updateOpenStatus();
+                showToast('✅ Status operasional diperbarui');
+                trackEvent('Admin', 'operational_status', value);
+            } catch (err) {
+                showToast('❌ Gagal menyimpan status: ' + err.message);
+            }
+        });
+    }
 
     // ============================================
     // SHARE MENU
@@ -334,7 +371,7 @@
     }
 
     // ============================================
-    // 🔥 GOOGLE ANALYTICS TRACKING
+    // GOOGLE ANALYTICS TRACKING
     // ============================================
     function trackEvent(category, action, label, value) {
         if (typeof gtag !== 'undefined') {
@@ -343,7 +380,6 @@
                 'event_label': label || '',
                 'value': value || 0
             });
-            console.log(`📊 Track: ${category} - ${action} ${label ? '- ' + label : ''}`);
         }
     }
 
@@ -365,17 +401,11 @@
     }
 
     function trackSearch(keyword) {
-        if (keyword.length > 0) {
-            trackEvent('Search', 'search', keyword);
-        }
+        if (keyword.length > 0) trackEvent('Search', 'search', keyword);
     }
 
     function trackCategoryFilter(category) {
         trackEvent('Navigation', 'filter_category', category);
-    }
-
-    function trackPrint() {
-        trackEvent('Engagement', 'print_menu');
     }
 
     // ============================================
@@ -423,9 +453,7 @@
 
         if (keyword.length > 2) {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                trackSearch(keyword);
-            }, 1000);
+            searchTimeout = setTimeout(() => trackSearch(keyword), 1000);
         }
 
         // Highlight
@@ -506,17 +534,13 @@
             );
             orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
 
-            // Save history
-            const historyKey = 'flora-last-order';
-            const lastOrder = localStorage.getItem(historyKey);
-            const currentOrder = orderList.join('|') + total;
-            if (lastOrder !== currentOrder) {
-                saveOrderHistory({
-                    items: orderList.join(' · '),
-                    total: 'Rp' + total.toLocaleString('id-ID')
-                });
-                localStorage.setItem(historyKey, currentOrder);
-            }
+            // Save to Firestore
+            saveOrderToFirestore({
+                items: orderList.join(' · '),
+                total: total,
+                rawItems: orderList,
+                customerNote: ''
+            });
 
         } else {
             cartSummary.classList.remove('show');
@@ -527,18 +551,45 @@
     }
 
     // ============================================
+    // SAVE ORDER TO FIRESTORE (FIXED!)
+    // ============================================
+    async function saveOrderToFirestore(order) {
+        try {
+            await db.collection('orders').add({
+                items: order.items,
+                total: order.total,
+                rawItems: order.rawItems || [],
+                customerNote: order.customerNote || '',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                source: 'web'
+            });
+            console.log('✅ Order saved to Firestore');
+        } catch (err) {
+            console.error('❌ Failed to save order:', err);
+            // Fallback: save to localStorage
+            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+            history.push({
+                id: Date.now(),
+                items: order.items,
+                total: 'Rp' + order.total.toLocaleString('id-ID'),
+                date: new Date().toLocaleString('id-ID')
+            });
+            while (history.length > 50) history.shift();
+            localStorage.setItem('flora-order-history', JSON.stringify(history));
+        }
+    }
+
+    // ============================================
     // CART BADGE
     // ============================================
     function updateCartBadge() {
         if (!cartBadge) return;
-
         let totalItems = 0;
         document.querySelectorAll('.item').forEach(item => {
             const checkbox = item.querySelector('.item-checkbox');
             const qtySpan = item.querySelector('.qty-value');
             if (checkbox && checkbox.checked) {
-                const qty = parseInt(qtySpan?.textContent) || 0;
-                totalItems += qty;
+                totalItems += parseInt(qtySpan?.textContent) || 0;
             }
         });
 
@@ -558,7 +609,6 @@
     // ============================================
     function updateCartMini() {
         if (!cartMini || !cartMiniBadge) return;
-
         let totalItems = 0;
         document.querySelectorAll('.item').forEach(item => {
             const checkbox = item.querySelector('.item-checkbox');
@@ -583,42 +633,36 @@
     }
 
     // ============================================
-    // WHATSAPP TEMPLATE
+    // ORDER HISTORY (dari Firestore)
     // ============================================
-    function getWATemplate(type, data) {
-        const templates = {
-            'order': 'Halo Flora Coffee,\n\nSaya mau pesan:\n{items}\n\nTotal: {total}\n\nAlamat: {address}',
-            'reservation': 'Halo Flora Coffee,\n\nSaya mau reservasi untuk {people} orang pada {date} pukul {time}.',
-            'feedback': 'Halo Flora Coffee,\n\nSaya mau memberi feedback:\n{message}'
-        };
+    async function loadOrderHistoryFromFirestore() {
+        try {
+            const snapshot = await db.collection('orders')
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .get();
 
-        let template = templates[type] || templates.order;
-        Object.keys(data).forEach(key => {
-            template = template.replace(new RegExp(`{${key}}`, 'g'), data[key]);
-        });
+            const history = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                history.push({
+                    id: doc.id,
+                    items: data.items || '',
+                    total: 'Rp' + (data.total || 0).toLocaleString('id-ID'),
+                    date: data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja'
+                });
+            });
 
-        return template;
-    }
-
-    // ============================================
-    // ORDER HISTORY
-    // ============================================
-    function saveOrderHistory(order) {
-        const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
-        history.push({
-            id: Date.now(),
-            items: order.items,
-            total: order.total,
-            date: new Date().toLocaleString('id-ID')
-        });
-        while (history.length > 50) {
-            history.shift();
+            return history;
+        } catch (err) {
+            console.error('Error loading history from Firestore:', err);
+            // Fallback to localStorage
+            return JSON.parse(localStorage.getItem('flora-order-history')) || [];
         }
-        localStorage.setItem('flora-order-history', JSON.stringify(history));
     }
 
-    function showOrderHistory() {
-        const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+    async function showOrderHistory() {
+        const history = await loadOrderHistoryFromFirestore();
         const container = document.getElementById('historyList');
         if (!container) return;
 
@@ -628,8 +672,7 @@
             return;
         }
 
-        const reversed = [...history].reverse();
-        container.innerHTML = reversed.map(item => `
+        container.innerHTML = history.map(item => `
             <div class="history-item">
                 <div class="date">📅 ${item.date}</div>
                 <div class="items">${item.items}</div>
@@ -659,51 +702,113 @@
 
     if (historyModal) {
         historyModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('show');
-            }
+            if (e.target === this) this.classList.remove('show');
         });
     }
 
     // ============================================
-    // ADMIN DASHBOARD
+    // ADMIN DASHBOARD (dari Firestore)
     // ============================================
     async function loadDashboardStats() {
         try {
+            // Total menu
             const menuSnapshot = await db.collection('menu').get();
-            const statMenus = document.getElementById('statMenus');
-            if (statMenus) statMenus.textContent = menuSnapshot.size;
+            document.getElementById('statMenus').textContent = menuSnapshot.size;
 
-            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
-            const today = new Date().toDateString();
-            const todayOrders = history.filter(item => {
-                try {
-                    const dateObj = new Date(item.date);
-                    return dateObj.toDateString() === today;
-                } catch {
-                    return false;
-                }
+            // Today's orders from Firestore
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const startOfDay = firebase.firestore.Timestamp.fromDate(today);
+
+            const ordersSnapshot = await db.collection('orders')
+                .where('timestamp', '>=', startOfDay)
+                .get();
+
+            let totalRevenue = 0;
+            let customerSet = new Set();
+
+            ordersSnapshot.forEach(doc => {
+                const data = doc.data();
+                totalRevenue += data.total || 0;
+                if (data.customerId) customerSet.add(data.customerId);
             });
 
-            const statOrders = document.getElementById('statOrders');
-            if (statOrders) statOrders.textContent = todayOrders.length;
+            document.getElementById('statOrders').textContent = ordersSnapshot.size;
+            document.getElementById('statRevenue').textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
+            document.getElementById('statCustomers').textContent = customerSet.size || '-';
 
-            const totalRevenue = todayOrders.reduce((sum, order) => {
-                const totalStr = order.total.replace(/[^0-9]/g, '');
-                const total = parseInt(totalStr) || 0;
-                return sum + total;
-            }, 0);
-
-            const statRevenue = document.getElementById('statRevenue');
-            if (statRevenue) statRevenue.textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
+            // Load chart
+            await loadSalesChart();
 
         } catch (error) {
             console.error('Error loading dashboard:', error);
+            // Fallback: use localStorage
+            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+            document.getElementById('statOrders').textContent = history.length;
         }
     }
 
     // ============================================
-    // CLOUDINARY UPLOAD SEAMLESS
+    // SALES CHART (7 Days)
+    // ============================================
+    async function loadSalesChart() {
+        const container = document.getElementById('chartContainer');
+        const barsContainer = document.getElementById('chartBars');
+        if (!container || !barsContainer) return;
+
+        try {
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                date.setHours(0, 0, 0, 0);
+
+                const startOfDay = firebase.firestore.Timestamp.fromDate(date);
+                const endOfDay = firebase.firestore.Timestamp.fromDate(new Date(date.getTime() + 86400000));
+
+                const snapshot = await db.collection('orders')
+                    .where('timestamp', '>=', startOfDay)
+                    .where('timestamp', '<', endOfDay)
+                    .get();
+
+                let dailyTotal = 0;
+                snapshot.forEach(doc => {
+                    dailyTotal += doc.data().total || 0;
+                });
+
+                last7Days.push({
+                    date: date.toLocaleDateString('id-ID', { weekday: 'short' }),
+                    total: dailyTotal,
+                    label: date.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })
+                });
+            }
+
+            // Check if there's any data
+            const hasData = last7Days.some(d => d.total > 0);
+            if (!hasData) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            const maxTotal = Math.max(...last7Days.map(d => d.total), 1);
+
+            barsContainer.innerHTML = last7Days.map(day => `
+                <div class="chart-bar-wrap">
+                    <div class="chart-bar-value">${day.total > 0 ? 'Rp' + (day.total/1000).toFixed(0) + 'k' : ''}</div>
+                    <div class="chart-bar" style="height: ${(day.total / maxTotal) * 80 + 10}px;"></div>
+                    <div class="chart-bar-label">${day.label}</div>
+                </div>
+            `).join('');
+
+        } catch (err) {
+            console.error('Error loading chart:', err);
+            container.style.display = 'none';
+        }
+    }
+
+    // ============================================
+    // CLOUDINARY UPLOAD
     // ============================================
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -771,6 +876,7 @@
             previewImage.src = response.secure_url;
             previewWrapper.classList.remove('hidden');
             inputImage.value = response.secure_url;
+            inputImagePublicId.value = response.public_id || '';
             currentFile = file;
 
             setTimeout(() => {
@@ -780,7 +886,7 @@
             showToast('✅ Gambar berhasil diupload!');
             trackEvent('Admin', 'upload_image', file.name);
 
-            return response.secure_url;
+            return { url: response.secure_url, publicId: response.public_id || '' };
 
         } catch (error) {
             console.error('Upload error:', error);
@@ -788,28 +894,26 @@
             progressFill.style.width = '0%';
             progressText.textContent = '❌ Upload gagal!';
             uploadProgress.classList.remove('hidden');
-
             showToast('❌ Gagal upload gambar: ' + error.message);
-
-            const retryBtn = document.createElement('button');
-            retryBtn.className = 'btn btn-sm';
-            retryBtn.textContent = '🔄 Coba Lagi';
-            retryBtn.style.marginTop = '8px';
-            retryBtn.onclick = () => {
-                if (currentFile) {
-                    uploadToCloudinary(currentFile);
-                } else if (fileInput && fileInput.files[0]) {
-                    uploadToCloudinary(fileInput.files[0]);
-                }
-                retryBtn.remove();
-            };
-
-            const progressContainer = document.querySelector('.upload-progress');
-            if (progressContainer) {
-                progressContainer.appendChild(retryBtn);
-            }
-
             return null;
+        }
+    }
+
+    // ============================================
+    // DELETE IMAGE FROM CLOUDINARY (via proxy)
+    // ============================================
+    async function deleteImageFromCloudinary(publicId) {
+        if (!publicId) return;
+        try {
+            // You'll need a backend endpoint for this
+            // For now, we'll just log it
+            console.log('🗑️ Would delete image:', publicId);
+            // await fetch('/api/cloudinary/delete', {
+            //     method: 'POST',
+            //     body: JSON.stringify({ publicId })
+            // });
+        } catch (err) {
+            console.error('Failed to delete image:', err);
         }
     }
 
@@ -842,9 +946,7 @@
         });
 
         uploadZone.addEventListener('dragover', function() {
-            if (!isUploading) {
-                this.classList.add('dragover');
-            }
+            if (!isUploading) this.classList.add('dragover');
         });
 
         uploadZone.addEventListener('dragleave', function() {
@@ -860,9 +962,7 @@
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 currentFile = files[0];
-                if (fileInput) {
-                    fileInput.files = files;
-                }
+                if (fileInput) fileInput.files = files;
                 uploadToCloudinary(files[0]);
             }
         });
@@ -872,6 +972,7 @@
         removeImageBtn.addEventListener('click', function() {
             currentFile = null;
             inputImage.value = '';
+            inputImagePublicId.value = '';
             previewWrapper.classList.add('hidden');
             previewImage.src = '';
             if (fileInput) fileInput.value = '';
@@ -906,41 +1007,41 @@
 
     const defaultMenuData = [
         { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
-            category: 'kopi-klasik', tag: '', image: '' },
+            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
         { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
-            category: 'kopi-klasik', tag: '', image: '' },
+            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
         { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
-            image: '' },
+            image: '', stock: 10 },
         { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
-            category: 'non-kopi', tag: '', image: '' },
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
         { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '' },
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
         { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
-            category: 'non-kopi', tag: '', image: '' },
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
         { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '' },
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
         { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
-            category: 'camilan', tag: '', image: '' },
+            category: 'camilan', tag: '', image: '', stock: 10 },
         { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
-            category: 'mie', tag: '', image: '' },
+            category: 'mie', tag: '', image: '', stock: 10 },
         { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '' },
+            tag: '', image: '', stock: 10 },
         { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '' }
+            tag: '', image: '', stock: 10 }
     ];
 
     function renderMenu(data) {
@@ -1108,7 +1209,7 @@
                 function updateQty(change) {
                     if (item.stock === 0) return;
                     let val = parseInt(qtySpan.textContent) || 0;
-                    val = Math.max(0, val + change);
+                    val = Math.max(0, Math.min(item.stock, val + change));
                     qtySpan.textContent = val;
                     qtySpan.classList.toggle('zero', val === 0);
                     if (val > 0) {
@@ -1171,8 +1272,6 @@
         document.querySelectorAll('.category').forEach(el => revealObserver.observe(el));
     }
 
-    let menuUnsubscribe = null;
-
     function loadMenu() {
         skeletonContainer.style.display = 'block';
         menuContainer.style.display = 'none';
@@ -1209,7 +1308,8 @@
             adminMenuGrid.innerHTML = '<p style="text-align:center;color:#95a5a6;padding:20px;">Belum ada menu.</p>';
             return;
         }
-                data.forEach(item => {
+
+        data.forEach(item => {
             const card = document.createElement('div');
             card.className = 'admin-card';
             card.innerHTML = `
@@ -1226,18 +1326,52 @@
                     </div>
                     <div class="admin-card-meta">
                         <span>${categoryNames[item.category] || item.category}</span>
-                        ${item.tag ? `<span class="tag">${item.tag}</span>` : ''}
-                        ${item.stock !== undefined ? `<span>Stok: ${item.stock}</span>` : ''}
+                        ${item.tag ? `<span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>` : ''}
                     </div>
+                </div>
+                <div class="admin-card-stock">
+                    <button onclick="quickUpdateStock('${item.id}', -1)" title="Kurangi stok">−</button>
+                    <span>Stok: ${item.stock !== undefined ? item.stock : 10}</span>
+                    <button onclick="quickUpdateStock('${item.id}', 1)" title="Tambah stok">+</button>
                 </div>
                 <div class="admin-card-actions">
                     <button class="btn btn-sm" onclick="editMenuItem('${item.id}')">✏️ Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteMenuItem('${item.id}')">🗑️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteMenuItem('${item.id}', '${item.name}')">🗑️</button>
                 </div>
             `;
             adminMenuGrid.appendChild(card);
         });
     }
+
+    // ============================================
+    // QUICK STOCK UPDATE (New Feature)
+    // ============================================
+    window.quickUpdateStock = async function(id, change) {
+        if (!isAdmin) {
+            showToast('❌ Hanya admin yang bisa mengubah stok');
+            return;
+        }
+        try {
+            const doc = await db.collection('menu').doc(id).get();
+            if (!doc.exists) {
+                showToast('❌ Menu tidak ditemukan');
+                return;
+            }
+            const currentStock = doc.data().stock || 0;
+            const newStock = Math.max(0, currentStock + change);
+            
+            await db.collection('menu').doc(id).update({
+                stock: newStock,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            showToast(`✅ Stok diperbarui menjadi ${newStock}`);
+            trackEvent('Admin', 'quick_stock_update', `${id}: ${currentStock}→${newStock}`);
+        } catch (err) {
+            console.error('Error updating stock:', err);
+            showToast('❌ Gagal update stok: ' + err.message);
+        }
+    };
 
     // ============================================
     // CRUD OPERATIONS
@@ -1258,15 +1392,17 @@
             inputDesc.value = data.desc || '';
             inputCategory.value = data.category || 'kopi-klasik';
             inputTag.value = data.tag || '';
-            inputStock.value = data.stock !== undefined ? data.stock : '';
-            inputPromo.checked = !!data.promoPrice;
+            inputStock.value = data.stock !== undefined ? data.stock : 10;
+            inputPromo.value = data.promoPrice || '';
             if (data.image) {
                 inputImage.value = data.image;
+                inputImagePublicId.value = data.imagePublicId || '';
                 previewImage.src = data.image;
                 previewWrapper.classList.remove('hidden');
             } else {
                 previewWrapper.classList.add('hidden');
                 inputImage.value = '';
+                inputImagePublicId.value = '';
             }
             document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
             trackEvent('Admin', 'edit_menu', data.name);
@@ -1276,15 +1412,31 @@
         });
     };
 
-    window.deleteMenuItem = function(id) {
+    window.deleteMenuItem = function(id, name) {
         if (!isAdmin) return;
-        if (!confirm('🗑️ Yakin ingin menghapus menu ini?')) return;
-        db.collection('menu').doc(id).delete().then(() => {
+        
+        // Anti-mistake confirmation
+        const confirmText = prompt(
+            `⚠️ HAPUS PERMANEN\n\nMenu "${name}" akan dihapus.\nKetik "HAPUS" untuk konfirmasi:`
+        );
+        if (confirmText !== 'HAPUS') {
+            showToast('❌ Penghapusan dibatalkan');
+            return;
+        }
+
+        db.collection('menu').doc(id).get().then(doc => {
+            const data = doc.data();
+            // Delete image from Cloudinary if exists
+            if (data.imagePublicId) {
+                deleteImageFromCloudinary(data.imagePublicId);
+            }
+            return db.collection('menu').doc(id).delete();
+        }).then(() => {
             showToast('✅ Menu berhasil dihapus');
-            trackEvent('Admin', 'delete_menu');
+            trackEvent('Admin', 'delete_menu', name);
         }).catch(err => {
             console.error('Error deleting:', err);
-            showToast('❌ Gagal menghapus menu');
+            showToast('❌ Gagal menghapus menu: ' + err.message);
         });
     };
 
@@ -1300,9 +1452,10 @@
         inputDesc.value = '';
         inputCategory.value = 'kopi-klasik';
         inputTag.value = '';
-        inputStock.value = '';
-        inputPromo.checked = false;
+        inputStock.value = '10';
+        inputPromo.value = '';
         inputImage.value = '';
+        inputImagePublicId.value = '';
         previewWrapper.classList.add('hidden');
         previewImage.src = '';
         currentFile = null;
@@ -1333,9 +1486,11 @@
             const category = inputCategory.value;
             const tag = inputTag.value.trim();
             const stock = parseInt(inputStock.value);
-            const promo = inputPromo.checked;
+            const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
             const image = inputImage.value.trim();
+            const imagePublicId = inputImagePublicId.value.trim();
 
+            // Validations
             if (!name) {
                 showToast('❌ Nama menu wajib diisi');
                 inputName.focus();
@@ -1351,6 +1506,26 @@
                 inputStock.focus();
                 return;
             }
+            if (promoPrice !== null && (isNaN(promoPrice) || promoPrice < 0 || promoPrice >= price)) {
+                showToast('❌ Harga promo harus lebih kecil dari harga normal');
+                inputPromo.focus();
+                return;
+            }
+
+            // Check duplicate name
+            try {
+                const existing = await db.collection('menu')
+                    .where('name', '==', name)
+                    .get();
+                
+                if (!existing.empty && existing.docs[0].id !== editingId) {
+                    showToast('❌ Nama menu sudah ada! Gunakan nama lain.');
+                    inputName.focus();
+                    return;
+                }
+            } catch (err) {
+                console.error('Error checking duplicate:', err);
+            }
 
             const data = {
                 name,
@@ -1359,19 +1534,26 @@
                 category,
                 tag: tag || '',
                 stock,
-                promoPrice: promo ? price : null,
+                promoPrice: promoPrice,
                 image: image || '',
+                imagePublicId: imagePublicId || '',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
             try {
                 if (editingId) {
+                    // If image changed, delete old one
+                    const oldDoc = await db.collection('menu').doc(editingId).get();
+                    if (oldDoc.exists && oldDoc.data().imagePublicId && 
+                        oldDoc.data().imagePublicId !== imagePublicId) {
+                        deleteImageFromCloudinary(oldDoc.data().imagePublicId);
+                    }
                     await db.collection('menu').doc(editingId).update(data);
                     showToast('✅ Menu berhasil diupdate!');
                     trackEvent('Admin', 'update_menu', name);
                 } else {
-                    const newId = Date.now().toString();
                     data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    const newId = Date.now().toString();
                     await db.collection('menu').doc(newId).set(data);
                     showToast('✅ Menu baru berhasil ditambahkan!');
                     trackEvent('Admin', 'add_menu', name);
@@ -1395,6 +1577,7 @@
             adminSection.style.display = 'block';
             adminUserEmail.textContent = user.email;
             loadDashboardStats();
+            loadOperationalStatus();
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             trackEvent('Auth', 'admin_login', user.email);
         } else {
@@ -1486,6 +1669,49 @@
     }
 
     // ============================================
+    // EXPORT REPORT (New Feature)
+    // ============================================
+    if (exportReportBtn) {
+        exportReportBtn.addEventListener('click', async function() {
+            if (!isAdmin) {
+                showToast('❌ Hanya admin yang bisa export');
+                return;
+            }
+            try {
+                const snapshot = await db.collection('orders')
+                    .orderBy('timestamp', 'desc')
+                    .limit(200)
+                    .get();
+                
+                const rows = [['Tanggal', 'Total', 'Items', 'Note']];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    rows.push([
+                        data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
+                        'Rp' + (data.total || 0).toLocaleString('id-ID'),
+                        data.items || '-',
+                        data.customerNote || ''
+                    ]);
+                });
+
+                const csv = rows.map(row => row.join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `flora-report-${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('✅ Laporan berhasil diexport');
+                trackEvent('Admin', 'export_report');
+            } catch (err) {
+                console.error('Export error:', err);
+                showToast('❌ Gagal export laporan: ' + err.message);
+            }
+        });
+    }
+
+    // ============================================
     // TOAST SYSTEM
     // ============================================
     function showToast(message, duration = 3000) {
@@ -1508,40 +1734,13 @@
     }
 
     // ============================================
-    // PRINT MENU
-    // ============================================
-    const printBtn = document.getElementById('printBtn');
-    if (printBtn) {
-        printBtn.addEventListener('click', function() {
-            trackPrint();
-            const originalTitle = document.title;
-            document.title = 'Flora Coffee — Menu';
-            window.print();
-            document.title = originalTitle;
-        });
-    }
-
-    const printFooterBtn = document.getElementById('printFooterBtn');
-    if (printFooterBtn) {
-        printFooterBtn.addEventListener('click', function() {
-            trackPrint();
-            const originalTitle = document.title;
-            document.title = 'Flora Coffee — Menu';
-            window.print();
-            document.title = originalTitle;
-        });
-    }
-
-    // ============================================
     // KEYBOARD SHORTCUTS
     // ============================================
     document.addEventListener('keydown', function(e) {
-        // Ctrl+/ untuk search
         if ((e.ctrlKey || e.metaKey) && e.key === '/') {
             e.preventDefault();
             searchInput.focus();
         }
-        // Escape untuk clear search & close modal
         if (e.key === 'Escape') {
             if (searchInput.value) {
                 searchInput.value = '';
@@ -1552,7 +1751,6 @@
                 historyModal.classList.remove('show');
             }
         }
-        // Alt+1-4 untuk kategori
         if (e.altKey && e.key >= '1' && e.key <= '4') {
             const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
             const idx = parseInt(e.key);
@@ -1568,18 +1766,12 @@
     window.addEventListener('online', function() {
         showToast('🔄 Koneksi kembali online!');
         loadMenu();
+        if (isAdmin) loadDashboardStats();
     });
 
     window.addEventListener('offline', function() {
         showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
     });
-
-    // ============================================
-    // SERVICE WORKER REGISTRATION (Optional)
-    // ============================================
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-    }
 
     // ============================================
     // INIT
@@ -1588,17 +1780,19 @@
     setLang(savedLang);
     loadMenu();
     showMenuOfTheDay();
+    loadOperationalStatus();
 
-    // Auto-refresh menu every 5 minutes
+    // Auto-refresh
     setInterval(() => {
         if (navigator.onLine) {
             loadMenu();
+            if (isAdmin) loadDashboardStats();
         }
     }, 300000);
 
     console.log('🌿 Flora Coffee Menu v2.0 loaded successfully!');
     console.log('📊 Analytics tracking enabled');
-    console.log('🔐 Admin panel protected');
+    console.log('🔐 Admin panel protected with Firestore stats');
     console.log('🌍 Multi-language support:', currentLang);
     console.log('📦 PWA ready');
 
