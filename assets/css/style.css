@@ -1087,37 +1087,8 @@ footer p {
     gap: 12px;
     margin-top: 16px;
 }
-.admin-section .menu-item {
-    background: var(--bg-body);
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-}
-.admin-section .menu-item .name {
-    font-weight: 600;
-    font-size: 16px;
-}
-.admin-section .menu-item .actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-}
-.admin-section .menu-item .actions button {
-    flex: 1;
-    padding: 4px 8px;
-    font-size: 11px;
-}
-.admin-section .tag {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 100px;
-    font-size: 10px;
-    font-weight: 600;
-}
 
-/* renderAdminMenu() di app.js membuat kartu dengan class "admin-card",
-   bukan "menu-item" di atas — blok ini yang tadinya hilang, sehingga
-   foto yang diupload tampil di ukuran asli (bisa sangat besar). */
+/* ===== ADMIN CARD ===== */
 .admin-section .admin-card {
     background: var(--bg-body);
     padding: 14px;
@@ -1183,11 +1154,50 @@ footer p {
 .admin-section .admin-card-actions {
     display: flex;
     gap: 6px;
+    flex-wrap: wrap;
 }
 .admin-section .admin-card-actions button {
     flex: 1;
     padding: 4px 8px;
     font-size: 11px;
+    min-width: 60px;
+}
+
+/* ===== QUICK STOCK CONTROL ===== */
+.admin-card-stock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    margin-bottom: 8px;
+}
+.admin-card-stock button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--leaf-deep);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.admin-card-stock button:hover {
+    transform: scale(1.1);
+    background: var(--brass);
+}
+.admin-card-stock button:active {
+    transform: scale(0.9);
+}
+.admin-card-stock span {
+    font-weight: 500;
+    font-size: 14px;
+    min-width: 50px;
+    text-align: center;
 }
 
 .tag-favorit {
@@ -1237,7 +1247,7 @@ footer p {
 /* ===== ADMIN DASHBOARD ===== */
 .dashboard-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-bottom: 20px;
 }
@@ -1267,7 +1277,7 @@ footer p {
 }
 @media (max-width: 600px) {
     .dashboard-stats {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     .stat-number {
@@ -1276,6 +1286,46 @@ footer p {
     .stat-card {
         padding: 12px;
     }
+}
+
+/* ===== CHART ===== */
+.chart-container {
+    background: var(--bg-body);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+}
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding: 8px 0;
+}
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.chart-bar {
+    width: 100%;
+    max-width: 30px;
+    border-radius: 4px 4px 0 0;
+    background: var(--brass);
+    min-height: 4px;
+    transition: height 0.6s ease;
+}
+.chart-bar-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+}
+.chart-bar-value {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--brass);
 }
 
 /* ===== HISTORY MODAL ===== */
@@ -1486,6 +1536,36 @@ mark {
     color: var(--leaf-deep);
 }
 
+/* ===== TOAST ===== */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.4s ease;
+    pointer-events: none;
+    max-width: 90%;
+    text-align: center;
+    border: 1px solid var(--brass);
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+[data-theme="dark"] .toast {
+    background: var(--leaf-deep);
+    border-color: var(--brass);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .wrap {
@@ -1646,6 +1726,16 @@ mark {
     .upload-preview-img {
         width: 60px;
         height: 60px;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .chart-bars {
+        height: 80px;
+    }
+    .chart-bar {
+        max-width: 20px;
     }
 }
 
