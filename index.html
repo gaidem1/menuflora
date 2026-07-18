@@ -260,6 +260,10 @@
                     </div>
                 </div>
 
+                <div style="margin:-8px 0 20px;">
+                    <button class="btn btn-outline" id="cleanGhostOrdersBtn" style="font-size:13px;padding:8px 14px;">🧹 Bersihkan Ghost Orders Lama</button>
+                </div>
+
                 <!-- Quick Stats Chart -->
                 <div class="chart-container" id="chartContainer" style="margin-bottom:20px;display:none;">
                     <h4 style="font-family:'Fraunces',serif;margin-bottom:12px;">📊 Grafik Penjualan 7 Hari</h4>
@@ -423,6 +427,25 @@
             <span class="modal-close" id="historyModalClose">&times;</span>
             <h3 id="langHistoryTitle">📋 Riwayat Pesanan</h3>
             <div id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- ===== KONFIRMASI PESANAN WHATSAPP ===== -->
+    <div class="modal" id="waConfirmModal">
+        <div class="modal-content" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">📱</div>
+            <h3 style="margin-bottom: 8px;">Konfirmasi Pesanan</h3>
+            <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 15px;">
+                WhatsApp baru saja terbuka di tab lain. Pastikan Anda sudah menekan tombol <strong>Kirim</strong> di sana.
+            </p>
+            <div style="display: flex; gap: 12px; flex-direction: column;">
+                <button class="btn btn-wa" id="btnAlreadySent" style="justify-content: center; width: 100%;">
+                    ✅ Ya, Saya Sudah Kirim
+                </button>
+                <button class="btn btn-outline" id="btnNotYet" style="justify-content: center; width: 100%;">
+                    ❌ Belum, Batalkan
+                </button>
+            </div>
         </div>
     </div>
 
