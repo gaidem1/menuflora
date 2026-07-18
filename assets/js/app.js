@@ -200,7 +200,7 @@
     // ============================================
     // ADMIN EMAIL VALIDATION
     // ============================================
-    const ADMIN_EMAILS = ["danielalthof1@gmail.com"];
+    const ADMIN_EMAILS = ["danielalthof1@gmail.com", "kedaiflora1@gmail.com"];
 
     // ============================================
     // CLOUDINARY KONFIGURASI
@@ -1268,7 +1268,7 @@
                 previewWrapper.classList.add('hidden');
                 inputImage.value = '';
             }
-            document.getElementById('adminForm').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
             trackEvent('Admin', 'edit_menu', data.name);
         }).catch(err => {
             console.error('Error loading menu:', err);
@@ -1391,6 +1391,7 @@
     auth.onAuthStateChanged(user => {
         if (user && ADMIN_EMAILS.includes(user.email)) {
             isAdmin = true;
+            adminSection.classList.remove('admin-hidden');
             adminSection.style.display = 'block';
             adminUserEmail.textContent = user.email;
             loadDashboardStats();
@@ -1398,6 +1399,7 @@
             trackEvent('Auth', 'admin_login', user.email);
         } else {
             isAdmin = false;
+            adminSection.classList.add('admin-hidden');
             adminSection.style.display = 'none';
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         }
@@ -1443,6 +1445,7 @@
                 showToast('👋 Logout berhasil');
                 trackEvent('Auth', 'admin_logout');
                 isAdmin = false;
+                adminSection.classList.add('admin-hidden');
                 adminSection.style.display = 'none';
                 document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             }).catch(err => {
