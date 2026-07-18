@@ -193,6 +193,8 @@
     // ============================================
     const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/vmny1hra/image/upload';
     const CLOUDINARY_UPLOAD_PRESET = 'emvx2to2';
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
     // ============================================
     // DOM ELEMENTS
@@ -229,6 +231,7 @@
     const uploadZone = document.getElementById('uploadZone');
     const previewWrapper = document.getElementById('previewWrapper');
     const previewImage = document.getElementById('previewImage');
+    const previewStatus = document.getElementById('previewStatus');
     const inputImage = document.getElementById('inputImage');
     const inputImagePublicId = document.getElementById('inputImagePublicId');
     const uploadProgress = document.getElementById('uploadProgress');
@@ -308,7 +311,6 @@
         const el = document.getElementById('openStatus');
         if (!el) return;
 
-        // Check override first
         if (operationalOverride === 'open') {
             el.textContent = '🟢 Buka (Override)';
             return;
@@ -318,7 +320,6 @@
             return;
         }
 
-        // Auto mode
         const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit',
             hour12: false }));
         const isOpen = (hour >= 11 && hour < 23);
@@ -326,7 +327,6 @@
         el.textContent = isOpen ? t.open : t.closed;
     }
 
-    // Save operational status
     if (operationalStatus) {
         operationalStatus.addEventListener('change', async function() {
             if (!isAdmin) return;
@@ -456,7 +456,6 @@
             searchTimeout = setTimeout(() => trackSearch(keyword), 1000);
         }
 
-        // Highlight
         document.querySelectorAll('.item:not(.hidden) .item-name, .item:not(.hidden) .item-desc').forEach(el => {
             const original = el.getAttribute('data-original') || el.textContent;
             el.setAttribute('data-original', original);
@@ -534,7 +533,6 @@
             );
             orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
 
-            // Save to Firestore
             saveOrderToFirestore({
                 items: orderList.join(' · '),
                 total: total,
@@ -551,7 +549,7 @@
     }
 
     // ============================================
-    // SAVE ORDER TO FIRESTORE (FIXED!)
+    // SAVE ORDER TO FIRESTORE
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
@@ -566,7 +564,6 @@
             console.log('✅ Order saved to Firestore');
         } catch (err) {
             console.error('❌ Failed to save order:', err);
-            // Fallback: save to localStorage
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: Date.now(),
@@ -633,7 +630,7 @@
     }
 
     // ============================================
-    // ORDER HISTORY (dari Firestore)
+    // ORDER HISTORY
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -656,7 +653,6 @@
             return history;
         } catch (err) {
             console.error('Error loading history from Firestore:', err);
-            // Fallback to localStorage
             return JSON.parse(localStorage.getItem('flora-order-history')) || [];
         }
     }
@@ -681,7 +677,6 @@
         `).join('');
     }
 
-    // History Modal
     const historyBtn = document.getElementById('historyBtn');
     const historyModal = document.getElementById('historyModal');
     const historyModalClose = document.getElementById('historyModalClose');
@@ -707,15 +702,13 @@
     }
 
     // ============================================
-    // ADMIN DASHBOARD (dari Firestore)
+    // ADMIN DASHBOARD
     // ============================================
     async function loadDashboardStats() {
         try {
-            // Total menu
             const menuSnapshot = await db.collection('menu').get();
             document.getElementById('statMenus').textContent = menuSnapshot.size;
 
-            // Today's orders from Firestore
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const startOfDay = firebase.firestore.Timestamp.fromDate(today);
@@ -737,19 +730,17 @@
             document.getElementById('statRevenue').textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
             document.getElementById('statCustomers').textContent = customerSet.size || '-';
 
-            // Load chart
             await loadSalesChart();
 
         } catch (error) {
             console.error('Error loading dashboard:', error);
-            // Fallback: use localStorage
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             document.getElementById('statOrders').textContent = history.length;
         }
     }
 
     // ============================================
-    // SALES CHART (7 Days)
+    // SALES CHART
     // ============================================
     async function loadSalesChart() {
         const container = document.getElementById('chartContainer');
@@ -783,7 +774,6 @@
                 });
             }
 
-            // Check if there's any data
             const hasData = last7Days.some(d => d.total > 0);
             if (!hasData) {
                 container.style.display = 'none';
@@ -808,11 +798,8 @@
     }
 
     // ============================================
-    // CLOUDINARY UPLOAD
+    // CLOUDINARY UPLOAD - FIXED!
     // ============================================
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
-    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-
     function validateFile(file) {
         if (!file) return { valid: false, message: 'Tidak ada file.' };
         if (!ALLOWED_TYPES.includes(file.type)) {
@@ -834,10 +821,9 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-        formData.append('transformation', JSON.stringify([
-            { width: 800, height: 600, crop: 'fill' },
-            { quality: 'auto', fetch_format: 'auto' }
-        ]));
+        
+        // ✅ FIX: HAPUS transformasi dari FormData
+        // Diatur di Cloudinary Dashboard (Upload Preset)
 
         isUploading = true;
         uploadProgress.classList.remove('hidden');
@@ -862,10 +848,17 @@
                     if (xhr.status === 200) {
                         resolve(JSON.parse(xhr.responseText));
                     } else {
-                        reject(new Error(xhr.statusText || 'Upload gagal'));
+                        let errorMsg = xhr.statusText || 'Upload gagal';
+                        try {
+                            const errData = JSON.parse(xhr.responseText);
+                            if (errData.error && errData.error.message) {
+                                errorMsg = errData.error.message;
+                            }
+                        } catch (e) {}
+                        reject(new Error(errorMsg));
                     }
                 };
-                xhr.onerror = () => reject(new Error('Network error'));
+                xhr.onerror = () => reject(new Error('Network error - cek koneksi internet'));
                 xhr.send(formData);
             });
 
@@ -873,11 +866,17 @@
             progressFill.style.width = '100%';
             progressText.textContent = '✅ Upload berhasil!';
 
+            // ✅ Tampilkan preview dengan ukuran terkontrol
             previewImage.src = response.secure_url;
             previewWrapper.classList.remove('hidden');
             inputImage.value = response.secure_url;
             inputImagePublicId.value = response.public_id || '';
             currentFile = file;
+
+            if (previewStatus) {
+                previewStatus.textContent = '✅ Upload berhasil';
+                previewStatus.className = 'preview-status success';
+            }
 
             setTimeout(() => {
                 uploadProgress.classList.add('hidden');
@@ -894,24 +893,49 @@
             progressFill.style.width = '0%';
             progressText.textContent = '❌ Upload gagal!';
             uploadProgress.classList.remove('hidden');
-            showToast('❌ Gagal upload gambar: ' + error.message);
+
+            let errorMessage = error.message || 'Terjadi kesalahan';
+            if (errorMessage.includes('unsigned')) {
+                errorMessage = 'Upload Preset tidak valid. Periksa konfigurasi Cloudinary.';
+            }
+            showToast('❌ Gagal upload: ' + errorMessage);
+
+            if (previewStatus) {
+                previewStatus.textContent = '❌ ' + errorMessage;
+                previewStatus.className = 'preview-status error';
+            }
+
+            const retryBtn = document.createElement('button');
+            retryBtn.className = 'btn btn-sm';
+            retryBtn.textContent = '🔄 Coba Lagi';
+            retryBtn.style.marginTop = '8px';
+            retryBtn.onclick = () => {
+                if (currentFile) {
+                    uploadToCloudinary(currentFile);
+                } else if (fileInput && fileInput.files[0]) {
+                    uploadToCloudinary(fileInput.files[0]);
+                }
+                retryBtn.remove();
+            };
+
+            const progressContainer = document.querySelector('.upload-progress');
+            if (progressContainer) {
+                const oldRetry = progressContainer.querySelector('.btn');
+                if (oldRetry) oldRetry.remove();
+                progressContainer.appendChild(retryBtn);
+            }
+
             return null;
         }
     }
 
     // ============================================
-    // DELETE IMAGE FROM CLOUDINARY (via proxy)
+    // DELETE IMAGE FROM CLOUDINARY
     // ============================================
     async function deleteImageFromCloudinary(publicId) {
         if (!publicId) return;
         try {
-            // You'll need a backend endpoint for this
-            // For now, we'll just log it
             console.log('🗑️ Would delete image:', publicId);
-            // await fetch('/api/cloudinary/delete', {
-            //     method: 'POST',
-            //     body: JSON.stringify({ publicId })
-            // });
         } catch (err) {
             console.error('Failed to delete image:', err);
         }
@@ -968,8 +992,17 @@
         });
     }
 
+    // ============================================
+    // REMOVE IMAGE - FIXED!
+    // ============================================
     if (removeImageBtn) {
         removeImageBtn.addEventListener('click', function() {
+            if (editingId && inputImage.value) {
+                if (!confirm('⚠️ Hapus gambar saat ini?\n\nAnda harus upload gambar baru sebelum menyimpan.')) {
+                    return;
+                }
+            }
+
             currentFile = null;
             inputImage.value = '';
             inputImagePublicId.value = '';
@@ -978,7 +1011,14 @@
             if (fileInput) fileInput.value = '';
             uploadProgress.classList.add('hidden');
             progressFill.style.width = '0%';
-            showToast('🗑️ Gambar dihapus');
+            progressText.textContent = '';
+
+            if (previewStatus) {
+                previewStatus.textContent = '🗑️ Gambar dihapus';
+                previewStatus.className = 'preview-status';
+            }
+
+            showToast('🗑️ Gambar dihapus dari form');
         });
     }
 
@@ -1344,7 +1384,7 @@
     }
 
     // ============================================
-    // QUICK STOCK UPDATE (New Feature)
+    // QUICK STOCK UPDATE
     // ============================================
     window.quickUpdateStock = async function(id, change) {
         if (!isAdmin) {
@@ -1377,45 +1417,71 @@
     // CRUD OPERATIONS
     // ============================================
     window.editMenuItem = function(id) {
-        if (!isAdmin) return;
-        db.collection('menu').doc(id).get().then(doc => {
-            if (!doc.exists) {
-                showToast('❌ Menu tidak ditemukan');
-                return;
-            }
-            const data = doc.data();
-            editingId = id;
-            formTitle.textContent = '✏️ Edit Menu';
-            saveBtn.textContent = '💾 Update Menu';
-            inputName.value = data.name || '';
-            inputPrice.value = data.price || '';
-            inputDesc.value = data.desc || '';
-            inputCategory.value = data.category || 'kopi-klasik';
-            inputTag.value = data.tag || '';
-            inputStock.value = data.stock !== undefined ? data.stock : 10;
-            inputPromo.value = data.promoPrice || '';
-            if (data.image) {
-                inputImage.value = data.image;
-                inputImagePublicId.value = data.imagePublicId || '';
-                previewImage.src = data.image;
-                previewWrapper.classList.remove('hidden');
-            } else {
-                previewWrapper.classList.add('hidden');
-                inputImage.value = '';
-                inputImagePublicId.value = '';
-            }
-            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-            trackEvent('Admin', 'edit_menu', data.name);
-        }).catch(err => {
-            console.error('Error loading menu:', err);
-            showToast('❌ Gagal memuat data menu');
-        });
+        if (!isAdmin) {
+            showToast('❌ Anda tidak memiliki akses admin');
+            return;
+        }
+        
+        db.collection('menu').doc(id).get()
+            .then(doc => {
+                if (!doc.exists) {
+                    showToast('❌ Menu tidak ditemukan');
+                    return;
+                }
+                
+                const data = doc.data();
+                editingId = id;
+                
+                formTitle.textContent = '✏️ Edit Menu';
+                saveBtn.textContent = '💾 Update Menu';
+                inputName.value = data.name || '';
+                inputPrice.value = data.price || '';
+                inputDesc.value = data.desc || '';
+                inputCategory.value = data.category || 'kopi-klasik';
+                inputTag.value = data.tag || '';
+                inputStock.value = data.stock !== undefined ? data.stock : 10;
+                inputPromo.value = data.promoPrice || '';
+                
+                // ✅ Reset image state sebelum load gambar lama
+                currentFile = null;
+                if (fileInput) fileInput.value = '';
+                uploadProgress.classList.add('hidden');
+                progressFill.style.width = '0%';
+                progressText.textContent = '';
+                
+                if (data.image && data.image.trim() !== '') {
+                    inputImage.value = data.image;
+                    inputImagePublicId.value = data.imagePublicId || '';
+                    previewImage.src = data.image;
+                    previewWrapper.classList.remove('hidden');
+                    
+                    if (previewStatus) {
+                        previewStatus.textContent = '📷 Gambar saat ini';
+                        previewStatus.className = 'preview-status';
+                    }
+                } else {
+                    inputImage.value = '';
+                    inputImagePublicId.value = '';
+                    previewWrapper.classList.add('hidden');
+                    previewImage.src = '';
+                }
+                
+                document.getElementById('formCard').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                trackEvent('Admin', 'edit_menu', data.name);
+            })
+            .catch(err => {
+                console.error('Error loading menu:', err);
+                showToast('❌ Gagal memuat data menu: ' + err.message);
+            });
     };
 
     window.deleteMenuItem = function(id, name) {
         if (!isAdmin) return;
         
-        // Anti-mistake confirmation
         const confirmText = prompt(
             `⚠️ HAPUS PERMANEN\n\nMenu "${name}" akan dihapus.\nKetik "HAPUS" untuk konfirmasi:`
         );
@@ -1426,7 +1492,6 @@
 
         db.collection('menu').doc(id).get().then(doc => {
             const data = doc.data();
-            // Delete image from Cloudinary if exists
             if (data.imagePublicId) {
                 deleteImageFromCloudinary(data.imagePublicId);
             }
@@ -1463,6 +1528,11 @@
         uploadProgress.classList.add('hidden');
         progressFill.style.width = '0%';
         progressText.textContent = '';
+        
+        if (previewStatus) {
+            previewStatus.textContent = '';
+            previewStatus.className = 'preview-status';
+        }
     }
 
     if (newMenuBtn) {
@@ -1490,7 +1560,6 @@
             const image = inputImage.value.trim();
             const imagePublicId = inputImagePublicId.value.trim();
 
-            // Validations
             if (!name) {
                 showToast('❌ Nama menu wajib diisi');
                 inputName.focus();
@@ -1512,7 +1581,6 @@
                 return;
             }
 
-            // Check duplicate name
             try {
                 const existing = await db.collection('menu')
                     .where('name', '==', name)
@@ -1542,7 +1610,6 @@
 
             try {
                 if (editingId) {
-                    // If image changed, delete old one
                     const oldDoc = await db.collection('menu').doc(editingId).get();
                     if (oldDoc.exists && oldDoc.data().imagePublicId && 
                         oldDoc.data().imagePublicId !== imagePublicId) {
@@ -1669,7 +1736,7 @@
     }
 
     // ============================================
-    // EXPORT REPORT (New Feature)
+    // EXPORT REPORT
     // ============================================
     if (exportReportBtn) {
         exportReportBtn.addEventListener('click', async function() {
@@ -1782,7 +1849,6 @@
     showMenuOfTheDay();
     loadOperationalStatus();
 
-    // Auto-refresh
     setInterval(() => {
         if (navigator.onLine) {
             loadMenu();
