@@ -257,6 +257,68 @@
     let menuUnsubscribe = null;
 
     // ============================================
+    // CATEGORY DATA
+    // ============================================
+    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
+    const categoryNames = {
+        'kopi-klasik': '☕ Kopi',
+        'non-kopi': '🍵 Non Kopi',
+        'camilan': '🍽️ Camilan',
+        'mie': '🍜 Mie & Topping'
+    };
+    const categoryDescs = {
+        'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
+        'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
+        'camilan': 'Camilan gurih untuk mengisi perut.',
+        'mie': 'Mie instan dengan berbagai topping pilihan.'
+    };
+    const categoryIcons = {
+        'kopi-klasik': '☕',
+        'non-kopi': '🍵',
+        'camilan': '🍽️',
+        'mie': '🍜'
+    };
+
+    const defaultMenuData = [
+        { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
+            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
+        { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
+            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
+        { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
+            tag: '', image: '', stock: 10 },
+        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
+            image: '', stock: 10 },
+        { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
+        { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
+        { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
+        { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
+            tag: '', image: '', stock: 10 },
+        { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
+            category: 'non-kopi', tag: '', image: '', stock: 10 },
+        { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
+            category: 'camilan', tag: '', image: '', stock: 10 },
+        { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
+            tag: '', image: '', stock: 10 },
+        { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
+            tag: '', image: '', stock: 10 },
+        { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
+            tag: '', image: '', stock: 10 },
+        { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
+            tag: '', image: '', stock: 10 },
+        { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
+            tag: '', image: '', stock: 10 },
+        { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
+            category: 'mie', tag: '', image: '', stock: 10 },
+        { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
+            tag: '', image: '', stock: 10 },
+        { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
+            tag: '', image: '', stock: 10 }
+    ];
+
+    // ============================================
     // DARK MODE
     // ============================================
     const savedTheme = localStorage.getItem('flora-theme');
@@ -1023,67 +1085,8 @@
     }
 
     // ============================================
-    // LOAD MENU
+    // RENDER MENU (Public)
     // ============================================
-    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
-    const categoryNames = {
-        'kopi-klasik': '☕ Kopi',
-        'non-kopi': '🍵 Non Kopi',
-        'camilan': '🍽️ Camilan',
-        'mie': '🍜 Mie & Topping'
-    };
-    const categoryDescs = {
-        'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
-        'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
-        'camilan': 'Camilan gurih untuk mengisi perut.',
-        'mie': 'Mie instan dengan berbagai topping pilihan.'
-    };
-    const categoryIcons = {
-        'kopi-klasik': '☕',
-        'non-kopi': '🍵',
-        'camilan': '🍽️',
-        'mie': '🍜'
-    };
-
-    const defaultMenuData = [
-        { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
-            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
-        { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
-            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
-        { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
-            tag: '', image: '', stock: 10 },
-        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
-            image: '', stock: 10 },
-        { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
-            tag: '', image: '', stock: 10 },
-        { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
-            category: 'camilan', tag: '', image: '', stock: 10 },
-        { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
-            tag: '', image: '', stock: 10 },
-        { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
-            category: 'mie', tag: '', image: '', stock: 10 },
-        { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '', stock: 10 },
-        { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '', stock: 10 }
-    ];
-
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
         menuContainer.style.display = 'block';
@@ -1312,6 +1315,9 @@
         document.querySelectorAll('.category').forEach(el => revealObserver.observe(el));
     }
 
+    // ============================================
+    // LOAD MENU - FIXED!
+    // ============================================
     function loadMenu() {
         skeletonContainer.style.display = 'block';
         menuContainer.style.display = 'none';
@@ -1320,32 +1326,88 @@
         menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(snapshot => {
             skeletonContainer.style.display = 'none';
             menuContainer.style.display = 'block';
+            
             if (snapshot.empty) {
                 defaultMenuData.forEach(item => {
                     db.collection('menu').doc(item.id).set(item).catch(() => {});
                 });
                 renderMenu(defaultMenuData);
+                if (isAdmin) renderAdminMenu(defaultMenuData);
                 return;
             }
+            
             const data = [];
-            snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
+            snapshot.forEach(doc => { 
+                data.push({ id: doc.id, ...doc.data() }); 
+            });
+            
             renderMenu(data);
             if (isAdmin) renderAdminMenu(data);
-        }, () => {
+            
+        }, (error) => {
+            console.error('Firestore error:', error);
             skeletonContainer.style.display = 'none';
             menuContainer.style.display = 'block';
             renderMenu(defaultMenuData);
+            if (isAdmin) renderAdminMenu(defaultMenuData);
         });
     }
 
     // ============================================
-    // ADMIN PANEL
+    // LOAD MENU FOR ADMIN - NEW FUNCTION!
+    // ============================================
+    async function loadMenuForAdmin() {
+        if (!isAdmin) return;
+        
+        try {
+            loadingMenu.classList.remove('hidden');
+            loadingMenu.textContent = '⏳ Memuat menu...';
+            
+            const snapshot = await db.collection('menu').orderBy('name').get();
+            
+            if (snapshot.empty) {
+                defaultMenuData.forEach(item => {
+                    db.collection('menu').doc(item.id).set(item).catch(() => {});
+                });
+                renderAdminMenu(defaultMenuData);
+            } else {
+                const data = [];
+                snapshot.forEach(doc => {
+                    data.push({ id: doc.id, ...doc.data() });
+                });
+                renderAdminMenu(data);
+            }
+            
+            loadingMenu.classList.add('hidden');
+        } catch (err) {
+            console.error('Error loading admin menu:', err);
+            loadingMenu.textContent = '❌ Gagal memuat menu';
+            renderAdminMenu(defaultMenuData);
+            setTimeout(() => {
+                loadingMenu.classList.add('hidden');
+            }, 2000);
+        }
+    }
+
+    // ============================================
+    // RENDER ADMIN MENU - FIXED!
     // ============================================
     function renderAdminMenu(data) {
+        if (!adminMenuGrid) {
+            console.error('adminMenuGrid not found');
+            return;
+        }
+        
         loadingMenu.classList.add('hidden');
         adminMenuGrid.innerHTML = '';
+        
         if (!data || data.length === 0) {
-            adminMenuGrid.innerHTML = '<p style="text-align:center;color:#95a5a6;padding:20px;">Belum ada menu.</p>';
+            adminMenuGrid.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);">
+                    <div style="font-size:48px;margin-bottom:12px;">📭</div>
+                    <p>Belum ada menu. Klik "Tambah Baru" untuk menambahkan.</p>
+                </div>
+            `;
             return;
         }
 
@@ -1442,7 +1504,7 @@
                 inputStock.value = data.stock !== undefined ? data.stock : 10;
                 inputPromo.value = data.promoPrice || '';
                 
-                // ✅ Reset image state sebelum load gambar lama
+                // Reset image state sebelum load gambar lama
                 currentFile = null;
                 if (fileInput) fileInput.value = '';
                 uploadProgress.classList.add('hidden');
@@ -1635,7 +1697,7 @@
     }
 
     // ============================================
-    // AUTHENTICATION
+    // AUTHENTICATION - FIXED!
     // ============================================
     auth.onAuthStateChanged(user => {
         if (user && ADMIN_EMAILS.includes(user.email)) {
@@ -1643,10 +1705,17 @@
             adminSection.classList.remove('admin-hidden');
             adminSection.style.display = 'block';
             adminUserEmail.textContent = user.email;
+            
+            // Load all data
             loadDashboardStats();
             loadOperationalStatus();
+            loadMenuForAdmin(); // ✅ FIX: Load menu langsung
+            loadMenu(); // ✅ FIX: Refresh public menu juga
+            
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             trackEvent('Auth', 'admin_login', user.email);
+            
+            console.log('✅ Admin logged in, menu loaded');
         } else {
             isAdmin = false;
             adminSection.classList.add('admin-hidden');
@@ -1655,7 +1724,9 @@
         }
     });
 
-    // Secret trigger (tap 5x)
+    // ============================================
+    // SECRET TRIGGER (Tap 5x)
+    // ============================================
     let tapCount = 0;
     let tapTimer = null;
 
@@ -1833,7 +1904,10 @@
     window.addEventListener('online', function() {
         showToast('🔄 Koneksi kembali online!');
         loadMenu();
-        if (isAdmin) loadDashboardStats();
+        if (isAdmin) {
+            loadDashboardStats();
+            loadMenuForAdmin();
+        }
     });
 
     window.addEventListener('offline', function() {
@@ -1849,10 +1923,14 @@
     showMenuOfTheDay();
     loadOperationalStatus();
 
+    // Auto-refresh
     setInterval(() => {
         if (navigator.onLine) {
             loadMenu();
-            if (isAdmin) loadDashboardStats();
+            if (isAdmin) {
+                loadDashboardStats();
+                loadMenuForAdmin();
+            }
         }
     }, 300000);
 
