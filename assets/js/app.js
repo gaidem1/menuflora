@@ -225,6 +225,7 @@
     const newMenuBtn = document.getElementById('newMenuBtn');
     const backupBtn = document.getElementById('backupBtn');
     const exportReportBtn = document.getElementById('exportReportBtn');
+    const cleanGhostOrdersBtn = document.getElementById('cleanGhostOrdersBtn');
 
     // Upload elements
     const fileInput = document.getElementById('fileInput');
@@ -595,13 +596,6 @@
             );
             orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
 
-            saveOrderToFirestore({
-                items: orderList.join(' · '),
-                total: total,
-                rawItems: orderList,
-                customerNote: ''
-            });
-
         } else {
             cartSummary.classList.remove('show');
         }
@@ -620,6 +614,7 @@
                 total: order.total,
                 rawItems: order.rawItems || [],
                 customerNote: order.customerNote || '',
+                status: order.status || 'completed',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 source: 'web'
             });
@@ -764,6 +759,58 @@
     }
 
     // ============================================
+    // KONFIRMASI PESANAN WHATSAPP (anti ghost order)
+    // Catatan: tidak pakai preventDefault supaya target="_blank"
+    // pada tombol orderBtn tetap membuka WA di tab baru seperti biasa.
+    // ============================================
+    const waConfirmModal = document.getElementById('waConfirmModal');
+    const btnAlreadySent = document.getElementById('btnAlreadySent');
+    const btnNotYet = document.getElementById('btnNotYet');
+
+    if (orderBtn) {
+        orderBtn.addEventListener('click', function() {
+            if (Object.keys(cartData).length === 0) return;
+            setTimeout(() => {
+                if (waConfirmModal) waConfirmModal.classList.add('show');
+            }, 400);
+        });
+    }
+
+    if (btnAlreadySent) {
+        btnAlreadySent.addEventListener('click', async function() {
+            if (waConfirmModal) waConfirmModal.classList.remove('show');
+
+            const total = parseInt((cartTotal.textContent || '0').replace(/[^0-9]/g, '')) || 0;
+            await saveOrderToFirestore({
+                items: cartDetail.textContent,
+                total: total,
+                rawItems: Object.values(cartData).map(i => `${i.name} x${i.qty}`),
+                customerNote: '',
+                status: 'completed'
+            });
+            trackOrder(total, Object.keys(cartData).length);
+
+            cartData = {};
+            saveCart();
+            updateCart();
+            showToast('✅ Pesanan tercatat, terima kasih!');
+        });
+    }
+
+    if (btnNotYet) {
+        btnNotYet.addEventListener('click', function() {
+            if (waConfirmModal) waConfirmModal.classList.remove('show');
+            showToast('ℹ️ Silakan selesaikan pesanan di WhatsApp saat sudah siap');
+        });
+    }
+
+    if (waConfirmModal) {
+        waConfirmModal.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    }
+
+    // ============================================
     // ADMIN DASHBOARD
     // ============================================
     async function loadDashboardStats() {
@@ -775,8 +822,12 @@
             today.setHours(0, 0, 0, 0);
             const startOfDay = firebase.firestore.Timestamp.fromDate(today);
 
+            // Catatan: kombinasi where('timestamp',>=) + where('status','==')
+            // butuh composite index. Kalau muncul error "requires an index" di
+            // console, klik link yang diberikan Firestore untuk membuatnya otomatis.
             const ordersSnapshot = await db.collection('orders')
                 .where('timestamp', '>=', startOfDay)
+                .where('status', '==', 'completed')
                 .get();
 
             let totalRevenue = 0;
@@ -822,6 +873,7 @@
                 const snapshot = await db.collection('orders')
                     .where('timestamp', '>=', startOfDay)
                     .where('timestamp', '<', endOfDay)
+                    .where('status', '==', 'completed')
                     .get();
 
                 let dailyTotal = 0;
@@ -1122,8 +1174,8 @@
             grouped[catKey].forEach((item) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'item';
-                itemDiv.setAttribute('data-name', item.name.toLowerCase());
-                itemDiv.setAttribute('data-desc', item.desc.toLowerCase());
+                itemDiv.setAttribute('data-name', (item.name || '').toLowerCase());
+                itemDiv.setAttribute('data-desc', (item.desc || '').toLowerCase());
                 itemDiv.setAttribute('data-category', item.category || '');
 
                 const activePrice = item.promoPrice ? item.promoPrice : item.price;
@@ -1186,7 +1238,7 @@
 
                 const descSpan = document.createElement('div');
                 descSpan.className = 'item-desc';
-                descSpan.textContent = item.desc;
+                descSpan.textContent = item.desc || '';
                 info.appendChild(descSpan);
                 itemDiv.appendChild(info);
 
@@ -1817,6 +1869,7 @@
             }
             try {
                 const snapshot = await db.collection('orders')
+                    .where('status', '==', 'completed')
                     .orderBy('timestamp', 'desc')
                     .limit(200)
                     .get();
@@ -1845,6 +1898,72 @@
             } catch (err) {
                 console.error('Export error:', err);
                 showToast('❌ Gagal export laporan: ' + err.message);
+            }
+        });
+    }
+
+    // ============================================
+    // BERSIHKAN GHOST ORDERS (data sampah dari bug lama)
+    // ============================================
+    if (cleanGhostOrdersBtn) {
+        cleanGhostOrdersBtn.addEventListener('click', async function() {
+            if (!isAdmin) {
+                showToast('❌ Hanya admin yang bisa membersihkan data');
+                return;
+            }
+
+            cleanGhostOrdersBtn.disabled = true;
+            cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
+
+            try {
+                // Ambil semua order lalu saring di JS — sengaja TIDAK pakai
+                // where('status','!=','completed') karena query itu tidak akan
+                // menangkap dokumen lama yang field status-nya tidak ada sama sekali.
+                const snapshot = await db.collection('orders').get();
+                const ghosts = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.status !== 'completed') ghosts.push(doc.id);
+                });
+
+                if (ghosts.length === 0) {
+                    showToast('✅ Tidak ada ghost order, database sudah bersih');
+                    return;
+                }
+
+                const sure = confirm(
+                    `Ditemukan ${ghosts.length} ghost order (belum terkonfirmasi terkirim).\n\n` +
+                    `Semua akan dihapus permanen dan TIDAK BISA dibatalkan.\n\n` +
+                    `Lanjutkan?`
+                );
+                if (!sure) {
+                    showToast('Dibatalkan, tidak ada yang dihapus');
+                    return;
+                }
+
+                cleanGhostOrdersBtn.textContent = `⏳ Menghapus 0/${ghosts.length}...`;
+
+                // Firestore batch maksimal 500 operasi, jadi dipecah per 500
+                let deleted = 0;
+                for (let i = 0; i < ghosts.length; i += 500) {
+                    const chunk = ghosts.slice(i, i + 500);
+                    const batch = db.batch();
+                    chunk.forEach(id => batch.delete(db.collection('orders').doc(id)));
+                    await batch.commit();
+                    deleted += chunk.length;
+                    cleanGhostOrdersBtn.textContent = `⏳ Menghapus ${deleted}/${ghosts.length}...`;
+                }
+
+                showToast(`✅ ${deleted} ghost order berhasil dihapus`);
+                trackEvent('Admin', 'clean_ghost_orders', '', deleted);
+                loadDashboardStats();
+
+            } catch (err) {
+                console.error('Clean ghost orders error:', err);
+                showToast('❌ Gagal membersihkan: ' + err.message);
+            } finally {
+                cleanGhostOrdersBtn.disabled = false;
+                cleanGhostOrdersBtn.textContent = '🧹 Bersihkan Ghost Orders Lama';
             }
         });
     }
@@ -1887,6 +2006,9 @@
             }
             if (historyModal && historyModal.classList.contains('show')) {
                 historyModal.classList.remove('show');
+            }
+            if (waConfirmModal && waConfirmModal.classList.contains('show')) {
+                waConfirmModal.classList.remove('show');
             }
         }
         if (e.altKey && e.key >= '1' && e.key <= '4') {
