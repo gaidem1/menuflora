@@ -1,1788 +1,1605 @@
-/* ===== ROOT VARIABLES ===== */
-:root {
-    --ink: #1e2a1e;
-    --ivory: #f6f2e9;
-    --leaf-deep: #1f3a2b;
-    --leaf-mid: #4a6b50;
-    --brass: #c49b5c;
-    --gold-light: #e8c87a;
-    --coffee-brown: #5c3a2a;
-    --line: rgba(30, 42, 30, 0.12);
-    --bg-body: #f6f2e9;
-    --bg-nav: rgba(246, 242, 233, 0.92);
-    --text-muted: #5b6356;
-    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
-    --radius: 16px;
-    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --skeleton-bg: #ececec;
-    --skeleton-shine: rgba(255, 255, 255, 0.6);
-}
-
-/* ===== DARK MODE ===== */
-[data-theme="dark"] {
-    --ink: #e8e4da;
-    --ivory: #1a2a1e;
-    --leaf-deep: #0f1f14;
-    --leaf-mid: #6a8b70;
-    --brass: #e8c87a;
-    --gold-light: #b58d4a;
-    --coffee-brown: #d4b8a0;
-    --line: rgba(232, 228, 218, 0.12);
-    --bg-body: #0f1f14;
-    --bg-nav: rgba(15, 31, 20, 0.92);
-    --text-muted: #a8b8a4;
-    --skeleton-bg: #1a2a1e;
-    --skeleton-shine: rgba(255, 255, 255, 0.06);
-}
-
-[data-theme="dark"] h1.brand,
-[data-theme="dark"] h1.brand em {
-    color: #ffffff !important;
-}
-[data-theme="dark"] .hero .tagline {
-    color: rgba(255, 255, 255, 0.9) !important;
-}
-[data-theme="dark"] .hero-meta {
-    color: rgba(255, 255, 255, 0.8) !important;
-}
-[data-theme="dark"] .hero-meta strong {
-    color: #ffffff !important;
-}
-[data-theme="dark"] .eyebrow {
-    color: var(--gold-light) !important;
-}
-[data-theme="dark"] .eyebrow::before {
-    background: var(--gold-light) !important;
-}
-[data-theme="dark"] .hero-btn-map {
-    color: rgba(255, 255, 255, 0.9) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-}
-[data-theme="dark"] .hero-btn-map:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-}
-[data-theme="dark"] .hero-btn-map svg .cls-1 {
-    fill: #ffffff !important;
-}
-[data-theme="dark"] .hero-btn-map svg .cls-2 {
-    fill: #ef4136 !important;
-}
-[data-theme="dark"] .theme-toggle {
-    background: var(--brass);
-    color: var(--leaf-deep);
-}
-[data-theme="dark"] .admin-section {
-    background: rgba(15, 31, 20, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-[data-theme="dark"] .qty-controls {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-[data-theme="dark"] .qty-controls button {
-    background: #4a6b50;
-    color: #f6f2e9;
-}
-[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
-    background: var(--brass);
-    color: var(--leaf-deep);
-}
-[data-theme="dark"] .qty-controls .qty-value {
-    color: #e8e4da !important;
-}
-
-/* ===== RESET & BASE ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    background: var(--bg-body);
-    color: var(--ink);
-    font-family: 'Work Sans', sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    transition: background 0.3s ease, color 0.3s ease;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.wrap {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 28px;
-    position: relative;
-    z-index: 1;
-}
-
-/* ===== BUTTONS ===== */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: var(--leaf-deep);
-    color: white;
-    cursor: pointer;
-    font-weight: 500;
-    font-family: 'Work Sans', sans-serif;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all var(--transition);
-}
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-.btn:active {
-    transform: scale(0.96);
-}
-
-.btn-wa {
-    background: #25D366;
-    color: #fff;
-}
-.btn-wa:hover {
-    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 2px solid var(--leaf-deep);
-    color: var(--leaf-deep);
-}
-.btn-outline:hover {
-    background: var(--leaf-deep);
-    color: white;
-}
-
-.btn-danger {
-    background: #e74c3c;
-    color: #fff;
-}
-.btn-danger:hover {
-    box-shadow: 0 4px 20px rgba(231, 76, 60, 0.35);
-}
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 12px;
-}
-
-/* ===== THEME TOGGLE ===== */
-.theme-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 100;
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    border: none;
-    border-radius: 50%;
-    width: 52px;
-    height: 52px;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.theme-toggle:hover {
-    transform: scale(1.1) rotate(12deg);
-}
-.theme-toggle:active {
-    transform: scale(0.92);
-}
-
-/* ===== FLOATING WHATSAPP ===== */
-.floating-wa {
-    position: fixed;
-    bottom: 100px;
-    right: 24px;
-    z-index: 99;
-    background: #25D366;
-    color: white;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-    transition: all var(--transition);
-}
-.floating-wa:hover {
-    transform: scale(1.1) translateY(-4px);
-}
-.floating-wa:active {
-    transform: scale(0.92);
-}
-.floating-wa svg {
-    width: 28px;
-    height: 28px;
-}
-.floating-wa .wa-status {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid white;
-    background: #95a5a6;
-}
-.floating-wa .wa-status.online {
-    background: #4caf50;
-}
-.floating-wa .wa-status.offline {
-    background: #95a5a6;
-}
-[data-theme="dark"] .floating-wa .wa-status {
-    border-color: var(--bg-body);
-}
-
-/* ===== FLOATING CART MINI ===== */
-.cart-mini {
-    position: fixed;
-    bottom: 164px;
-    right: 24px;
-    z-index: 98;
-    background: var(--brass);
-    color: var(--leaf-deep);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-md);
-    cursor: pointer;
-    transition: all var(--transition);
-    border: 2px solid var(--bg-body);
-}
-.cart-mini:hover {
-    transform: scale(1.1);
-}
-.cart-mini-icon {
-    font-size: 20px;
-}
-.cart-mini-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #e74c3c;
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    border: 2px solid var(--bg-body);
-}
-[data-theme="dark"] .cart-mini {
-    border-color: var(--bg-body);
-}
-[data-theme="dark"] .cart-mini-badge {
-    border-color: var(--bg-body);
-}
-
-/* ===== SCROLL TOP ===== */
-.scroll-top {
-    position: fixed;
-    bottom: 164px;
-    right: 24px;
-    z-index: 99;
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    border: none;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition);
-    opacity: 0;
-    transform: translateY(12px);
-    pointer-events: none;
-}
-.scroll-top.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-.scroll-top:hover {
-    transform: translateY(-3px) scale(1.05);
-}
-
-/* ===== HERO ===== */
-.hero {
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    position: relative;
-    overflow: hidden;
-    padding: 80px 0 64px;
-    border-bottom: 4px solid var(--brass);
-    transition: background 0.3s ease;
-}
-
-.hero .branch {
-    position: absolute;
-    opacity: 0.35;
-    pointer-events: none;
-}
-.hero .branch.tl {
-    top: -20px;
-    left: -40px;
-    width: 200px;
-    transform: rotate(-10deg);
-}
-.hero .branch.br {
-    bottom: -30px;
-    right: -50px;
-    width: 240px;
-    transform: rotate(170deg);
-}
-
-.eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold-light);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.eyebrow::before {
-    content: '';
-    width: 28px;
-    height: 2px;
-    background: var(--gold-light);
-    display: inline-block;
-}
-
-h1.brand {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(48px, 10vw, 80px);
-    line-height: 0.96;
-    letter-spacing: -0.02em;
-    color: var(--ivory);
-}
-h1.brand em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--brass);
-}
-
-.tagline {
-    margin-top: 18px;
-    max-width: 38ch;
-    font-size: 16px;
-    color: rgba(247, 243, 233, 0.85);
-}
-
-.hero-meta {
-    margin-top: 34px;
-    display: flex;
-    gap: 32px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: rgba(247, 243, 233, 0.6);
-    flex-wrap: wrap;
-}
-.hero-meta strong {
-    color: var(--ivory);
-    font-weight: 500;
-}
-
-.hero-buttons {
-    margin-top: 28px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-.hero-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 100px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all var(--transition);
-    border: none;
-    cursor: pointer;
-}
-.hero-btn-wa {
-    background: #25D366;
-    color: #fff;
-}
-.hero-btn-wa:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
-}
-.hero-btn-map {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--ivory);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.hero-btn-map:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-}
-
-/* ===== NAV ===== */
-.cats {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--bg-nav);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
-    transition: background 0.3s ease;
-}
-.cats .wrap {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 14px 28px;
-    scrollbar-width: none;
-}
-.cats .wrap::-webkit-scrollbar {
-    display: none;
-}
-.cat-filter-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    padding: 8px 18px;
-    border-radius: 100px;
-    border: 1.5px solid transparent;
-    background: transparent;
-    color: var(--leaf-mid);
-    transition: all var(--transition);
-    font-weight: 500;
-    cursor: pointer;
-}
-.cat-filter-btn:hover {
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    border-color: var(--leaf-deep);
-}
-.cat-filter-btn.active {
-    background: var(--brass);
-    color: var(--leaf-deep);
-    border-color: var(--brass);
-}
-
-/* ===== SEARCH ===== */
-.search-wrap {
-    padding: 24px 0 16px;
-    position: sticky;
-    top: 52px;
-    z-index: 9;
-    background: var(--bg-body);
-    transition: background 0.3s ease;
-}
-.search-box {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg-body);
-    border: 1.5px solid var(--line);
-    border-radius: 100px;
-    padding: 12px 20px;
-    transition: all var(--transition);
-    box-shadow: var(--shadow-sm);
-}
-.search-box:focus-within {
-    border-color: var(--brass);
-    box-shadow: 0 0 0 4px rgba(196, 155, 92, 0.15);
-}
-.search-box input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    font-family: 'Work Sans', sans-serif;
-    color: var(--ink);
-}
-.search-box input::placeholder {
-    color: var(--text-muted);
-    opacity: 0.6;
-}
-.search-box .icon {
-    font-size: 18px;
-    opacity: 0.5;
-}
-.search-box .clear-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: 0 4px;
-    display: none;
-}
-.search-box .clear-btn.show {
-    display: block;
-}
-
-/* ===== SKELETON ===== */
-.skeleton-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 8px 0;
-}
-.skeleton {
-    height: 76px;
-    border-radius: var(--radius);
-    overflow: hidden;
-    position: relative;
-    background: var(--skeleton-bg);
-}
-.skeleton::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
-    animation: shimmer 1.8s ease-in-out infinite;
-}
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
-}
-
-/* ===== CATEGORY ===== */
-.category {
-    margin-bottom: 56px;
-    scroll-margin-top: 120px;
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.category.revealed {
-    opacity: 1;
-    transform: translateY(0);
-}
-.category.hidden {
-    display: none;
-}
-
-.cat-head {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 4px;
-}
-.cat-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--brass);
-    font-weight: 500;
-}
-.cat-head h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 32px;
-    color: var(--leaf-deep);
-    letter-spacing: -0.02em;
-}
-[data-theme="dark"] .cat-head h2 {
-    color: var(--gold-light);
-}
-.cat-desc {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-    padding-left: 40px;
-}
-
-/* ===== ITEM ===== */
-.item {
-    display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
-    gap: 2px 12px;
-    padding: 18px 16px;
-    background: var(--bg-body);
-    border-radius: var(--radius);
-    border: 1px solid transparent;
-    margin-bottom: 8px;
-    transition: all var(--transition);
-    box-shadow: var(--shadow-sm);
-}
-.item:hover {
-    border-color: var(--brass);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-.item.hidden {
-    display: none;
-}
-.item:last-child {
-    margin-bottom: 0;
-}
-
-.item-checkbox {
-    grid-column: 1;
-    grid-row: 1 / 3;
-    align-self: center;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--brass);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.item-checkbox:checked {
-    transform: scale(1.1);
-}
-.item-checkbox:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.item-thumb {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    align-self: center;
-}
-.item-image {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    display: none;
-}
-.item-image.show {
-    display: block;
-}
-.item-placeholder {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    background: var(--line);
-}
-
-.item-info {
-    grid-column: 3;
-    display: flex;
-    flex-direction: column;
-}
-.item-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 19px;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-.item-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--brass);
-    background: rgba(196, 155, 92, 0.15);
-    border: 1px solid var(--brass);
-    border-radius: 100px;
-    padding: 2px 10px;
-}
-.item-desc {
-    font-size: 13.5px;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-.item-price {
-    grid-column: 4;
-    grid-row: 1;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--coffee-brown);
-    background: rgba(92, 58, 42, 0.06);
-    padding: 2px 12px;
-    border-radius: 100px;
-}
-
-.badge-promo {
-    font-size: 10px;
-    background: #e74c3c;
-    color: white;
-    padding: 2px 10px;
-    border-radius: 100px;
-}
-.badge-habis {
-    font-size: 10px;
-    background: #95a5a6;
-    color: white;
-    padding: 2px 10px;
-    border-radius: 100px;
-}
-.price-original {
-    text-decoration: line-through;
-    color: #95a5a6;
-    font-size: 13px;
-    margin-right: 6px;
-}
-
-/* ===== QUANTITY CONTROLS ===== */
-.qty-controls {
-    grid-column: 5;
-    grid-row: 1;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg-body);
-    border-radius: 100px;
-    padding: 2px 4px;
-    border: 1px solid var(--line);
-    transition: all 0.2s ease;
-}
-.item:hover .qty-controls {
-    border-color: var(--brass);
-}
-
-.qty-controls button {
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 50%;
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-.qty-controls button:hover:not(:disabled) {
-    transform: scale(1.12);
-    background: var(--brass);
-}
-.qty-controls button:active:not(:disabled) {
-    transform: scale(0.88);
-}
-.qty-controls button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-.qty-controls .qty-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    font-weight: 500;
-    min-width: 24px;
-    text-align: center;
-    color: var(--ink);
-    transition: color 0.3s ease;
-}
-.qty-controls .qty-value.zero {
-    opacity: 0.35;
-}
-
-/* ===== CART ===== */
-.cart-summary {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
-    background: var(--bg-body);
-    border-top: 2px solid var(--brass);
-    padding: 16px 0;
-    box-shadow: var(--shadow-lg);
-    transition: background 0.3s ease;
-    display: none;
-}
-.cart-summary.show {
-    display: block;
-}
-.cart-summary .wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-.cart-total {
-    font-family: 'Fraunces', serif;
-    font-size: 20px;
-    font-weight: 500;
-}
-.cart-total span {
-    color: var(--brass);
-}
-.cart-detail {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.cart-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #e74c3c;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    min-width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    border: 2px solid var(--bg-body);
-    box-shadow: var(--shadow-sm);
-    font-family: 'JetBrains Mono', monospace;
-    transition: transform 0.2s ease;
-}
-.cart-badge.pulse {
-    animation: badgePulse 0.4s ease;
-}
-@keyframes badgePulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.3);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-[data-theme="dark"] .cart-badge {
-    border-color: var(--bg-body);
-}
-
-/* ===== DIVIDER ===== */
-.divider {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 48px 0 40px;
-}
-.divider svg {
-    flex-shrink: 0;
-    width: 36px;
-    height: 22px;
-}
-.divider .line {
-    flex: 1;
-    height: 1.5px;
-    background: var(--line);
-}
-
-/* ===== FOOTER ===== */
-footer {
-    background: var(--leaf-deep);
-    color: var(--ivory);
-    padding: 56px 0 44px;
-    margin-top: 24px;
-    border-top: 4px solid var(--brass);
-}
-footer h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 28px;
-    margin-bottom: 8px;
-}
-footer p {
-    font-size: 14px;
-    color: rgba(247, 243, 233, 0.75);
-    max-width: 42ch;
-    margin-bottom: 24px;
-}
-.footer-buttons {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-.foot-note {
-    margin-top: 32px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: rgba(247, 243, 233, 0.4);
-    text-align: center;
-}
-.secret-trigger {
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-.secret-trigger:hover {
-    color: var(--brass);
-}
-.secret-trigger::after {
-    content: '🔑';
-    font-size: 10px;
-    margin-left: 4px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-.secret-trigger:hover::after {
-    opacity: 1;
-}
-
-/* ===== LANGUAGE SWITCH ===== */
-.lang-switch {
-    position: fixed;
-    top: 20px;
-    right: 80px;
-    z-index: 100;
-    display: flex;
-    gap: 4px;
-    background: var(--bg-body);
-    border-radius: 100px;
-    padding: 4px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--line);
-    transition: background 0.3s ease, border-color 0.3s ease;
-}
-[data-theme="dark"] .lang-switch {
-    background: var(--bg-body);
-    border-color: var(--line);
-}
-.lang-btn {
-    padding: 4px 12px;
-    border: none;
-    border-radius: 100px;
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    font-family: 'Work Sans', sans-serif;
-}
-.lang-btn.active {
-    background: var(--leaf-deep);
-    color: white;
-}
-[data-theme="dark"] .lang-btn.active {
-    background: var(--brass);
-    color: var(--leaf-deep);
-}
-.lang-btn:hover:not(.active) {
-    background: var(--line);
-}
-
-/* ===== MENU OF THE DAY ===== */
-.menu-of-the-day {
-    background: var(--brass);
-    color: var(--leaf-deep);
-    padding: 12px 24px;
-    border-radius: 100px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    margin: 16px auto 8px;
-    max-width: 600px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-}
-[data-theme="dark"] .menu-of-the-day {
-    background: var(--leaf-mid);
-    color: var(--ivory);
-}
-.menu-of-the-day strong {
-    color: var(--leaf-deep);
-}
-[data-theme="dark"] .menu-of-the-day strong {
-    color: var(--gold-light);
-}
-
-/* ===== ADMIN PANEL ===== */
-.admin-section {
-    margin-top: 32px;
-    padding: 28px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: var(--shadow-md);
-}
-[data-theme="dark"] .admin-section {
-    background: rgba(15, 31, 20, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.admin-section h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 24px;
-    color: var(--leaf-deep);
-    margin-bottom: 16px;
-}
-.admin-section .form-group {
-    margin-bottom: 14px;
-}
-.admin-section .form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 4px;
-    font-size: 14px;
-}
-.admin-section .form-group input,
-.admin-section .form-group textarea,
-.admin-section .form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'Work Sans', sans-serif;
-    background: var(--bg-body);
-    color: var(--ink);
-}
-.admin-section .form-group input:focus,
-.admin-section .form-group textarea:focus,
-.admin-section .form-group select:focus {
-    border-color: var(--brass);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(196, 155, 92, 0.15);
-}
-.admin-section .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-}
-.admin-section .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 12px;
-    margin-top: 16px;
-}
-.admin-section .menu-item {
-    background: var(--bg-body);
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-}
-.admin-section .menu-item .name {
-    font-weight: 600;
-    font-size: 16px;
-}
-.admin-section .menu-item .actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-}
-.admin-section .menu-item .actions button {
-    flex: 1;
-    padding: 4px 8px;
-    font-size: 11px;
-}
-.admin-section .tag {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 100px;
-    font-size: 10px;
-    font-weight: 600;
-}
-
-/* renderAdminMenu() di app.js membuat kartu dengan class "admin-card",
-   bukan "menu-item" di atas — blok ini yang tadinya hilang, sehingga
-   foto yang diupload tampil di ukuran asli (bisa sangat besar). */
-.admin-section .admin-card {
-    background: var(--bg-body);
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-}
-.admin-section .admin-card-img {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    background: var(--line);
-}
-.admin-section .admin-card-img img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.admin-section .admin-card-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-}
-.admin-card-img .badge-promo,
-.admin-card-img .badge-habis {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-}
-.admin-card-img .badge-habis {
-    left: 8px;
-    right: auto;
-}
-.admin-section .admin-card-info h4 {
-    margin: 0 0 4px;
-    font-size: 16px;
-    font-weight: 600;
-}
-.admin-section .admin-card-info p {
-    margin: 0 0 6px;
-    font-size: 13px;
-    color: var(--text-muted);
-}
-.admin-section .admin-card-price {
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-.admin-section .admin-card-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-.admin-section .admin-card-actions {
-    display: flex;
-    gap: 6px;
-}
-.admin-section .admin-card-actions button {
-    flex: 1;
-    padding: 4px 8px;
-    font-size: 11px;
-}
-
-.tag-favorit {
-    background: #f1c40f;
-    color: #1e2a1e;
-}
-.tag-promo {
-    background: #e74c3c;
-    color: white;
-}
-.tag-habis {
-    background: #95a5a6;
-    color: white;
-}
-
-.upload-preview {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-top: 6px;
-    border: 2px solid var(--line);
-}
-.upload-preview.hidden {
-    display: none !important;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 4px;
-    background: var(--line);
-    border-radius: 4px;
-    margin-top: 6px;
-    overflow: hidden;
-}
-.progress-bar .progress {
-    height: 100%;
-    background: var(--brass);
-    width: 0%;
-    transition: width 0.3s ease;
-}
-
-.admin-hidden {
-    display: none !important;
-}
-
-/* ===== ADMIN DASHBOARD ===== */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-}
-.stat-card {
-    background: var(--bg-body);
-    padding: 16px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid var(--line);
-    transition: all var(--transition);
-}
-.stat-card:hover {
-    border-color: var(--brass);
-    transform: translateY(-2px);
-}
-.stat-number {
-    display: block;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--brass);
-    font-family: 'Fraunces', serif;
-}
-.stat-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-}
-@media (max-width: 600px) {
-    .dashboard-stats {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-    .stat-number {
-        font-size: 20px;
-    }
-    .stat-card {
-        padding: 12px;
-    }
-}
-
-/* ===== HISTORY MODAL ===== */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 200;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-}
-.modal.show {
-    display: flex;
-}
-.modal-content {
-    background: var(--bg-body);
-    max-width: 500px;
-    width: 90%;
-    padding: 28px;
-    border-radius: 16px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--line);
-    animation: modalIn 0.3s ease;
-}
-@keyframes modalIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-.modal-close {
-    float: right;
-    font-size: 28px;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: color 0.2s;
-    line-height: 1;
-}
-.modal-close:hover {
-    color: var(--ink);
-}
-.modal-content h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 24px;
-    margin-bottom: 16px;
-    color: var(--leaf-deep);
-}
-[data-theme="dark"] .modal-content h3 {
-    color: var(--gold-light);
-}
-.history-item {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-}
-.history-item:last-child {
-    border-bottom: none;
-}
-.history-item .date {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-.history-item .items {
-    font-size: 14px;
-    margin: 4px 0;
-}
-.history-item .total {
-    font-weight: 600;
-    color: var(--brass);
-}
-.history-empty {
-    text-align: center;
-    color: var(--text-muted);
-    padding: 30px 0;
-}
-
-/* ===== UPLOAD SEAMLESS ===== */
-.upload-zone {
-    border: 2px dashed var(--line);
-    border-radius: 12px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: var(--bg-body);
-    position: relative;
-}
-.upload-zone:hover,
-.upload-zone.dragover {
-    border-color: var(--brass);
-    background: rgba(196, 155, 92, 0.05);
-}
-.upload-zone.dragover {
-    transform: scale(1.01);
-}
-.upload-icon {
-    font-size: 40px;
-    margin-bottom: 8px;
-}
-.upload-text strong {
-    font-size: 16px;
-    color: var(--ink);
-}
-.upload-text span {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-.upload-hint {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 8px;
-    opacity: 0.6;
-}
-[data-theme="dark"] .upload-zone {
-    border-color: var(--line);
-}
-[data-theme="dark"] .upload-zone:hover,
-[data-theme="dark"] .upload-zone.dragover {
-    border-color: var(--brass);
-    background: rgba(232, 200, 122, 0.05);
-}
-
-.upload-progress {
-    margin-top: 12px;
-    padding: 12px 16px;
-    background: var(--bg-body);
-    border-radius: 8px;
-    border: 1px solid var(--line);
-}
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background: var(--line);
-    border-radius: 4px;
-    overflow: hidden;
-}
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--brass), var(--gold-light));
-    width: 0%;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-.progress-text {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 6px;
-    text-align: center;
-}
-
-.upload-preview-wrapper {
-    margin-top: 12px;
-    padding: 12px;
-    background: var(--bg-body);
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.upload-preview-img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-}
-.preview-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-.preview-status {
-    font-size: 13px;
-    font-weight: 500;
-}
-.preview-status.success {
-    color: #27ae60;
-}
-.preview-status.error {
-    color: #e74c3c;
-}
-.preview-status.uploading {
-    color: var(--brass);
-}
-
-/* ===== SEARCH HIGHLIGHT ===== */
-mark {
-    background: var(--brass);
-    color: var(--leaf-deep);
-    padding: 0 2px;
-    border-radius: 2px;
-}
-[data-theme="dark"] mark {
-    background: var(--gold-light);
-    color: var(--leaf-deep);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 600px) {
-    .wrap {
-        padding: 0 18px;
-    }
-    .cat-desc {
-        padding-left: 0;
-    }
-
-    .item {
-        grid-template-columns: auto auto 1fr auto;
-        gap: 4px 8px;
-        padding: 12px 10px;
-    }
-    .item-checkbox {
-        grid-row: 1 / 3;
-    }
-    .item-thumb {
-        grid-row: 1 / 3;
-    }
-    .item-image {
-        width: 40px;
-        height: 40px;
-    }
-    .item-placeholder {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-    .item-info {
-        grid-row: 1 / 3;
-    }
-    .item-name {
-        font-size: 16px;
-    }
-    .item-desc {
-        font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .item-price {
-        font-size: 13px;
-        padding: 2px 8px;
-    }
-    .qty-controls {
-        grid-row: 2;
-    }
-    .qty-controls button {
-        width: 24px;
-        height: 24px;
-        font-size: 14px;
-    }
-    .qty-controls .qty-value {
-        font-size: 12px;
-        min-width: 20px;
-    }
-
-    .cats .wrap {
-        padding: 12px 18px;
-    }
-    .hero {
-        padding: 48px 0 40px;
-    }
-    .hero-meta {
-        gap: 18px;
-        font-size: 11px;
-    }
-    .theme-toggle {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
-        bottom: 16px;
-        right: 16px;
-    }
-    .floating-wa {
-        width: 48px;
-        height: 48px;
-        bottom: 76px;
-        right: 16px;
-    }
-    .floating-wa svg {
-        width: 24px;
-        height: 24px;
-    }
-    .cart-mini {
-        width: 40px;
-        height: 40px;
-        bottom: 132px;
-        right: 16px;
-    }
-    .cart-mini-icon {
-        font-size: 16px;
-    }
-    .scroll-top {
-        bottom: 132px;
-        right: 16px;
-        width: 38px;
-        height: 38px;
-        font-size: 16px;
-    }
-    .search-wrap {
-        top: 44px;
-        padding: 14px 0 8px;
-    }
-    .search-box {
-        padding: 8px 16px;
-    }
-    .search-box input {
-        font-size: 13px;
-    }
-    .hero-buttons {
-        gap: 8px;
-    }
-    .hero-btn {
-        font-size: 11px;
-        padding: 8px 16px;
-    }
-    .cart-summary .wrap {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-    .cart-summary .btn-wa {
-        justify-content: center;
-    }
-    .admin-section .form-row {
-        grid-template-columns: 1fr;
-    }
-    .admin-section .menu-grid {
-        grid-template-columns: 1fr;
-    }
-    .admin-section {
-        padding: 16px;
-    }
-
-    .lang-switch {
-        top: 12px;
-        right: 68px;
-        padding: 3px;
-    }
-    .lang-btn {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
-    .menu-of-the-day {
-        font-size: 12px;
-        padding: 8px 16px;
-        margin: 10px auto 6px;
-        border-radius: 20px;
-    }
-    .upload-zone {
-        padding: 20px 16px;
-    }
-    .upload-icon {
-        font-size: 32px;
-    }
-    .upload-preview-img {
-        width: 60px;
-        height: 60px;
-    }
-}
-
-@media (max-width: 400px) {
-    .item {
-        grid-template-columns: auto auto 1fr auto;
-        gap: 2px 6px;
-        padding: 10px 6px;
-    }
-    .item-checkbox {
-        width: 16px;
-        height: 16px;
-    }
-    .item-image {
-        width: 36px;
-        height: 36px;
-    }
-    .item-placeholder {
-        width: 36px;
-        height: 36px;
-        font-size: 14px;
-    }
-    .item-name {
-        font-size: 14px;
-    }
-    .item-desc {
-        font-size: 11px;
-    }
-    .item-price {
-        font-size: 12px;
-    }
-    .qty-controls button {
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
-    }
-    .qty-controls .qty-value {
-        font-size: 11px;
-        min-width: 16px;
-    }
-    .lang-switch {
-        top: 10px;
-        right: 56px;
-        padding: 2px;
-    }
-    .lang-btn {
-        font-size: 9px;
-        padding: 2px 6px;
-    }
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-    .theme-toggle,
-    .floating-wa,
-    .cart-mini,
-    .scroll-top,
-    .cats,
-    .search-wrap,
-    .cart-summary,
-    .admin-section,
-    .hero-buttons,
-    .footer-buttons,
-    .cart-badge,
-    .lang-switch,
-    .menu-of-the-day,
-    .modal {
-        display: none !important;
-    }
-
-    body {
-        background: white !important;
-        color: black !important;
-        padding: 20px !important;
-    }
-
-    .hero {
-        background: white !important;
-        color: black !important;
-        padding: 30px 0 !important;
-        border-bottom: 2px solid #c49b5c !important;
-    }
-
-    h1.brand {
-        color: black !important;
-        font-size: 36px !important;
-    }
-    h1.brand em {
-        color: #c49b5c !important;
-    }
-
-    .item {
-        break-inside: avoid;
-        box-shadow: none !important;
-        border: 1px solid #ddd !important;
-        border-radius: 8px !important;
-        padding: 12px 16px !important;
-        margin-bottom: 8px !important;
-        background: white !important;
-    }
-
-    .item:hover {
-        transform: none !important;
-    }
-
-    .wrap {
-        max-width: 100% !important;
-        padding: 0 20px !important;
-    }
-
-    .qty-controls button {
-        display: none !important;
-    }
-    .qty-controls .qty-value {
-        min-width: auto !important;
-    }
-
-    .item-checkbox {
-        display: none !important;
-    }
-
-    .item-image {
-        width: 40px !important;
-        height: 40px !important;
-    }
-
-    .item-placeholder {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 16px !important;
-    }
-
-    .cat-head h2 {
-        font-size: 24px !important;
-    }
-
-    .item-thumb {
-        margin-right: 12px !important;
-    }
-}
+(function() {
+    'use strict';
+
+    // ============================================
+    // 🔥 FASE 2 — MULTI-LANGUAGE
+    // ============================================
+
+    // ============================================
+    // TRANSLATIONS
+    // ============================================
+    const translations = {
+        'id': {
+            eyebrow: 'Menu · ',
+            open: '🟢 Buka Sekarang',
+            closed: '🔴 Tutup — Buka lagi 11.00',
+            brand: 'Flora',
+            brandEm: 'Coffee',
+            tagline: 'Kopi, camilan, dan mie — semua tersedia di sini.',
+            hours: '11.00 – 23.00',
+            days: 'Senin–Minggu',
+            location: 'Kesugihan, Cilacap',
+            dinein: 'Dine-in & Takeaway',
+            wa: 'Pesan via WhatsApp',
+            maps: 'Lihat di Maps',
+            share: 'Bagikan Menu',
+            print: 'Cetak Menu',
+            history: 'Riwayat',
+            all: 'Semua',
+            coffee: 'Kopi',
+            nonCoffee: 'Non Kopi',
+            snacks: 'Camilan',
+            noodles: 'Mie & Topping',
+            search: 'Cari menu...',
+            noResult: 'Menu tidak ditemukan. Coba kata kunci lain!',
+            total: 'Total',
+            emptyCart: 'Belum ada pesanan',
+            orderNow: 'Pesan Sekarang',
+            footerTitle: 'Mau pesan?',
+            footerDesc: 'Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.',
+            waFooter: 'Pesan via WhatsApp',
+            mapsFooter: 'Lihat di Maps',
+            printFooter: 'Cetak Menu',
+            menuOfTheDay: '🌟 Hari ini rekomendasi: ',
+            historyTitle: '📋 Riwayat Pesanan',
+            historyEmpty: '📭 Belum ada riwayat pesanan.'
+        },
+        'en': {
+            eyebrow: 'Menu · ',
+            open: '🟢 Open Now',
+            closed: '🔴 Closed — Opens at 11.00',
+            brand: 'Flora',
+            brandEm: 'Coffee',
+            tagline: 'Coffee, snacks, and noodles — all available here.',
+            hours: '11.00 – 23.00',
+            days: 'Monday–Sunday',
+            location: 'Kesugihan, Cilacap',
+            dinein: 'Dine-in & Takeaway',
+            wa: 'Order via WhatsApp',
+            maps: 'View on Maps',
+            share: 'Share Menu',
+            print: 'Print Menu',
+            history: 'History',
+            all: 'All',
+            coffee: 'Coffee',
+            nonCoffee: 'Non Coffee',
+            snacks: 'Snacks',
+            noodles: 'Noodles & Topping',
+            search: 'Search menu...',
+            noResult: 'Menu not found. Try another keyword!',
+            total: 'Total',
+            emptyCart: 'No order yet',
+            orderNow: 'Order Now',
+            footerTitle: 'Want to order?',
+            footerDesc: 'Send a message via WhatsApp, mention the menu and quantity — we\'ll prepare it for you.',
+            waFooter: 'Order via WhatsApp',
+            mapsFooter: 'View on Maps',
+            printFooter: 'Print Menu',
+            menuOfTheDay: '🌟 Today\'s recommendation: ',
+            historyTitle: '📋 Order History',
+            historyEmpty: '📭 No order history yet.'
+        }
+    };
+
+    let currentLang = 'id';
+
+    // ============================================
+    // LANGUAGE FUNCTIONS
+    // ============================================
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        updateTranslations();
+        if (typeof trackEvent === 'function') {
+            trackEvent('Language', 'switch', lang);
+        }
+        localStorage.setItem('flora-lang', lang);
+        console.log('✅ Language set to:', lang);
+    }
+
+    function updateTranslations() {
+        const t = translations[currentLang];
+        if (!t) {
+            console.error('❌ Translation not found for:', currentLang);
+            return;
+        }
+
+        function updateEl(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+            }
+        }
+
+        updateEl('langEyebrow', t.eyebrow);
+        updateEl('langBrand', t.brand);
+        updateEl('langBrandEm', t.brandEm);
+        updateEl('langTagline', t.tagline);
+        updateEl('langHours', t.hours);
+        updateEl('langDays', t.days);
+        updateEl('langLocation', t.location);
+        updateEl('langDinein', t.dinein);
+        updateEl('langWa', t.wa);
+        updateEl('langMaps', t.maps);
+        updateEl('langShare', t.share);
+        updateEl('langPrint', t.print);
+        updateEl('langHistory', t.history);
+        updateEl('langAll', t.all);
+        updateEl('langCoffee', t.coffee);
+        updateEl('langNonCoffee', t.nonCoffee);
+        updateEl('langSnacks', t.snacks);
+        updateEl('langNoodles', t.noodles);
+        updateEl('langNoResult', t.noResult);
+        updateEl('langTotal', t.total);
+        updateEl('langEmptyCart', t.emptyCart);
+        updateEl('langOrderNow', t.orderNow);
+        updateEl('langFooterTitle', t.footerTitle);
+        updateEl('langFooterDesc', t.footerDesc);
+        updateEl('langWaFooter', t.waFooter);
+        updateEl('langMapsFooter', t.mapsFooter);
+        updateEl('langPrintFooter', t.printFooter);
+        updateEl('langMenuOfTheDay', t.menuOfTheDay);
+        updateEl('langHistoryTitle', t.historyTitle);
+
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.placeholder = t.search;
+
+        updateOpenStatus();
+        console.log('✅ Translations updated to:', currentLang);
+    }
+
+    // ============================================
+    // 🔥 FASE 2 — MENU OF THE DAY
+    // ============================================
+
+    function getMenuOfTheDay() {
+        const day = new Date().getDay();
+        const recommendations = {
+            0: "Flora's Coffee",
+            1: 'Ice Rost Latte',
+            2: 'Mango Yakult',
+            3: 'Indomie Goreng',
+            4: "Flora's Matcha",
+            5: 'Mix Plater',
+            6: 'Ice Lemon Tea'
+        };
+        return recommendations[day] || "Flora's Coffee";
+    }
+
+    function showMenuOfTheDay() {
+        const name = getMenuOfTheDay();
+        const el = document.getElementById('recommendationName');
+        if (el) {
+            el.textContent = name;
+        }
+    }
+
+    // ============================================
+    // FIREBASE KONFIGURASI
+    // ============================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-0wDqKOm1bZphQ4Qglmto6O3hsvduZoA",
+        authDomain: "menuflora-5d08a.firebaseapp.com",
+        projectId: "menuflora-5d08a",
+        storageBucket: "menuflora-5d08a.firebasestorage.app",
+        messagingSenderId: "219274188593",
+        appId: "1:219274188593:web:c25a9599b0ab3a88e64210"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ============================================
+    // OFFLINE PERSISTENCE
+    // ============================================
+    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+    // ============================================
+    // ADMIN EMAIL VALIDATION
+    // ============================================
+    const ADMIN_EMAILS = ["danielalthof1@gmail.com", "kedaiflora1@gmail.com"];
+
+    // ============================================
+    // CLOUDINARY KONFIGURASI
+    // ============================================
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/vmny1hra/image/upload';
+    const CLOUDINARY_UPLOAD_PRESET = 'emvx2to2';
+
+    // ============================================
+    // DOM ELEMENTS
+    // ============================================
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    const cartSummary = document.getElementById('cartSummary');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartDetail = document.getElementById('cartDetail');
+    const orderBtn = document.getElementById('orderBtn');
+    const menuContainer = document.getElementById('menuContainer');
+    const skeletonContainer = document.getElementById('skeletonContainer');
+    const secretTrigger = document.getElementById('secretAdminTrigger');
+    const themeToggle = document.getElementById('themeToggle');
+    const scrollBtn = document.getElementById('scrollTop');
+    const cartBadge = document.getElementById('cartBadge');
+    const cartMini = document.getElementById('cartMini');
+    const cartMiniBadge = document.getElementById('cartMiniBadge');
+
+    const adminSection = document.getElementById('adminSection');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminUserEmail = document.getElementById('adminUserEmail');
+    const adminMenuGrid = document.getElementById('adminMenuGrid');
+    const loadingMenu = document.getElementById('loadingMenu');
+    const formTitle = document.getElementById('formTitle');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const newMenuBtn = document.getElementById('newMenuBtn');
+    const backupBtn = document.getElementById('backupBtn');
+
+    // Upload elements
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const previewWrapper = document.getElementById('previewWrapper');
+    const previewImage = document.getElementById('previewImage');
+    const inputImage = document.getElementById('inputImage');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+
+    const inputName = document.getElementById('inputName');
+    const inputPrice = document.getElementById('inputPrice');
+    const inputDesc = document.getElementById('inputDesc');
+    const inputCategory = document.getElementById('inputCategory');
+    const inputTag = document.getElementById('inputTag');
+    const inputStock = document.getElementById('inputStock');
+    const inputPromo = document.getElementById('inputPromo');
+
+    let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
+    let editingId = null;
+    let isAdmin = false;
+    let searchTimeout = null;
+    let currentFile = null;
+    let isUploading = false;
+
+    // ============================================
+    // DARK MODE
+    // ============================================
+    const savedTheme = localStorage.getItem('flora-theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', function() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('flora-theme', 'light');
+            this.textContent = '🌙';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('flora-theme', 'dark');
+            this.textContent = '☀️';
+        }
+    });
+
+    // ============================================
+    // SCROLL TO TOP
+    // ============================================
+    window.addEventListener('scroll', function() {
+        scrollBtn.classList.toggle('show', window.scrollY > 400);
+    });
+    scrollBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ============================================
+    // STATUS BUKA/TUTUP
+    // ============================================
+    function updateOpenStatus() {
+        const el = document.getElementById('openStatus');
+        if (!el) return;
+        const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit',
+            hour12: false }));
+        const isOpen = (hour >= 11 && hour < 23);
+        const t = translations[currentLang];
+        el.textContent = isOpen ? t.open : t.closed;
+    }
+    updateOpenStatus();
+    setInterval(updateOpenStatus, 60000);
+
+    // ============================================
+    // SHARE MENU
+    // ============================================
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async function() {
+            const shareData = { title: 'Flora Coffee — Menu', text: 'Cek menu Flora Coffee di sini!',
+            url: window.location.href };
+            const method = navigator.share ? 'navigator.share' : 'clipboard';
+            trackEvent('Engagement', 'share', method);
+            if (navigator.share) {
+                try { await navigator.share(shareData); } catch (e) {}
+            } else if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(shareData.url);
+                    showToast('🔗 Link menu disalin ke clipboard!');
+                } catch (e) {
+                    alert('Gagal menyalin link. Salin manual dari address bar ya.');
+                }
+            }
+        });
+    }
+
+    // ============================================
+    // 🔥 GOOGLE ANALYTICS TRACKING
+    // ============================================
+    function trackEvent(category, action, label, value) {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', action, {
+                'event_category': category,
+                'event_label': label || '',
+                'value': value || 0
+            });
+            console.log(`📊 Track: ${category} - ${action} ${label ? '- ' + label : ''}`);
+        }
+    }
+
+    function trackMenuView(menuName) {
+        trackEvent('Menu', 'view', menuName);
+    }
+
+    function trackAddToCart(menuName, price, quantity) {
+        trackEvent('Ecommerce', 'add_to_cart', menuName, price * quantity);
+    }
+
+    function trackRemoveFromCart(menuName) {
+        trackEvent('Ecommerce', 'remove_from_cart', menuName);
+    }
+
+    function trackOrder(total, itemCount) {
+        trackEvent('Ecommerce', 'checkout', 'Order Completed', total);
+        trackEvent('Ecommerce', 'purchase', `${itemCount} items`, total);
+    }
+
+    function trackSearch(keyword) {
+        if (keyword.length > 0) {
+            trackEvent('Search', 'search', keyword);
+        }
+    }
+
+    function trackCategoryFilter(category) {
+        trackEvent('Navigation', 'filter_category', category);
+    }
+
+    function trackPrint() {
+        trackEvent('Engagement', 'print_menu');
+    }
+
+    // ============================================
+    // SEARCH & FILTER
+    // ============================================
+    let activeCategoryFilter = 'all';
+
+    function filterMenu() {
+        const keyword = searchInput.value.toLowerCase().trim();
+        const items = document.querySelectorAll('.item');
+        const categories = document.querySelectorAll('.category');
+        const noResult = document.getElementById('noResult');
+
+        items.forEach(item => {
+            const name = item.getAttribute('data-name') || '';
+            const desc = item.getAttribute('data-desc') || '';
+            const cat = item.getAttribute('data-category') || '';
+            const matchKeyword = keyword === '' || name.includes(keyword) || desc.includes(keyword);
+            const matchCategory = activeCategoryFilter === 'all' || cat === activeCategoryFilter;
+
+            if (matchKeyword && matchCategory) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+
+        categories.forEach(cat => {
+            const matchCategory = activeCategoryFilter === 'all' || cat.id === activeCategoryFilter;
+            const visibleItems = cat.querySelectorAll('.item:not(.hidden)');
+            if (!matchCategory || visibleItems.length === 0) {
+                cat.classList.add('hidden');
+            } else {
+                cat.classList.remove('hidden');
+            }
+        });
+
+        document.querySelectorAll('.divider').forEach(d => {
+            d.style.display = (activeCategoryFilter === 'all') ? '' : 'none';
+        });
+
+        const anyVisible = document.querySelectorAll('.item:not(.hidden)').length > 0;
+        noResult.style.display = !anyVisible ? 'block' : 'none';
+        clearBtn.classList.toggle('show', keyword.length > 0);
+
+        if (keyword.length > 2) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                trackSearch(keyword);
+            }, 1000);
+        }
+
+        // Highlight
+        document.querySelectorAll('.item:not(.hidden) .item-name, .item:not(.hidden) .item-desc').forEach(el => {
+            const original = el.getAttribute('data-original') || el.textContent;
+            el.setAttribute('data-original', original);
+            if (keyword.length >= 2) {
+                const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escaped})`, 'gi');
+                el.innerHTML = original.replace(regex, '<mark>$1</mark>');
+            } else {
+                el.innerHTML = original;
+            }
+        });
+    }
+
+    document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            activeCategoryFilter = this.getAttribute('data-filter');
+            document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            if (activeCategoryFilter !== 'all') {
+                trackCategoryFilter(activeCategoryFilter);
+            }
+            filterMenu();
+        });
+    });
+
+    searchInput.addEventListener('input', filterMenu);
+    clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        filterMenu();
+        searchInput.focus();
+    });
+
+    // ============================================
+    // CART
+    // ============================================
+    function saveCart() {
+        localStorage.setItem('flora-cart', JSON.stringify(cartData));
+    }
+
+    function updateCart() {
+        const allItems = document.querySelectorAll('.item');
+        let total = 0;
+        let orderList = [];
+        let hasOrder = false;
+        let newCart = {};
+
+        allItems.forEach(item => {
+            const checkbox = item.querySelector('.item-checkbox');
+            const qtySpan = item.querySelector('.qty-value');
+            const qty = parseInt(qtySpan.textContent) || 0;
+            const price = parseInt(item.getAttribute('data-price')) || 0;
+            const name = item.querySelector('.item-name').textContent.trim();
+            const id = item.getAttribute('data-id') || name;
+
+            if (checkbox.checked && qty > 0) {
+                const subtotal = price * qty;
+                total += subtotal;
+                orderList.push(`${name} x${qty} (Rp${(price * qty).toLocaleString('id-ID')})`);
+                hasOrder = true;
+                newCart[id] = { name, qty, price };
+            }
+        });
+
+        cartData = newCart;
+        saveCart();
+
+        if (hasOrder) {
+            cartSummary.classList.add('show');
+            cartTotal.textContent = 'Rp' + total.toLocaleString('id-ID');
+            cartDetail.textContent = orderList.join(' · ') || 'Belum ada pesanan';
+            const message = encodeURIComponent(
+                'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
+                orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
+                '\n\nTotal: Rp' + total.toLocaleString('id-ID')
+            );
+            orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
+
+            // Save history
+            const historyKey = 'flora-last-order';
+            const lastOrder = localStorage.getItem(historyKey);
+            const currentOrder = orderList.join('|') + total;
+            if (lastOrder !== currentOrder) {
+                saveOrderHistory({
+                    items: orderList.join(' · '),
+                    total: 'Rp' + total.toLocaleString('id-ID')
+                });
+                localStorage.setItem(historyKey, currentOrder);
+            }
+
+        } else {
+            cartSummary.classList.remove('show');
+        }
+
+        updateCartBadge();
+        updateCartMini();
+    }
+
+    // ============================================
+    // CART BADGE
+    // ============================================
+    function updateCartBadge() {
+        if (!cartBadge) return;
+
+        let totalItems = 0;
+        document.querySelectorAll('.item').forEach(item => {
+            const checkbox = item.querySelector('.item-checkbox');
+            const qtySpan = item.querySelector('.qty-value');
+            if (checkbox && checkbox.checked) {
+                const qty = parseInt(qtySpan?.textContent) || 0;
+                totalItems += qty;
+            }
+        });
+
+        if (totalItems > 0) {
+            cartBadge.style.display = 'flex';
+            cartBadge.textContent = totalItems;
+            cartBadge.classList.remove('pulse');
+            void cartBadge.offsetWidth;
+            cartBadge.classList.add('pulse');
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    }
+
+    // ============================================
+    // FLOATING CART MINI
+    // ============================================
+    function updateCartMini() {
+        if (!cartMini || !cartMiniBadge) return;
+
+        let totalItems = 0;
+        document.querySelectorAll('.item').forEach(item => {
+            const checkbox = item.querySelector('.item-checkbox');
+            const qtySpan = item.querySelector('.qty-value');
+            if (checkbox && checkbox.checked) {
+                totalItems += parseInt(qtySpan?.textContent) || 0;
+            }
+        });
+
+        if (totalItems > 0) {
+            cartMini.style.display = 'flex';
+            cartMiniBadge.textContent = totalItems;
+        } else {
+            cartMini.style.display = 'none';
+        }
+    }
+
+    if (cartMini) {
+        cartMini.addEventListener('click', function() {
+            document.getElementById('cartSummary').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    // ============================================
+    // WHATSAPP TEMPLATE
+    // ============================================
+    function getWATemplate(type, data) {
+        const templates = {
+            'order': 'Halo Flora Coffee,\n\nSaya mau pesan:\n{items}\n\nTotal: {total}\n\nAlamat: {address}',
+            'reservation': 'Halo Flora Coffee,\n\nSaya mau reservasi untuk {people} orang pada {date} pukul {time}.',
+            'feedback': 'Halo Flora Coffee,\n\nSaya mau memberi feedback:\n{message}'
+        };
+
+        let template = templates[type] || templates.order;
+        Object.keys(data).forEach(key => {
+            template = template.replace(new RegExp(`{${key}}`, 'g'), data[key]);
+        });
+
+        return template;
+    }
+
+    // ============================================
+    // ORDER HISTORY
+    // ============================================
+    function saveOrderHistory(order) {
+        const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+        history.push({
+            id: Date.now(),
+            items: order.items,
+            total: order.total,
+            date: new Date().toLocaleString('id-ID')
+        });
+        while (history.length > 50) {
+            history.shift();
+        }
+        localStorage.setItem('flora-order-history', JSON.stringify(history));
+    }
+
+    function showOrderHistory() {
+        const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+        const container = document.getElementById('historyList');
+        if (!container) return;
+
+        if (history.length === 0) {
+            const t = translations[currentLang];
+            container.innerHTML = `<div class="history-empty">${t.historyEmpty || '📭 Belum ada riwayat pesanan.'}</div>`;
+            return;
+        }
+
+        const reversed = [...history].reverse();
+        container.innerHTML = reversed.map(item => `
+            <div class="history-item">
+                <div class="date">📅 ${item.date}</div>
+                <div class="items">${item.items}</div>
+                <div class="total">Total: ${item.total}</div>
+            </div>
+        `).join('');
+    }
+
+    // History Modal
+    const historyBtn = document.getElementById('historyBtn');
+    const historyModal = document.getElementById('historyModal');
+    const historyModalClose = document.getElementById('historyModalClose');
+
+    if (historyBtn) {
+        historyBtn.addEventListener('click', function() {
+            showOrderHistory();
+            historyModal.classList.add('show');
+            trackEvent('Engagement', 'view_history');
+        });
+    }
+
+    if (historyModalClose) {
+        historyModalClose.addEventListener('click', function() {
+            historyModal.classList.remove('show');
+        });
+    }
+
+    if (historyModal) {
+        historyModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
+    }
+
+    // ============================================
+    // ADMIN DASHBOARD
+    // ============================================
+    async function loadDashboardStats() {
+        try {
+            const menuSnapshot = await db.collection('menu').get();
+            const statMenus = document.getElementById('statMenus');
+            if (statMenus) statMenus.textContent = menuSnapshot.size;
+
+            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+            const today = new Date().toDateString();
+            const todayOrders = history.filter(item => {
+                try {
+                    const dateObj = new Date(item.date);
+                    return dateObj.toDateString() === today;
+                } catch {
+                    return false;
+                }
+            });
+
+            const statOrders = document.getElementById('statOrders');
+            if (statOrders) statOrders.textContent = todayOrders.length;
+
+            const totalRevenue = todayOrders.reduce((sum, order) => {
+                const totalStr = order.total.replace(/[^0-9]/g, '');
+                const total = parseInt(totalStr) || 0;
+                return sum + total;
+            }, 0);
+
+            const statRevenue = document.getElementById('statRevenue');
+            if (statRevenue) statRevenue.textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
+
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+        }
+    }
+
+    // ============================================
+    // CLOUDINARY UPLOAD SEAMLESS
+    // ============================================
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+    function validateFile(file) {
+        if (!file) return { valid: false, message: 'Tidak ada file.' };
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            return { valid: false, message: '❌ Format tidak didukung. Gunakan JPG, PNG, atau WebP.' };
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            return { valid: false, message: `❌ File terlalu besar (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal 5MB.` };
+        }
+        return { valid: true };
+    }
+
+    async function uploadToCloudinary(file) {
+        const validation = validateFile(file);
+        if (!validation.valid) {
+            showToast(validation.message);
+            return null;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('transformation', JSON.stringify([
+            { width: 800, height: 600, crop: 'fill' },
+            { quality: 'auto', fetch_format: 'auto' }
+        ]));
+
+        isUploading = true;
+        uploadProgress.classList.remove('hidden');
+        progressFill.style.width = '0%';
+        progressText.textContent = '⏳ Mengupload... 0%';
+        previewWrapper.classList.add('hidden');
+
+        try {
+            const xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressFill.style.width = percent + '%';
+                    progressText.textContent = `⏳ Mengupload... ${percent}%`;
+                }
+            });
+
+            const response = await new Promise((resolve, reject) => {
+                xhr.open('POST', CLOUDINARY_URL);
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        reject(new Error(xhr.statusText || 'Upload gagal'));
+                    }
+                };
+                xhr.onerror = () => reject(new Error('Network error'));
+                xhr.send(formData);
+            });
+
+            isUploading = false;
+            progressFill.style.width = '100%';
+            progressText.textContent = '✅ Upload berhasil!';
+
+            previewImage.src = response.secure_url;
+            previewWrapper.classList.remove('hidden');
+            inputImage.value = response.secure_url;
+            currentFile = file;
+
+            setTimeout(() => {
+                uploadProgress.classList.add('hidden');
+            }, 1500);
+
+            showToast('✅ Gambar berhasil diupload!');
+            trackEvent('Admin', 'upload_image', file.name);
+
+            return response.secure_url;
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            isUploading = false;
+            progressFill.style.width = '0%';
+            progressText.textContent = '❌ Upload gagal!';
+            uploadProgress.classList.remove('hidden');
+
+            showToast('❌ Gagal upload gambar: ' + error.message);
+
+            const retryBtn = document.createElement('button');
+            retryBtn.className = 'btn btn-sm';
+            retryBtn.textContent = '🔄 Coba Lagi';
+            retryBtn.style.marginTop = '8px';
+            retryBtn.onclick = () => {
+                if (currentFile) {
+                    uploadToCloudinary(currentFile);
+                } else if (fileInput && fileInput.files[0]) {
+                    uploadToCloudinary(fileInput.files[0]);
+                }
+                retryBtn.remove();
+            };
+
+            const progressContainer = document.querySelector('.upload-progress');
+            if (progressContainer) {
+                progressContainer.appendChild(retryBtn);
+            }
+
+            return null;
+        }
+    }
+
+    // ============================================
+    // UPLOAD EVENT LISTENERS
+    // ============================================
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            currentFile = file;
+            uploadToCloudinary(file);
+        });
+    }
+
+    if (uploadZone) {
+        uploadZone.addEventListener('click', function() {
+            if (isUploading) {
+                showToast('⏳ Tunggu upload selesai dulu ya!');
+                return;
+            }
+            if (fileInput) fileInput.click();
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        uploadZone.addEventListener('dragover', function() {
+            if (!isUploading) {
+                this.classList.add('dragover');
+            }
+        });
+
+        uploadZone.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            this.classList.remove('dragover');
+            if (isUploading) {
+                showToast('⏳ Tunggu upload selesai dulu ya!');
+                return;
+            }
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                currentFile = files[0];
+                if (fileInput) {
+                    fileInput.files = files;
+                }
+                uploadToCloudinary(files[0]);
+            }
+        });
+    }
+
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener('click', function() {
+            currentFile = null;
+            inputImage.value = '';
+            previewWrapper.classList.add('hidden');
+            previewImage.src = '';
+            if (fileInput) fileInput.value = '';
+            uploadProgress.classList.add('hidden');
+            progressFill.style.width = '0%';
+            showToast('🗑️ Gambar dihapus');
+        });
+    }
+
+    // ============================================
+    // LOAD MENU
+    // ============================================
+    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
+    const categoryNames = {
+        'kopi-klasik': '☕ Kopi',
+        'non-kopi': '🍵 Non Kopi',
+        'camilan': '🍽️ Camilan',
+        'mie': '🍜 Mie & Topping'
+    };
+    const categoryDescs = {
+        'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
+        'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
+        'camilan': 'Camilan gurih untuk mengisi perut.',
+        'mie': 'Mie instan dengan berbagai topping pilihan.'
+    };
+    const categoryIcons = {
+        'kopi-klasik': '☕',
+        'non-kopi': '🍵',
+        'camilan': '🍽️',
+        'mie': '🍜'
+    };
+
+    const defaultMenuData = [
+        { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
+            category: 'kopi-klasik', tag: '', image: '' },
+        { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
+            category: 'kopi-klasik', tag: '', image: '' },
+        { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
+            tag: '', image: '' },
+        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
+            image: '' },
+        { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
+            category: 'non-kopi', tag: '', image: '' },
+        { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
+            category: 'non-kopi', tag: '', image: '' },
+        { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
+            category: 'non-kopi', tag: '', image: '' },
+        { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
+            tag: '', image: '' },
+        { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
+            category: 'non-kopi', tag: '', image: '' },
+        { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
+            category: 'camilan', tag: '', image: '' },
+        { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
+            tag: '', image: '' },
+        { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
+            tag: '', image: '' },
+        { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
+            tag: '', image: '' },
+        { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
+            tag: '', image: '' },
+        { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
+            tag: '', image: '' },
+        { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
+            category: 'mie', tag: '', image: '' },
+        { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
+            tag: '', image: '' },
+        { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
+            tag: '', image: '' }
+    ];
+
+    function renderMenu(data) {
+        skeletonContainer.style.display = 'none';
+        menuContainer.style.display = 'block';
+        menuContainer.innerHTML = '';
+
+        const grouped = {};
+        data.forEach(item => {
+            if (!grouped[item.category]) grouped[item.category] = [];
+            grouped[item.category].push(item);
+        });
+
+        let catIndex = 1;
+        categories.forEach(catKey => {
+            if (!grouped[catKey]) return;
+
+            const section = document.createElement('section');
+            section.className = 'category';
+            section.id = catKey;
+
+            const head = document.createElement('div');
+            head.className = 'cat-head';
+            head.innerHTML = `
+                <span class="cat-num">${String(catIndex).padStart(2, '0')}</span>
+                <h2>${categoryNames[catKey] || catKey}</h2>
+            `;
+            section.appendChild(head);
+
+            const desc = document.createElement('p');
+            desc.className = 'cat-desc';
+            desc.textContent = categoryDescs[catKey] || '';
+            section.appendChild(desc);
+
+            grouped[catKey].forEach((item) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.setAttribute('data-name', item.name.toLowerCase());
+                itemDiv.setAttribute('data-desc', item.desc.toLowerCase());
+                itemDiv.setAttribute('data-category', item.category || '');
+
+                const activePrice = item.promoPrice ? item.promoPrice : item.price;
+                itemDiv.setAttribute('data-price', activePrice);
+                itemDiv.setAttribute('data-id', item.id);
+
+                trackMenuView(item.name);
+
+                const thumb = document.createElement('div');
+                thumb.className = 'item-thumb';
+                const hasImage = item.image && item.image.trim() !== '';
+                if (hasImage) {
+                    const img = document.createElement('img');
+                    img.className = 'item-image show';
+                    img.src = item.image;
+                    img.alt = item.name;
+                    img.loading = 'lazy';
+                    thumb.appendChild(img);
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'item-placeholder';
+                    placeholder.textContent = categoryIcons[item.category] || '☕';
+                    placeholder.setAttribute('aria-hidden', 'true');
+                    thumb.appendChild(placeholder);
+                }
+                itemDiv.appendChild(thumb);
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'item-checkbox';
+                if (item.stock === 0) { checkbox.disabled = true;
+                    checkbox.style.opacity = '0.4'; }
+                itemDiv.appendChild(checkbox);
+
+                const info = document.createElement('div');
+                info.className = 'item-info';
+                const nameSpan = document.createElement('div');
+                nameSpan.className = 'item-name';
+                nameSpan.textContent = item.name;
+
+                if (item.tag) {
+                    const tag = document.createElement('span');
+                    tag.className = 'item-tag';
+                    tag.textContent = item.tag;
+                    nameSpan.appendChild(tag);
+                }
+                if (item.promoPrice) {
+                    const promo = document.createElement('span');
+                    promo.className = 'badge-promo';
+                    promo.textContent = '🔥 Promo';
+                    nameSpan.appendChild(promo);
+                }
+                if (item.stock === 0) {
+                    const habis = document.createElement('span');
+                    habis.className = 'badge-habis';
+                    habis.textContent = '⛔ Habis';
+                    nameSpan.appendChild(habis);
+                }
+                info.appendChild(nameSpan);
+
+                const descSpan = document.createElement('div');
+                descSpan.className = 'item-desc';
+                descSpan.textContent = item.desc;
+                info.appendChild(descSpan);
+                itemDiv.appendChild(info);
+
+                const priceSpan = document.createElement('div');
+                priceSpan.className = 'item-price';
+                if (item.promoPrice) {
+                    const original = document.createElement('span');
+                    original.className = 'price-original';
+                    original.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
+                    priceSpan.appendChild(original);
+                    const promoPrice = document.createElement('span');
+                    promoPrice.textContent = 'Rp' + Number(item.promoPrice).toLocaleString('id-ID');
+                    priceSpan.appendChild(promoPrice);
+                } else {
+                    priceSpan.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
+                }
+                itemDiv.appendChild(priceSpan);
+
+                const qtyDiv = document.createElement('div');
+                qtyDiv.className = 'qty-controls';
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'qty-minus';
+                minusBtn.textContent = '−';
+                if (item.stock === 0) minusBtn.disabled = true;
+                qtyDiv.appendChild(minusBtn);
+
+                const qtySpan = document.createElement('span');
+                qtySpan.className = 'qty-value zero';
+                qtySpan.textContent = '0';
+                qtyDiv.appendChild(qtySpan);
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'qty-plus';
+                plusBtn.textContent = '+';
+                if (item.stock === 0) plusBtn.disabled = true;
+                qtyDiv.appendChild(plusBtn);
+                itemDiv.appendChild(qtyDiv);
+
+                const saved = cartData[item.id];
+                if (saved && saved.qty > 0 && item.stock !== 0) {
+                    checkbox.checked = true;
+                    qtySpan.textContent = saved.qty;
+                    qtySpan.classList.remove('zero');
+                }
+
+                checkbox.addEventListener('change', function() {
+                    if (item.stock === 0) return;
+                    const qty = parseInt(qtySpan.textContent) || 0;
+                    if (!this.checked) {
+                        qtySpan.textContent = '0';
+                        qtySpan.classList.add('zero');
+                        trackRemoveFromCart(item.name);
+                    } else if (qty === 0) {
+                        qtySpan.textContent = '1';
+                        qtySpan.classList.remove('zero');
+                        trackAddToCart(item.name, activePrice, 1);
+                    } else {
+                        trackAddToCart(item.name, activePrice, qty);
+                    }
+                    updateCart();
+                });
+
+                function updateQty(change) {
+                    if (item.stock === 0) return;
+                    let val = parseInt(qtySpan.textContent) || 0;
+                    val = Math.max(0, val + change);
+                    qtySpan.textContent = val;
+                    qtySpan.classList.toggle('zero', val === 0);
+                    if (val > 0) {
+                        checkbox.checked = true;
+                        trackAddToCart(item.name, activePrice, val);
+                    } else {
+                        checkbox.checked = false;
+                        trackRemoveFromCart(item.name);
+                    }
+                    updateCart();
+                }
+
+                minusBtn.addEventListener('click', function(e) { e.stopPropagation();
+                    updateQty(-1); });
+                plusBtn.addEventListener('click', function(e) { e.stopPropagation();
+                    updateQty(1); });
+                qtySpan.addEventListener('click', function() { updateQty(-parseInt(qtySpan.textContent) || 0); });
+
+                section.appendChild(itemDiv);
+            });
+
+            menuContainer.appendChild(section);
+
+            if (catIndex < Object.keys(grouped).length) {
+                const divider = document.createElement('div');
+                divider.className = 'divider';
+                divider.innerHTML = `
+                    <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b58d4a" stroke-width="1.4" /><circle cx="17" cy="5" r="2.6" fill="#b58d4a" /></svg>
+                    <div class="line"></div>
+                `;
+                menuContainer.appendChild(divider);
+            }
+            catIndex++;
+        });
+
+        updateCart();
+        filterMenu();
+        setupScrollReveal();
+    }
+
+    // ============================================
+    // SCROLL REVEAL
+    // ============================================
+    let revealObserver = null;
+
+    function setupScrollReveal() {
+        if (!('IntersectionObserver' in window)) {
+            document.querySelectorAll('.category').forEach(el => el.classList.add('revealed'));
+            return;
+        }
+        if (revealObserver) revealObserver.disconnect();
+        revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.category').forEach(el => revealObserver.observe(el));
+    }
+
+    let menuUnsubscribe = null;
+
+    function loadMenu() {
+        skeletonContainer.style.display = 'block';
+        menuContainer.style.display = 'none';
+
+        if (menuUnsubscribe) menuUnsubscribe();
+        menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(snapshot => {
+            skeletonContainer.style.display = 'none';
+            menuContainer.style.display = 'block';
+            if (snapshot.empty) {
+                defaultMenuData.forEach(item => {
+                    db.collection('menu').doc(item.id).set(item).catch(() => {});
+                });
+                renderMenu(defaultMenuData);
+                return;
+            }
+            const data = [];
+            snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
+            renderMenu(data);
+            if (isAdmin) renderAdminMenu(data);
+        }, () => {
+            skeletonContainer.style.display = 'none';
+            menuContainer.style.display = 'block';
+            renderMenu(defaultMenuData);
+        });
+    }
+
+    // ============================================
+    // ADMIN PANEL
+    // ============================================
+    function renderAdminMenu(data) {
+        loadingMenu.classList.add('hidden');
+        adminMenuGrid.innerHTML = '';
+        if (!data || data.length === 0) {
+            adminMenuGrid.innerHTML = '<p style="text-align:center;color:#95a5a6;padding:20px;">Belum ada menu.</p>';
+            return;
+        }
+                data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'admin-card';
+            card.innerHTML = `
+                <div class="admin-card-img">
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : `<div class="admin-card-placeholder">${categoryIcons[item.category] || '☕'}</div>`}
+                    ${item.promoPrice ? '<span class="badge-promo">🔥 Promo</span>' : ''}
+                    ${item.stock === 0 ? '<span class="badge-habis">⛔ Habis</span>' : ''}
+                </div>
+                <div class="admin-card-info">
+                    <h4>${item.name}</h4>
+                    <p>${item.desc || ''}</p>
+                    <div class="admin-card-price">
+                        ${item.promoPrice ? `<span class="price-original">Rp${Number(item.price).toLocaleString('id-ID')}</span> Rp${Number(item.promoPrice).toLocaleString('id-ID')}` : `Rp${Number(item.price).toLocaleString('id-ID')}`}
+                    </div>
+                    <div class="admin-card-meta">
+                        <span>${categoryNames[item.category] || item.category}</span>
+                        ${item.tag ? `<span class="tag">${item.tag}</span>` : ''}
+                        ${item.stock !== undefined ? `<span>Stok: ${item.stock}</span>` : ''}
+                    </div>
+                </div>
+                <div class="admin-card-actions">
+                    <button class="btn btn-sm" onclick="editMenuItem('${item.id}')">✏️ Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteMenuItem('${item.id}')">🗑️</button>
+                </div>
+            `;
+            adminMenuGrid.appendChild(card);
+        });
+    }
+
+    // ============================================
+    // CRUD OPERATIONS
+    // ============================================
+    window.editMenuItem = function(id) {
+        if (!isAdmin) return;
+        db.collection('menu').doc(id).get().then(doc => {
+            if (!doc.exists) {
+                showToast('❌ Menu tidak ditemukan');
+                return;
+            }
+            const data = doc.data();
+            editingId = id;
+            formTitle.textContent = '✏️ Edit Menu';
+            saveBtn.textContent = '💾 Update Menu';
+            inputName.value = data.name || '';
+            inputPrice.value = data.price || '';
+            inputDesc.value = data.desc || '';
+            inputCategory.value = data.category || 'kopi-klasik';
+            inputTag.value = data.tag || '';
+            inputStock.value = data.stock !== undefined ? data.stock : '';
+            inputPromo.checked = !!data.promoPrice;
+            if (data.image) {
+                inputImage.value = data.image;
+                previewImage.src = data.image;
+                previewWrapper.classList.remove('hidden');
+            } else {
+                previewWrapper.classList.add('hidden');
+                inputImage.value = '';
+            }
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+            trackEvent('Admin', 'edit_menu', data.name);
+        }).catch(err => {
+            console.error('Error loading menu:', err);
+            showToast('❌ Gagal memuat data menu');
+        });
+    };
+
+    window.deleteMenuItem = function(id) {
+        if (!isAdmin) return;
+        if (!confirm('🗑️ Yakin ingin menghapus menu ini?')) return;
+        db.collection('menu').doc(id).delete().then(() => {
+            showToast('✅ Menu berhasil dihapus');
+            trackEvent('Admin', 'delete_menu');
+        }).catch(err => {
+            console.error('Error deleting:', err);
+            showToast('❌ Gagal menghapus menu');
+        });
+    };
+
+    // ============================================
+    // FORM HANDLING
+    // ============================================
+    function resetForm() {
+        editingId = null;
+        formTitle.textContent = '📝 Tambah Menu Baru';
+        saveBtn.textContent = '💾 Simpan Menu';
+        inputName.value = '';
+        inputPrice.value = '';
+        inputDesc.value = '';
+        inputCategory.value = 'kopi-klasik';
+        inputTag.value = '';
+        inputStock.value = '';
+        inputPromo.checked = false;
+        inputImage.value = '';
+        previewWrapper.classList.add('hidden');
+        previewImage.src = '';
+        currentFile = null;
+        if (fileInput) fileInput.value = '';
+        uploadProgress.classList.add('hidden');
+        progressFill.style.width = '0%';
+        progressText.textContent = '';
+    }
+
+    if (newMenuBtn) {
+        newMenuBtn.addEventListener('click', resetForm);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', resetForm);
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async function() {
+            if (!isAdmin) {
+                showToast('❌ Anda tidak memiliki akses admin');
+                return;
+            }
+
+            const name = inputName.value.trim();
+            const price = parseInt(inputPrice.value);
+            const desc = inputDesc.value.trim();
+            const category = inputCategory.value;
+            const tag = inputTag.value.trim();
+            const stock = parseInt(inputStock.value);
+            const promo = inputPromo.checked;
+            const image = inputImage.value.trim();
+
+            if (!name) {
+                showToast('❌ Nama menu wajib diisi');
+                inputName.focus();
+                return;
+            }
+            if (isNaN(price) || price < 0) {
+                showToast('❌ Harga harus diisi dengan angka valid');
+                inputPrice.focus();
+                return;
+            }
+            if (isNaN(stock) || stock < 0) {
+                showToast('❌ Stok harus diisi dengan angka valid');
+                inputStock.focus();
+                return;
+            }
+
+            const data = {
+                name,
+                price,
+                desc: desc || '',
+                category,
+                tag: tag || '',
+                stock,
+                promoPrice: promo ? price : null,
+                image: image || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if (editingId) {
+                    await db.collection('menu').doc(editingId).update(data);
+                    showToast('✅ Menu berhasil diupdate!');
+                    trackEvent('Admin', 'update_menu', name);
+                } else {
+                    const newId = Date.now().toString();
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('menu').doc(newId).set(data);
+                    showToast('✅ Menu baru berhasil ditambahkan!');
+                    trackEvent('Admin', 'add_menu', name);
+                }
+                resetForm();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving:', err);
+                showToast('❌ Gagal menyimpan menu: ' + err.message);
+            }
+        });
+    }
+
+    // ============================================
+    // AUTHENTICATION
+    // ============================================
+    auth.onAuthStateChanged(user => {
+        if (user && ADMIN_EMAILS.includes(user.email)) {
+            isAdmin = true;
+            adminSection.classList.remove('admin-hidden');
+            adminSection.style.display = 'block';
+            adminUserEmail.textContent = user.email;
+            loadDashboardStats();
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            trackEvent('Auth', 'admin_login', user.email);
+        } else {
+            isAdmin = false;
+            adminSection.classList.add('admin-hidden');
+            adminSection.style.display = 'none';
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        }
+    });
+
+    // Secret trigger (tap 5x)
+    let tapCount = 0;
+    let tapTimer = null;
+
+    if (secretTrigger) {
+        secretTrigger.addEventListener('click', function() {
+            tapCount++;
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => { tapCount = 0; }, 1000);
+
+            if (tapCount >= 5) {
+                tapCount = 0;
+                if (!isAdmin) {
+                    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+                        .then(result => {
+                            if (ADMIN_EMAILS.includes(result.user.email)) {
+                                showToast('✅ Selamat datang Admin!');
+                                trackEvent('Auth', 'admin_login_popup', result.user.email);
+                            } else {
+                                showToast('❌ Email tidak terdaftar sebagai admin');
+                                auth.signOut();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Auth error:', err);
+                            showToast('❌ Gagal login: ' + err.message);
+                        });
+                } else {
+                    showToast('👋 Anda sudah login sebagai admin');
+                }
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            auth.signOut().then(() => {
+                showToast('👋 Logout berhasil');
+                trackEvent('Auth', 'admin_logout');
+                isAdmin = false;
+                adminSection.classList.add('admin-hidden');
+                adminSection.style.display = 'none';
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            }).catch(err => {
+                console.error('Logout error:', err);
+                showToast('❌ Gagal logout');
+            });
+        });
+    }
+
+    // ============================================
+    // BACKUP
+    // ============================================
+    if (backupBtn) {
+        backupBtn.addEventListener('click', function() {
+            if (!isAdmin) {
+                showToast('❌ Hanya admin yang bisa backup');
+                return;
+            }
+            db.collection('menu').get().then(snapshot => {
+                const data = [];
+                snapshot.forEach(doc => {
+                    data.push({ id: doc.id, ...doc.data() });
+                });
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `flora-backup-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('✅ Backup berhasil diunduh');
+                trackEvent('Admin', 'backup');
+            }).catch(err => {
+                console.error('Backup error:', err);
+                showToast('❌ Gagal backup data');
+            });
+        });
+    }
+
+    // ============================================
+    // TOAST SYSTEM
+    // ============================================
+    function showToast(message, duration = 3000) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => { toast.remove(); }, 400);
+        }, duration);
+    }
+
+    // ============================================
+    // PRINT MENU
+    // ============================================
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            trackPrint();
+            const originalTitle = document.title;
+            document.title = 'Flora Coffee — Menu';
+            window.print();
+            document.title = originalTitle;
+        });
+    }
+
+    const printFooterBtn = document.getElementById('printFooterBtn');
+    if (printFooterBtn) {
+        printFooterBtn.addEventListener('click', function() {
+            trackPrint();
+            const originalTitle = document.title;
+            document.title = 'Flora Coffee — Menu';
+            window.print();
+            document.title = originalTitle;
+        });
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+/ untuk search
+        if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        // Escape untuk clear search & close modal
+        if (e.key === 'Escape') {
+            if (searchInput.value) {
+                searchInput.value = '';
+                filterMenu();
+                searchInput.blur();
+            }
+            if (historyModal && historyModal.classList.contains('show')) {
+                historyModal.classList.remove('show');
+            }
+        }
+        // Alt+1-4 untuk kategori
+        if (e.altKey && e.key >= '1' && e.key <= '4') {
+            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
+            const idx = parseInt(e.key);
+            const filter = filters[idx] || 'all';
+            const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
+            if (btn) btn.click();
+        }
+    });
+
+    // ============================================
+    // NETWORK STATUS
+    // ============================================
+    window.addEventListener('online', function() {
+        showToast('🔄 Koneksi kembali online!');
+        loadMenu();
+    });
+
+    window.addEventListener('offline', function() {
+        showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
+    });
+
+    // ============================================
+    // SERVICE WORKER REGISTRATION (Optional)
+    // ============================================
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    const savedLang = localStorage.getItem('flora-lang') || 'id';
+    setLang(savedLang);
+    loadMenu();
+    showMenuOfTheDay();
+
+    // Auto-refresh menu every 5 minutes
+    setInterval(() => {
+        if (navigator.onLine) {
+            loadMenu();
+        }
+    }, 300000);
+
+    console.log('🌿 Flora Coffee Menu v2.0 loaded successfully!');
+    console.log('📊 Analytics tracking enabled');
+    console.log('🔐 Admin panel protected');
+    console.log('🌍 Multi-language support:', currentLang);
+    console.log('📦 PWA ready');
+
+})();
