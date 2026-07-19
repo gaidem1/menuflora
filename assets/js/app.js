@@ -1196,7 +1196,7 @@
     }
 
     // ============================================
-    // RENDER MENU (Public) - FIXED Badge Double!
+    // RENDER MENU (Public) - FIXED BADGE DOUBLE!
     // ============================================
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
@@ -1273,31 +1273,32 @@
                 const nameSpan = document.createElement('div');
                 nameSpan.className = 'item-name';
                 
-                // ✅ FIX: Bersihkan nama dari emoji
                 const cleanName = cleanNameFromEmoji(item.name);
                 nameSpan.textContent = cleanName;
 
-                // ===== BADGE HANDLING - HANYA SATU KALI =====
-                // 1. Badge dari field tag (Favorit atau Promo)
-                if (item.tag && item.tag !== '') {
+                // ============================================
+                // BADGE HANDLING - FIXED: no double promo
+                // ============================================
+                // 1. Badge Favorit
+                if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
-                    if (item.tag === 'Favorit') {
-                        tag.textContent = '⭐ Favorit';
-                    } else if (item.tag === 'Promo') {
-                        tag.textContent = '🔥 Promo';
-                    } else {
-                        tag.textContent = item.tag;
-                    }
+                    tag.textContent = '⭐ Favorit';
                     nameSpan.appendChild(tag);
                 }
 
-                // 2. Badge Promo dari promoPrice (tambahan jika ada)
+                // 2. Badge Promo (hanya satu, prioritas promoPrice)
                 if (item.promoPrice) {
                     const promo = document.createElement('span');
                     promo.className = 'badge-promo';
                     promo.textContent = '🔥 Promo';
                     nameSpan.appendChild(promo);
+                } else if (item.tag === 'Promo') {
+                    // jika tag Promo tapi tidak ada promoPrice, tampilkan sebagai item-tag biasa
+                    const tag = document.createElement('span');
+                    tag.className = 'item-tag';
+                    tag.textContent = '🔥 Promo';
+                    nameSpan.appendChild(tag);
                 }
 
                 // 3. Badge Habis
@@ -1514,7 +1515,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU - FIXED Badge Double!
+    // RENDER ADMIN MENU - FIXED BADGE DOUBLE!
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) {
@@ -1540,12 +1541,26 @@
             
             const card = document.createElement('div');
             card.className = 'admin-card';
+            
+            // Bangun badge string untuk admin card
+            let badgeHTML = '';
+            if (item.promoPrice) {
+                badgeHTML += '<span class="badge-promo">🔥 Promo</span>';
+            } else if (item.tag === 'Promo') {
+                // hanya jika tidak ada promoPrice, tampilkan tag Promo sebagai badge biasa
+                badgeHTML += '<span class="badge-promo">🔥 Promo</span>';
+            }
+            if (item.tag === 'Favorit') {
+                badgeHTML += '<span class="badge-favorit">⭐ Favorit</span>';
+            }
+            if (item.stock === 0) {
+                badgeHTML += '<span class="badge-habis">⛔ Habis</span>';
+            }
+
             card.innerHTML = `
                 <div class="admin-card-img">
                     ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : `<div class="admin-card-placeholder">${categoryIcons[item.category] || '☕'}</div>`}
-                    ${item.promoPrice ? '<span class="badge-promo">🔥 Promo</span>' : ''}
-                    ${item.tag === 'Favorit' ? '<span class="badge-favorit">⭐ Favorit</span>' : ''}
-                    ${item.stock === 0 ? '<span class="badge-habis">⛔ Habis</span>' : ''}
+                    ${badgeHTML}
                 </div>
                 <div class="admin-card-info">
                     <h4>${cleanName}</h4>
@@ -1555,7 +1570,7 @@
                     </div>
                     <div class="admin-card-meta">
                         <span>${categoryNames[item.category] || item.category}</span>
-                        ${item.tag ? `<span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>` : ''}
+                        ${item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit' ? `<span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>` : ''}
                     </div>
                 </div>
                 <div class="admin-card-stock">
