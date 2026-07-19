@@ -93,6 +93,33 @@
     color: #e8e4da !important;
 }
 
+/* ===== FOOTER DARK MODE FIX ===== */
+[data-theme="dark"] footer {
+    background: var(--leaf-deep);
+    border-top-color: var(--brass);
+}
+[data-theme="dark"] footer h3,
+[data-theme="dark"] footer p,
+[data-theme="dark"] footer .foot-note {
+    color: #ffffff !important;
+}
+[data-theme="dark"] footer .btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+[data-theme="dark"] footer .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+[data-theme="dark"] footer .btn-wa {
+    background: #25D366 !important;
+    color: #ffffff !important;
+    border: none;
+}
+[data-theme="dark"] footer .btn-wa:hover {
+    background: #1da85c !important;
+}
+
 /* ===== RESET & BASE ===== */
 * {
     margin: 0;
@@ -330,6 +357,10 @@ a {
 }
 .scroll-top:hover {
     transform: translateY(-3px) scale(1.05);
+}
+[data-theme="dark"] .scroll-top {
+    background: var(--brass);
+    color: var(--leaf-deep);
 }
 
 /* ===== HERO ===== */
@@ -770,7 +801,6 @@ h1.brand em {
     word-break: break-word;
 }
 
-/* ===== ITEM PRICE ===== */
 .item-price {
     grid-column: 4;
     grid-row: 1 / 3;
@@ -791,7 +821,6 @@ h1.brand em {
     margin-right: 6px;
 }
 
-/* ===== QUANTITY CONTROLS ===== */
 .qty-controls {
     grid-column: 5;
     grid-row: 1 / 3;
