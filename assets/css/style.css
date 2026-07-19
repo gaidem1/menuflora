@@ -110,6 +110,7 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     transition: background 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
 }
 
 a {
@@ -636,6 +637,7 @@ h1.brand em {
     margin-bottom: 8px;
     transition: all var(--transition);
     box-shadow: var(--shadow-sm);
+    overflow: hidden;
 }
 .item:hover {
     border-color: var(--brass);
@@ -697,6 +699,7 @@ h1.brand em {
     grid-column: 3;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 .item-name {
     font-family: 'Fraunces', serif;
@@ -708,8 +711,6 @@ h1.brand em {
     gap: 6px;
     flex-wrap: wrap;
 }
-
-/* ===== BADGES - FIXED Smaller & Cleaner ===== */
 .item-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px;
@@ -766,13 +767,14 @@ h1.brand em {
     font-size: 13.5px;
     color: var(--text-muted);
     margin-top: 2px;
+    word-break: break-word;
 }
 
-/* ===== ITEM PRICE - FIXED ALIGNMENT ===== */
+/* ===== ITEM PRICE ===== */
 .item-price {
     grid-column: 4;
-    grid-row: 1 / 3;          /* Perbaikan: membentang 2 baris */
-    align-self: center;       /* Perbaikan: pusat vertikal */
+    grid-row: 1 / 3;
+    align-self: center;
     font-family: 'JetBrains Mono', monospace;
     font-size: 15px;
     font-weight: 500;
@@ -780,6 +782,7 @@ h1.brand em {
     background: rgba(92, 58, 42, 0.06);
     padding: 2px 12px;
     border-radius: 100px;
+    white-space: nowrap;
 }
 .price-original {
     text-decoration: line-through;
@@ -788,11 +791,11 @@ h1.brand em {
     margin-right: 6px;
 }
 
-/* ===== QUANTITY CONTROLS - FIXED ALIGNMENT ===== */
+/* ===== QUANTITY CONTROLS ===== */
 .qty-controls {
     grid-column: 5;
-    grid-row: 1 / 3;          /* Perbaikan: membentang 2 baris */
-    align-self: center;       /* Perbaikan: pusat vertikal */
+    grid-row: 1 / 3;
+    align-self: center;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1585,7 +1588,7 @@ mark {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .wrap {
-        padding: 0 18px;
+        padding: 0 14px;
     }
     .cat-desc {
         padding-left: 0;
@@ -1593,29 +1596,34 @@ mark {
 
     .item {
         grid-template-columns: auto auto 1fr auto;
-        gap: 4px 8px;
-        padding: 12px 10px;
+        gap: 2px 6px;
+        padding: 10px 8px;
+        border-radius: 12px;
     }
     .item-checkbox {
         grid-row: 1 / 3;
+        width: 16px;
+        height: 16px;
     }
     .item-thumb {
         grid-row: 1 / 3;
     }
     .item-image {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
     }
     .item-placeholder {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
     }
     .item-info {
         grid-row: 1 / 3;
     }
     .item-name {
-        font-size: 16px;
+        font-size: 15px;
+        gap: 4px;
     }
     .item-desc {
         font-size: 12px;
@@ -1624,90 +1632,100 @@ mark {
         text-overflow: ellipsis;
     }
     .item-price {
+        grid-column: 4;
+        grid-row: 1;
         font-size: 13px;
         padding: 2px 8px;
+        white-space: nowrap;
+        justify-self: end;
+        align-self: center;
     }
     .qty-controls {
         grid-column: 4;
         grid-row: 2;
         justify-self: end;
+        align-self: center;
+        padding: 1px 3px;
+        gap: 4px;
+        border-radius: 20px;
     }
     .qty-controls button {
-        width: 24px;
-        height: 24px;
-        font-size: 14px;
+        width: 22px;
+        height: 22px;
+        font-size: 13px;
     }
     .qty-controls .qty-value {
         font-size: 12px;
-        min-width: 20px;
+        min-width: 18px;
     }
 
     .cats .wrap {
-        padding: 12px 18px;
+        padding: 10px 14px;
     }
     .hero {
-        padding: 48px 0 40px;
+        padding: 40px 0 32px;
     }
     .hero-meta {
-        gap: 18px;
+        gap: 14px;
         font-size: 11px;
     }
     
     .theme-toggle {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
-        bottom: 20px;
-        right: 16px;
-    }
-    .floating-wa {
-        width: 48px;
-        height: 48px;
-        bottom: 126px;
-        right: 16px;
-    }
-    .floating-wa svg {
-        width: 24px;
-        height: 24px;
-    }
-    .cart-mini {
         width: 40px;
         height: 40px;
-        bottom: 186px;
-        right: 16px;
+        font-size: 18px;
+        bottom: 16px;
+        right: 12px;
+    }
+    .floating-wa {
+        width: 44px;
+        height: 44px;
+        bottom: 112px;
+        right: 12px;
+    }
+    .floating-wa svg {
+        width: 22px;
+        height: 22px;
+    }
+    .cart-mini {
+        width: 36px;
+        height: 36px;
+        bottom: 164px;
+        right: 12px;
     }
     .cart-mini-icon {
-        font-size: 16px;
+        font-size: 14px;
     }
     .scroll-top {
-        bottom: 76px;
-        right: 16px;
-        width: 38px;
-        height: 38px;
-        font-size: 16px;
+        bottom: 68px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
     }
     
     .search-wrap {
         top: 44px;
-        padding: 14px 0 8px;
+        padding: 10px 0 6px;
     }
     .search-box {
-        padding: 8px 16px;
+        padding: 6px 14px;
+        gap: 8px;
     }
     .search-box input {
         font-size: 13px;
     }
     .hero-buttons {
-        gap: 8px;
+        gap: 6px;
     }
     .hero-btn {
         font-size: 11px;
-        padding: 8px 16px;
+        padding: 6px 14px;
     }
     .cart-summary .wrap {
         flex-direction: column;
         align-items: stretch;
-        gap: 8px;
+        gap: 6px;
     }
     .cart-summary .btn-wa {
         justify-content: center;
@@ -1719,87 +1737,97 @@ mark {
         grid-template-columns: 1fr;
     }
     .admin-section {
-        padding: 16px;
+        padding: 14px;
     }
 
     .lang-switch {
-        top: 12px;
-        right: 68px;
-        padding: 3px;
+        top: 10px;
+        right: 60px;
+        padding: 2px;
     }
     .lang-btn {
         font-size: 10px;
-        padding: 3px 8px;
+        padding: 2px 6px;
     }
     .menu-of-the-day {
         font-size: 12px;
-        padding: 8px 16px;
-        margin: 10px auto 6px;
-        border-radius: 20px;
+        padding: 6px 16px;
+        margin: 8px auto 4px;
+        border-radius: 16px;
     }
     .upload-zone {
-        padding: 20px 16px;
+        padding: 16px 12px;
     }
     .upload-icon {
-        font-size: 32px;
+        font-size: 28px;
     }
     
     .dashboard-stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    .stat-card {
+        padding: 10px;
+    }
+    .stat-number {
+        font-size: 18px;
     }
     .chart-bars {
-        height: 80px;
+        height: 70px;
     }
     .chart-bar {
-        max-width: 20px;
+        max-width: 18px;
     }
 }
 
 @media (max-width: 400px) {
     .item {
-        grid-template-columns: auto auto 1fr auto;
-        gap: 2px 6px;
-        padding: 10px 6px;
+        padding: 8px 6px;
+        gap: 2px 4px;
     }
     .item-checkbox {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
     .item-image {
-        width: 36px;
-        height: 36px;
+        width: 30px;
+        height: 30px;
     }
     .item-placeholder {
-        width: 36px;
-        height: 36px;
-        font-size: 14px;
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
     }
     .item-name {
-        font-size: 14px;
+        font-size: 13px;
     }
     .item-desc {
-        font-size: 11px;
+        font-size: 10px;
     }
     .item-price {
-        font-size: 12px;
+        font-size: 11px;
+        padding: 1px 6px;
     }
     .qty-controls button {
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
     }
     .qty-controls .qty-value {
-        font-size: 11px;
-        min-width: 16px;
+        font-size: 10px;
+        min-width: 14px;
     }
     .lang-switch {
-        top: 10px;
-        right: 56px;
+        top: 8px;
+        right: 48px;
         padding: 2px;
     }
     .lang-btn {
-        font-size: 9px;
-        padding: 2px 6px;
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+    .wrap {
+        padding: 0 10px;
     }
 }
 
