@@ -80,7 +80,7 @@
     let currentLang = 'id';
 
     // ============================================
-    // LANGUAGE FUNCTIONS
+    // LANGUAGE FUNCTIONS - FIXED!
     // ============================================
     function setLang(lang) {
         currentLang = lang;
@@ -99,41 +99,45 @@
         const t = translations[currentLang];
         if (!t) return;
 
-        function updateEl(id, value) {
+        // Update semua elemen dengan ID
+        const elements = {
+            'langEyebrow': t.eyebrow,
+            'langBrand': t.brand,
+            'langBrandEm': t.brandEm,
+            'langTagline': t.tagline,
+            'langHours': t.hours,
+            'langDays': t.days,
+            'langLocation': t.location,
+            'langDinein': t.dinein,
+            'langWa': t.wa,
+            'langMaps': t.maps,
+            'langShare': t.share,
+            'langPrint': t.print,
+            'langHistory': t.history,
+            'langAll': t.all,
+            'langCoffee': t.coffee,
+            'langNonCoffee': t.nonCoffee,
+            'langSnacks': t.snacks,
+            'langNoodles': t.noodles,
+            'langNoResult': t.noResult,
+            'langTotal': t.total,
+            'langEmptyCart': t.emptyCart,
+            'langOrderNow': t.orderNow,
+            'langFooterTitle': t.footerTitle,
+            'langFooterDesc': t.footerDesc,
+            'langWaFooter': t.waFooter,
+            'langMapsFooter': t.mapsFooter,
+            'langPrintFooter': t.printFooter,
+            'langMenuOfTheDay': t.menuOfTheDay,
+            'langHistoryTitle': t.historyTitle
+        };
+
+        Object.keys(elements).forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.textContent = value;
-        }
+            if (el) el.textContent = elements[id];
+        });
 
-        updateEl('langEyebrow', t.eyebrow);
-        updateEl('langBrand', t.brand);
-        updateEl('langBrandEm', t.brandEm);
-        updateEl('langTagline', t.tagline);
-        updateEl('langHours', t.hours);
-        updateEl('langDays', t.days);
-        updateEl('langLocation', t.location);
-        updateEl('langDinein', t.dinein);
-        updateEl('langWa', t.wa);
-        updateEl('langMaps', t.maps);
-        updateEl('langShare', t.share);
-        updateEl('langPrint', t.print);
-        updateEl('langHistory', t.history);
-        updateEl('langAll', t.all);
-        updateEl('langCoffee', t.coffee);
-        updateEl('langNonCoffee', t.nonCoffee);
-        updateEl('langSnacks', t.snacks);
-        updateEl('langNoodles', t.noodles);
-        updateEl('langNoResult', t.noResult);
-        updateEl('langTotal', t.total);
-        updateEl('langEmptyCart', t.emptyCart);
-        updateEl('langOrderNow', t.orderNow);
-        updateEl('langFooterTitle', t.footerTitle);
-        updateEl('langFooterDesc', t.footerDesc);
-        updateEl('langWaFooter', t.waFooter);
-        updateEl('langMapsFooter', t.mapsFooter);
-        updateEl('langPrintFooter', t.printFooter);
-        updateEl('langMenuOfTheDay', t.menuOfTheDay);
-        updateEl('langHistoryTitle', t.historyTitle);
-
+        // Update placeholder search
         const searchInput = document.getElementById('searchInput');
         if (searchInput) searchInput.placeholder = t.search;
 
@@ -352,7 +356,7 @@
     });
 
     // ============================================
-    // STATUS BUKA/TUTUP (dengan override)
+    // STATUS BUKA/TUTUP (dengan override) - FIXED!
     // ============================================
     let operationalOverride = null;
 
@@ -374,19 +378,19 @@
         const el = document.getElementById('openStatus');
         if (!el) return;
 
+        const t = translations[currentLang] || translations['id'];
+
         if (operationalOverride === 'open') {
-            el.textContent = '🟢 Buka (Override)';
+            el.textContent = '🟢 ' + (currentLang === 'en' ? 'Open (Override)' : 'Buka (Override)');
             return;
         }
         if (operationalOverride === 'closed') {
-            el.textContent = '🔴 Tutup (Override)';
+            el.textContent = '🔴 ' + (currentLang === 'en' ? 'Closed (Override)' : 'Tutup (Override)');
             return;
         }
 
-        const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit',
-            hour12: false }));
+        const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
         const isOpen = (hour >= 11 && hour < 23);
-        const t = translations[currentLang];
         el.textContent = isOpen ? t.open : t.closed;
     }
 
@@ -416,8 +420,7 @@
     const shareBtn = document.getElementById('shareBtn');
     if (shareBtn) {
         shareBtn.addEventListener('click', async function() {
-            const shareData = { title: 'Flora Coffee — Menu', text: 'Cek menu Flora Coffee di sini!',
-            url: window.location.href };
+            const shareData = { title: 'Flora Coffee — Menu', text: 'Cek menu Flora Coffee di sini!', url: window.location.href };
             const method = navigator.share ? 'navigator.share' : 'clipboard';
             trackEvent('Engagement', 'share', method);
             if (navigator.share) {
@@ -605,31 +608,53 @@
     }
 
     // ============================================
-    // SAVE ORDER TO FIRESTORE
+    // SAVE ORDER TO FIRESTORE - FIXED!
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
-            await db.collection('orders').add({
-                items: order.items,
-                total: order.total,
+            const orderData = {
+                items: order.items || '',
+                total: order.total || 0,
                 rawItems: order.rawItems || [],
                 customerNote: order.customerNote || '',
-                status: order.status || 'completed',
+                status: 'completed',
+                source: 'web',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                source: 'web'
+                orderDate: new Date().toISOString().split('T')[0],
+                orderTime: new Date().toLocaleTimeString('id-ID')
+            };
+
+            console.log('📦 Saving order:', orderData);
+
+            const docRef = await db.collection('orders').add(orderData);
+            console.log('✅ Order saved with ID:', docRef.id);
+
+            // Backup ke localStorage
+            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
+            history.push({
+                id: docRef.id,
+                items: order.items,
+                total: 'Rp' + (order.total || 0).toLocaleString('id-ID'),
+                date: new Date().toLocaleString('id-ID'),
+                timestamp: Date.now()
             });
-            console.log('✅ Order saved to Firestore');
+            while (history.length > 50) history.shift();
+            localStorage.setItem('flora-order-history', JSON.stringify(history));
+
+            return true;
         } catch (err) {
             console.error('❌ Failed to save order:', err);
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: Date.now(),
-                items: order.items,
-                total: 'Rp' + order.total.toLocaleString('id-ID'),
-                date: new Date().toLocaleString('id-ID')
+                items: order.items || '',
+                total: 'Rp' + (order.total || 0).toLocaleString('id-ID'),
+                date: new Date().toLocaleString('id-ID'),
+                timestamp: Date.now()
             });
             while (history.length > 50) history.shift();
             localStorage.setItem('flora-order-history', JSON.stringify(history));
+            return false;
         }
     }
 
@@ -759,9 +784,7 @@
     }
 
     // ============================================
-    // KONFIRMASI PESANAN WHATSAPP (anti ghost order)
-    // Catatan: tidak pakai preventDefault supaya target="_blank"
-    // pada tombol orderBtn tetap membuka WA di tab baru seperti biasa.
+    // KONFIRMASI PESANAN WHATSAPP - FIXED!
     // ============================================
     const waConfirmModal = document.getElementById('waConfirmModal');
     const btnAlreadySent = document.getElementById('btnAlreadySent');
@@ -780,19 +803,33 @@
         btnAlreadySent.addEventListener('click', async function() {
             if (waConfirmModal) waConfirmModal.classList.remove('show');
 
+            const items = cartDetail.textContent || 'Pesanan';
             const total = parseInt((cartTotal.textContent || '0').replace(/[^0-9]/g, '')) || 0;
+            const rawItems = Object.values(cartData).map(i => `${i.name} x${i.qty}`);
+
+            console.log('📝 Saving order:', { items, total, rawItems });
+
             await saveOrderToFirestore({
-                items: cartDetail.textContent,
+                items: items,
                 total: total,
-                rawItems: Object.values(cartData).map(i => `${i.name} x${i.qty}`),
+                rawItems: rawItems,
                 customerNote: '',
                 status: 'completed'
             });
+
             trackOrder(total, Object.keys(cartData).length);
 
             cartData = {};
             saveCart();
             updateCart();
+
+            if (isAdmin) {
+                console.log('🔄 Refreshing dashboard...');
+                setTimeout(() => {
+                    loadDashboardStats();
+                }, 1500);
+            }
+
             showToast('✅ Pesanan tercatat, terima kasih!');
         });
     }
@@ -811,49 +848,87 @@
     }
 
     // ============================================
-    // ADMIN DASHBOARD
+    // ADMIN DASHBOARD - FIXED dengan Composite Index + Fallback!
     // ============================================
     async function loadDashboardStats() {
         try {
+            // 1. Load total menu
             const menuSnapshot = await db.collection('menu').get();
             document.getElementById('statMenus').textContent = menuSnapshot.size;
 
+            // 2. Hitung orders hari ini
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const startOfDay = firebase.firestore.Timestamp.fromDate(today);
+            const endOfDay = firebase.firestore.Timestamp.fromDate(new Date(today.getTime() + 86400000));
 
-            // Catatan: kombinasi where('timestamp',>=) + where('status','==')
-            // butuh composite index. Kalau muncul error "requires an index" di
-            // console, klik link yang diberikan Firestore untuk membuatnya otomatis.
-            const ordersSnapshot = await db.collection('orders')
-                .where('timestamp', '>=', startOfDay)
-                .where('status', '==', 'completed')
-                .get();
-
+            let completedOrders = 0;
             let totalRevenue = 0;
             let customerSet = new Set();
 
-            ordersSnapshot.forEach(doc => {
-                const data = doc.data();
-                totalRevenue += data.total || 0;
-                if (data.customerId) customerSet.add(data.customerId);
-            });
+            try {
+                // OPSI 1: Pakai composite index (lebih cepat)
+                console.log('📊 Trying with composite index...');
+                const ordersSnapshot = await db.collection('orders')
+                    .where('status', '==', 'completed')
+                    .where('timestamp', '>=', startOfDay)
+                    .where('timestamp', '<', endOfDay)
+                    .get();
 
-            document.getElementById('statOrders').textContent = ordersSnapshot.size;
+                console.log('✅ Composite index works! Orders:', ordersSnapshot.size);
+
+                ordersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    completedOrders++;
+                    totalRevenue += data.total || 0;
+                    if (data.customerId) customerSet.add(data.customerId);
+                });
+
+            } catch (indexError) {
+                // OPSI 2: Fallback - filter di JavaScript
+                console.warn('⚠️ Composite index failed, using JavaScript filter:', indexError.message);
+
+                const ordersSnapshot = await db.collection('orders')
+                    .where('timestamp', '>=', startOfDay)
+                    .where('timestamp', '<', endOfDay)
+                    .get();
+
+                console.log('📊 All orders today (no status filter):', ordersSnapshot.size);
+
+                ordersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.status === 'completed') {
+                        completedOrders++;
+                        totalRevenue += data.total || 0;
+                        if (data.customerId) customerSet.add(data.customerId);
+                    }
+                });
+
+                console.log('✅ Filtered in JavaScript - Completed:', completedOrders, 'Revenue:', totalRevenue);
+            }
+
+            // Update dashboard
+            document.getElementById('statOrders').textContent = completedOrders;
             document.getElementById('statRevenue').textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
             document.getElementById('statCustomers').textContent = customerSet.size || '-';
 
+            // Load chart
             await loadSalesChart();
 
         } catch (error) {
-            console.error('Error loading dashboard:', error);
+            console.error('❌ Error loading dashboard:', error);
+            // Fallback ke localStorage
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             document.getElementById('statOrders').textContent = history.length;
+            document.getElementById('statRevenue').textContent = 'Rp' + history.reduce((sum, h) => {
+                const total = parseInt((h.total || 'Rp0').replace(/[^0-9]/g, ''));
+                return sum + (total || 0);
+            }, 0).toLocaleString('id-ID');
         }
     }
 
     // ============================================
-    // SALES CHART
+    // SALES CHART - FIXED dengan Composite Index + Fallback!
     // ============================================
     async function loadSalesChart() {
         const container = document.getElementById('chartContainer');
@@ -870,16 +945,34 @@
                 const startOfDay = firebase.firestore.Timestamp.fromDate(date);
                 const endOfDay = firebase.firestore.Timestamp.fromDate(new Date(date.getTime() + 86400000));
 
-                const snapshot = await db.collection('orders')
-                    .where('timestamp', '>=', startOfDay)
-                    .where('timestamp', '<', endOfDay)
-                    .where('status', '==', 'completed')
-                    .get();
-
                 let dailyTotal = 0;
-                snapshot.forEach(doc => {
-                    dailyTotal += doc.data().total || 0;
-                });
+
+                try {
+                    // OPSI 1: Pakai composite index
+                    const snapshot = await db.collection('orders')
+                        .where('status', '==', 'completed')
+                        .where('timestamp', '>=', startOfDay)
+                        .where('timestamp', '<', endOfDay)
+                        .get();
+
+                    snapshot.forEach(doc => {
+                        dailyTotal += doc.data().total || 0;
+                    });
+
+                } catch (indexError) {
+                    // OPSI 2: Fallback - filter di JavaScript
+                    const snapshot = await db.collection('orders')
+                        .where('timestamp', '>=', startOfDay)
+                        .where('timestamp', '<', endOfDay)
+                        .get();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.status === 'completed') {
+                            dailyTotal += data.total || 0;
+                        }
+                    });
+                }
 
                 last7Days.push({
                     date: date.toLocaleDateString('id-ID', { weekday: 'short' }),
@@ -912,7 +1005,7 @@
     }
 
     // ============================================
-    // CLOUDINARY UPLOAD - FIXED!
+    // CLOUDINARY UPLOAD
     // ============================================
     function validateFile(file) {
         if (!file) return { valid: false, message: 'Tidak ada file.' };
@@ -935,9 +1028,6 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-        
-        // ✅ FIX: HAPUS transformasi dari FormData
-        // Diatur di Cloudinary Dashboard (Upload Preset)
 
         isUploading = true;
         uploadProgress.classList.remove('hidden');
@@ -980,7 +1070,6 @@
             progressFill.style.width = '100%';
             progressText.textContent = '✅ Upload berhasil!';
 
-            // ✅ Tampilkan preview dengan ukuran terkontrol
             previewImage.src = response.secure_url;
             previewWrapper.classList.remove('hidden');
             inputImage.value = response.secure_url;
@@ -1009,34 +1098,11 @@
             uploadProgress.classList.remove('hidden');
 
             let errorMessage = error.message || 'Terjadi kesalahan';
-            if (errorMessage.includes('unsigned')) {
-                errorMessage = 'Upload Preset tidak valid. Periksa konfigurasi Cloudinary.';
-            }
             showToast('❌ Gagal upload: ' + errorMessage);
 
             if (previewStatus) {
                 previewStatus.textContent = '❌ ' + errorMessage;
                 previewStatus.className = 'preview-status error';
-            }
-
-            const retryBtn = document.createElement('button');
-            retryBtn.className = 'btn btn-sm';
-            retryBtn.textContent = '🔄 Coba Lagi';
-            retryBtn.style.marginTop = '8px';
-            retryBtn.onclick = () => {
-                if (currentFile) {
-                    uploadToCloudinary(currentFile);
-                } else if (fileInput && fileInput.files[0]) {
-                    uploadToCloudinary(fileInput.files[0]);
-                }
-                retryBtn.remove();
-            };
-
-            const progressContainer = document.querySelector('.upload-progress');
-            if (progressContainer) {
-                const oldRetry = progressContainer.querySelector('.btn');
-                if (oldRetry) oldRetry.remove();
-                progressContainer.appendChild(retryBtn);
             }
 
             return null;
@@ -1106,9 +1172,6 @@
         });
     }
 
-    // ============================================
-    // REMOVE IMAGE - FIXED!
-    // ============================================
     if (removeImageBtn) {
         removeImageBtn.addEventListener('click', function() {
             if (editingId && inputImage.value) {
@@ -1137,7 +1200,7 @@
     }
 
     // ============================================
-    // RENDER MENU (Public)
+    // RENDER MENU (Public) - FIXED dengan Badge Favorit!
     // ============================================
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
@@ -1206,8 +1269,7 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'item-checkbox';
-                if (item.stock === 0) { checkbox.disabled = true;
-                    checkbox.style.opacity = '0.4'; }
+                if (item.stock === 0) { checkbox.disabled = true; checkbox.style.opacity = '0.4'; }
                 itemDiv.appendChild(checkbox);
 
                 const info = document.createElement('div');
@@ -1216,18 +1278,30 @@
                 nameSpan.className = 'item-name';
                 nameSpan.textContent = item.name;
 
+                // Badge Tag (dari field tag)
                 if (item.tag) {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
                     tag.textContent = item.tag;
                     nameSpan.appendChild(tag);
                 }
+
+                // ✅ FIX: Badge Promo (hanya satu kali)
                 if (item.promoPrice) {
                     const promo = document.createElement('span');
                     promo.className = 'badge-promo';
                     promo.textContent = '🔥 Promo';
                     nameSpan.appendChild(promo);
                 }
+
+                // ✅ NEW: Badge Favorit
+                if (item.tag === 'Favorit') {
+                    const favorit = document.createElement('span');
+                    favorit.className = 'badge-favorit';
+                    favorit.textContent = '⭐ Favorit';
+                    nameSpan.appendChild(favorit);
+                }
+
                 if (item.stock === 0) {
                     const habis = document.createElement('span');
                     habis.className = 'badge-habis';
@@ -1301,9 +1375,10 @@
                     updateCart();
                 });
 
+                // ✅ FIX: Fungsi updateQty dengan handling NaN
                 function updateQty(change) {
                     if (item.stock === 0) return;
-                    let val = parseInt(qtySpan.textContent) || 0;
+                    let val = parseInt(qtySpan.textContent) || 0; // Default 0 jika NaN
                     val = Math.max(0, Math.min(item.stock, val + change));
                     qtySpan.textContent = val;
                     qtySpan.classList.toggle('zero', val === 0);
@@ -1317,10 +1392,8 @@
                     updateCart();
                 }
 
-                minusBtn.addEventListener('click', function(e) { e.stopPropagation();
-                    updateQty(-1); });
-                plusBtn.addEventListener('click', function(e) { e.stopPropagation();
-                    updateQty(1); });
+                minusBtn.addEventListener('click', function(e) { e.stopPropagation(); updateQty(-1); });
+                plusBtn.addEventListener('click', function(e) { e.stopPropagation(); updateQty(1); });
                 qtySpan.addEventListener('click', function() { updateQty(-parseInt(qtySpan.textContent) || 0); });
 
                 section.appendChild(itemDiv);
@@ -1368,7 +1441,7 @@
     }
 
     // ============================================
-    // LOAD MENU - FIXED!
+    // LOAD MENU
     // ============================================
     function loadMenu() {
         skeletonContainer.style.display = 'block';
@@ -1406,7 +1479,7 @@
     }
 
     // ============================================
-    // LOAD MENU FOR ADMIN - NEW FUNCTION!
+    // LOAD MENU FOR ADMIN
     // ============================================
     async function loadMenuForAdmin() {
         if (!isAdmin) return;
@@ -1442,7 +1515,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU - FIXED!
+    // RENDER ADMIN MENU - FIXED dengan Badge Favorit!
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) {
@@ -1470,6 +1543,7 @@
                 <div class="admin-card-img">
                     ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : `<div class="admin-card-placeholder">${categoryIcons[item.category] || '☕'}</div>`}
                     ${item.promoPrice ? '<span class="badge-promo">🔥 Promo</span>' : ''}
+                    ${item.tag === 'Favorit' ? '<span class="badge-favorit">⭐ Favorit</span>' : ''}
                     ${item.stock === 0 ? '<span class="badge-habis">⛔ Habis</span>' : ''}
                 </div>
                 <div class="admin-card-info">
@@ -1556,7 +1630,6 @@
                 inputStock.value = data.stock !== undefined ? data.stock : 10;
                 inputPromo.value = data.promoPrice || '';
                 
-                // Reset image state sebelum load gambar lama
                 currentFile = null;
                 if (fileInput) fileInput.value = '';
                 uploadProgress.classList.add('hidden');
@@ -1749,7 +1822,7 @@
     }
 
     // ============================================
-    // AUTHENTICATION - FIXED!
+    // AUTHENTICATION
     // ============================================
     auth.onAuthStateChanged(user => {
         if (user && ADMIN_EMAILS.includes(user.email)) {
@@ -1758,11 +1831,10 @@
             adminSection.style.display = 'block';
             adminUserEmail.textContent = user.email;
             
-            // Load all data
             loadDashboardStats();
             loadOperationalStatus();
-            loadMenuForAdmin(); // ✅ FIX: Load menu langsung
-            loadMenu(); // ✅ FIX: Refresh public menu juga
+            loadMenuForAdmin();
+            loadMenu();
             
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             trackEvent('Auth', 'admin_login', user.email);
@@ -1903,7 +1975,7 @@
     }
 
     // ============================================
-    // BERSIHKAN GHOST ORDERS (data sampah dari bug lama)
+    // BERSIHKAN GHOST ORDERS
     // ============================================
     if (cleanGhostOrdersBtn) {
         cleanGhostOrdersBtn.addEventListener('click', async function() {
@@ -1916,9 +1988,6 @@
             cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
 
             try {
-                // Ambil semua order lalu saring di JS — sengaja TIDAK pakai
-                // where('status','!=','completed') karena query itu tidak akan
-                // menangkap dokumen lama yang field status-nya tidak ada sama sekali.
                 const snapshot = await db.collection('orders').get();
                 const ghosts = [];
                 snapshot.forEach(doc => {
@@ -1943,7 +2012,6 @@
 
                 cleanGhostOrdersBtn.textContent = `⏳ Menghapus 0/${ghosts.length}...`;
 
-                // Firestore batch maksimal 500 operasi, jadi dipecah per 500
                 let deleted = 0;
                 for (let i = 0; i < ghosts.length; i += 500) {
                     const chunk = ghosts.slice(i, i + 500);
@@ -2034,6 +2102,16 @@
 
     window.addEventListener('offline', function() {
         showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
+    });
+
+    // ============================================
+    // LANGUAGE SWITCH EVENT LISTENERS - FIXED!
+    // ============================================
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.dataset.lang;
+            setLang(lang);
+        });
     });
 
     // ============================================
