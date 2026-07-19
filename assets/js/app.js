@@ -112,24 +112,24 @@ const categoryDescs = { 'kopi-klasik': 'Berbagai pilihan kopi untuk menemani har
 const categoryIcons = { 'kopi-klasik': '☕', 'non-kopi': '🍵', 'camilan': '🍽️', 'mie': '🍜' };
 
 const defaultMenuData = [
-    { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000, category: 'kopi-klasik', stock: 10 },
-    { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000, category: 'kopi-klasik', stock: 10 },
-    { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik', stock: 10 },
-    { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', stock: 10 },
-    { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000, category: 'non-kopi', stock: 10 },
-    { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000, category: 'non-kopi', stock: 10 },
-    { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000, category: 'non-kopi', stock: 10 },
-    { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi', stock: 10 },
-    { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000, category: 'non-kopi', stock: 10 },
-    { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500, category: 'camilan', stock: 10 },
-    { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan', stock: 10 },
-    { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan', stock: 10 },
-    { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan', stock: 10 },
-    { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan', stock: 10 },
-    { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie', stock: 10 },
-    { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000, category: 'mie', stock: 10 },
-    { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie', stock: 10 },
-    { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie', stock: 10 }
+    { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000, category: 'kopi-klasik', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000, category: 'kopi-klasik', stock: 10, tag: '⭐ Favorit', image: '', promoPrice: null },
+    { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000, category: 'non-kopi', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500, category: 'camilan', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000, category: 'mie', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie', stock: 10, tag: '', image: '', promoPrice: null },
+    { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie', stock: 10, tag: '', image: '', promoPrice: null }
 ];
 
 // ===== DARK MODE =====
@@ -311,10 +311,6 @@ const loadDashboardStats = async () => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const sod = firebase.firestore.Timestamp.fromDate(today);
     if (ordersUnsubscribe) ordersUnsubscribe();
-    // Single range filter only (no compound where + status ==), so this never needs a
-    // Firestore composite index. Status is filtered client-side instead. Using onSnapshot
-    // (not get()) means the moment an order is confirmed — from this device or any other —
-    // these numbers update live, without needing a page reload.
     ordersUnsubscribe = db.collection('orders').where('timestamp', '>=', sod)
         .onSnapshot(snap => {
             let rev = 0, count = 0;
@@ -332,8 +328,6 @@ const loadSalesChart = async () => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const start = new Date(today); start.setDate(start.getDate() - 6);
         const sod = firebase.firestore.Timestamp.fromDate(start);
-        // One query for the whole week (single range filter, no composite index needed)
-        // instead of 7 separate compound queries — also filters status client-side.
         const snap = await db.collection('orders').where('timestamp', '>=', sod).get();
         const days = [];
         for (let i = 6; i >= 0; i--) {
@@ -478,17 +472,46 @@ const renderMenu = (data) => {
     updateCart(); filterMenu();
 };
 
-// ===== LOAD MENU =====
+// ===== LOAD MENU - FIXED! =====
 const loadMenu = () => {
-    els.skeletonContainer.style.display = 'block'; els.menuContainer.style.display = 'none';
+    els.skeletonContainer.style.display = 'block';
+    els.menuContainer.style.display = 'none';
+    
     if (menuUnsubscribe) menuUnsubscribe();
-    menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(snap => {
-        els.skeletonContainer.style.display = 'none'; els.menuContainer.style.display = 'block';
-        if (snap.empty) { renderMenu(defaultMenuData); return; }
-        const data = []; snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+    menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(async snap => {
+        els.skeletonContainer.style.display = 'none';
+        els.menuContainer.style.display = 'block';
+        
+        if (snap.empty) {
+            // ✅ FIX: Simpan default data ke Firestore
+            try {
+                const batch = db.batch();
+                defaultMenuData.forEach(item => {
+                    const ref = db.collection('menu').doc(item.id);
+                    batch.set(ref, item);
+                });
+                await batch.commit();
+                console.log('✅ Default menu data saved to Firestore');
+            } catch (err) {
+                console.error('Error saving default data:', err);
+            }
+            
+            renderMenu(defaultMenuData);
+            if (isAdmin) renderAdminMenu(defaultMenuData);
+            return;
+        }
+        
+        const data = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() }));
         renderMenu(data);
         if (isAdmin) renderAdminMenu(data);
-    }, err => { console.error(err); renderMenu([]); });
+    }, err => {
+        console.error('Firestore error:', err);
+        els.skeletonContainer.style.display = 'none';
+        els.menuContainer.style.display = 'block';
+        renderMenu(defaultMenuData);
+        if (isAdmin) renderAdminMenu(defaultMenuData);
+    });
 };
 
 // ===== ADMIN MENU =====
@@ -589,7 +612,9 @@ els.saveBtn?.addEventListener('click', async () => {
 auth.onAuthStateChanged(user => {
     if (user && ADMIN_EMAILS.includes(user.email)) {
         isAdmin = true; els.adminSection.classList.remove('admin-hidden'); els.adminSection.style.display = 'block';
-        els.adminUserEmail.textContent = user.email; loadDashboardStats(); loadOperationalStatus(); loadMenu();
+        els.adminUserEmail.textContent = user.email; loadDashboardStats(); loadOperationalStatus(); 
+        // Reload menu for admin
+        loadMenu();
     } else {
         isAdmin = false; els.adminSection.classList.add('admin-hidden'); els.adminSection.style.display = 'none';
         if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
@@ -610,8 +635,6 @@ els.backupBtn?.addEventListener('click', () => {
 els.exportReportBtn?.addEventListener('click', async () => {
     if (!isAdmin) return;
     try {
-        // Single equality filter only (no orderBy on a different field), so this never
-        // needs a composite index. Sorted by date client-side, then trimmed to 200.
         const snap = await db.collection('orders').where('status', '==', 'completed').get();
         const rows = [['Tanggal', 'Total', 'Items']];
         const docs = [...snap.docs].sort((a, b) => (b.data().timestamp?.toMillis?.() || 0) - (a.data().timestamp?.toMillis?.() || 0)).slice(0, 200);
@@ -654,4 +677,5 @@ window.addEventListener('offline', () => showToast('⚠️ Offline'));
 setLang(localStorage.getItem('flora-lang') || 'id');
 loadMenu(); showMenuOfTheDay(); loadOperationalStatus();
 console.log('🌿 Flora Coffee v3.0 — Compact Edition');
+
 })();
