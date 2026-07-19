@@ -80,7 +80,7 @@
     let currentLang = 'id';
 
     // ============================================
-    // LANGUAGE FUNCTIONS - FIXED!
+    // LANGUAGE FUNCTIONS
     // ============================================
     function setLang(lang) {
         currentLang = lang;
@@ -99,7 +99,6 @@
         const t = translations[currentLang];
         if (!t) return;
 
-        // Update semua elemen dengan ID
         const elements = {
             'langEyebrow': t.eyebrow,
             'langBrand': t.brand,
@@ -137,7 +136,6 @@
             if (el) el.textContent = elements[id];
         });
 
-        // Update placeholder search
         const searchInput = document.getElementById('searchInput');
         if (searchInput) searchInput.placeholder = t.search;
 
@@ -231,7 +229,6 @@
     const exportReportBtn = document.getElementById('exportReportBtn');
     const cleanGhostOrdersBtn = document.getElementById('cleanGhostOrdersBtn');
 
-    // Upload elements
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');
     const previewWrapper = document.getElementById('previewWrapper');
@@ -284,15 +281,24 @@
         'mie': '🍜'
     };
 
+    // ============================================
+    // HELPER: Clean name from emoji
+    // ============================================
+    function cleanNameFromEmoji(name) {
+        if (!name) return '';
+        const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F1E0}-\u{1F1FF}]/gu;
+        return name.replace(emojiRegex, '').trim();
+    }
+
     const defaultMenuData = [
         { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
             category: 'kopi-klasik', tag: '', image: '', stock: 10 },
         { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
-            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
+            category: 'kopi-klasik', tag: 'Favorit', image: '', stock: 10 },
         { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
             tag: '', image: '', stock: 10 },
-        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi', tag: '',
-            image: '', stock: 10 },
+        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi',
+            tag: 'Favorit', image: '', stock: 10 },
         { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
             category: 'non-kopi', tag: '', image: '', stock: 10 },
         { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
@@ -308,7 +314,7 @@
         { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
             tag: '', image: '', stock: 10 },
         { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
+            tag: 'Promo', image: '', stock: 10 },
         { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
             tag: '', image: '', stock: 10 },
         { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
@@ -356,7 +362,7 @@
     });
 
     // ============================================
-    // STATUS BUKA/TUTUP (dengan override) - FIXED!
+    // STATUS BUKA/TUTUP
     // ============================================
     let operationalOverride = null;
 
@@ -608,7 +614,7 @@
     }
 
     // ============================================
-    // SAVE ORDER TO FIRESTORE - FIXED!
+    // SAVE ORDER TO FIRESTORE
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
@@ -629,7 +635,6 @@
             const docRef = await db.collection('orders').add(orderData);
             console.log('✅ Order saved with ID:', docRef.id);
 
-            // Backup ke localStorage
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: docRef.id,
@@ -784,7 +789,7 @@
     }
 
     // ============================================
-    // KONFIRMASI PESANAN WHATSAPP - FIXED!
+    // KONFIRMASI PESANAN WHATSAPP
     // ============================================
     const waConfirmModal = document.getElementById('waConfirmModal');
     const btnAlreadySent = document.getElementById('btnAlreadySent');
@@ -848,15 +853,13 @@
     }
 
     // ============================================
-    // ADMIN DASHBOARD - FIXED dengan Composite Index + Fallback!
+    // ADMIN DASHBOARD
     // ============================================
     async function loadDashboardStats() {
         try {
-            // 1. Load total menu
             const menuSnapshot = await db.collection('menu').get();
             document.getElementById('statMenus').textContent = menuSnapshot.size;
 
-            // 2. Hitung orders hari ini
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const startOfDay = firebase.firestore.Timestamp.fromDate(today);
@@ -867,7 +870,6 @@
             let customerSet = new Set();
 
             try {
-                // OPSI 1: Pakai composite index (lebih cepat)
                 console.log('📊 Trying with composite index...');
                 const ordersSnapshot = await db.collection('orders')
                     .where('status', '==', 'completed')
@@ -885,7 +887,6 @@
                 });
 
             } catch (indexError) {
-                // OPSI 2: Fallback - filter di JavaScript
                 console.warn('⚠️ Composite index failed, using JavaScript filter:', indexError.message);
 
                 const ordersSnapshot = await db.collection('orders')
@@ -907,17 +908,14 @@
                 console.log('✅ Filtered in JavaScript - Completed:', completedOrders, 'Revenue:', totalRevenue);
             }
 
-            // Update dashboard
             document.getElementById('statOrders').textContent = completedOrders;
             document.getElementById('statRevenue').textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
             document.getElementById('statCustomers').textContent = customerSet.size || '-';
 
-            // Load chart
             await loadSalesChart();
 
         } catch (error) {
             console.error('❌ Error loading dashboard:', error);
-            // Fallback ke localStorage
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             document.getElementById('statOrders').textContent = history.length;
             document.getElementById('statRevenue').textContent = 'Rp' + history.reduce((sum, h) => {
@@ -928,7 +926,7 @@
     }
 
     // ============================================
-    // SALES CHART - FIXED dengan Composite Index + Fallback!
+    // SALES CHART
     // ============================================
     async function loadSalesChart() {
         const container = document.getElementById('chartContainer');
@@ -948,7 +946,6 @@
                 let dailyTotal = 0;
 
                 try {
-                    // OPSI 1: Pakai composite index
                     const snapshot = await db.collection('orders')
                         .where('status', '==', 'completed')
                         .where('timestamp', '>=', startOfDay)
@@ -960,7 +957,6 @@
                     });
 
                 } catch (indexError) {
-                    // OPSI 2: Fallback - filter di JavaScript
                     const snapshot = await db.collection('orders')
                         .where('timestamp', '>=', startOfDay)
                         .where('timestamp', '<', endOfDay)
@@ -1200,7 +1196,7 @@
     }
 
     // ============================================
-    // RENDER MENU (Public) - FIXED dengan Badge Favorit!
+    // RENDER MENU (Public) - FIXED Badge Double!
     // ============================================
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
@@ -1276,17 +1272,27 @@
                 info.className = 'item-info';
                 const nameSpan = document.createElement('div');
                 nameSpan.className = 'item-name';
-                nameSpan.textContent = item.name;
+                
+                // ✅ FIX: Bersihkan nama dari emoji
+                const cleanName = cleanNameFromEmoji(item.name);
+                nameSpan.textContent = cleanName;
 
-                // Badge Tag (dari field tag)
-                if (item.tag) {
+                // ===== BADGE HANDLING - HANYA SATU KALI =====
+                // 1. Badge dari field tag (Favorit atau Promo)
+                if (item.tag && item.tag !== '') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
-                    tag.textContent = item.tag;
+                    if (item.tag === 'Favorit') {
+                        tag.textContent = '⭐ Favorit';
+                    } else if (item.tag === 'Promo') {
+                        tag.textContent = '🔥 Promo';
+                    } else {
+                        tag.textContent = item.tag;
+                    }
                     nameSpan.appendChild(tag);
                 }
 
-                // ✅ FIX: Badge Promo (hanya satu kali)
+                // 2. Badge Promo dari promoPrice (tambahan jika ada)
                 if (item.promoPrice) {
                     const promo = document.createElement('span');
                     promo.className = 'badge-promo';
@@ -1294,20 +1300,14 @@
                     nameSpan.appendChild(promo);
                 }
 
-                // ✅ NEW: Badge Favorit
-                if (item.tag === 'Favorit') {
-                    const favorit = document.createElement('span');
-                    favorit.className = 'badge-favorit';
-                    favorit.textContent = '⭐ Favorit';
-                    nameSpan.appendChild(favorit);
-                }
-
+                // 3. Badge Habis
                 if (item.stock === 0) {
                     const habis = document.createElement('span');
                     habis.className = 'badge-habis';
                     habis.textContent = '⛔ Habis';
                     nameSpan.appendChild(habis);
                 }
+
                 info.appendChild(nameSpan);
 
                 const descSpan = document.createElement('div');
@@ -1375,10 +1375,9 @@
                     updateCart();
                 });
 
-                // ✅ FIX: Fungsi updateQty dengan handling NaN
                 function updateQty(change) {
                     if (item.stock === 0) return;
-                    let val = parseInt(qtySpan.textContent) || 0; // Default 0 jika NaN
+                    let val = parseInt(qtySpan.textContent) || 0;
                     val = Math.max(0, Math.min(item.stock, val + change));
                     qtySpan.textContent = val;
                     qtySpan.classList.toggle('zero', val === 0);
@@ -1515,7 +1514,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU - FIXED dengan Badge Favorit!
+    // RENDER ADMIN MENU - FIXED Badge Double!
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) {
@@ -1537,6 +1536,8 @@
         }
 
         data.forEach(item => {
+            const cleanName = cleanNameFromEmoji(item.name);
+            
             const card = document.createElement('div');
             card.className = 'admin-card';
             card.innerHTML = `
@@ -1547,7 +1548,7 @@
                     ${item.stock === 0 ? '<span class="badge-habis">⛔ Habis</span>' : ''}
                 </div>
                 <div class="admin-card-info">
-                    <h4>${item.name}</h4>
+                    <h4>${cleanName}</h4>
                     <p>${item.desc || ''}</p>
                     <div class="admin-card-price">
                         ${item.promoPrice ? `<span class="price-original">Rp${Number(item.price).toLocaleString('id-ID')}</span> Rp${Number(item.promoPrice).toLocaleString('id-ID')}` : `Rp${Number(item.price).toLocaleString('id-ID')}`}
@@ -2089,6 +2090,16 @@
     });
 
     // ============================================
+    // LANGUAGE SWITCH EVENT LISTENERS
+    // ============================================
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.dataset.lang;
+            setLang(lang);
+        });
+    });
+
+    // ============================================
     // NETWORK STATUS
     // ============================================
     window.addEventListener('online', function() {
@@ -2105,16 +2116,6 @@
     });
 
     // ============================================
-    // LANGUAGE SWITCH EVENT LISTENERS - FIXED!
-    // ============================================
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const lang = this.dataset.lang;
-            setLang(lang);
-        });
-    });
-
-    // ============================================
     // INIT
     // ============================================
     const savedLang = localStorage.getItem('flora-lang') || 'id';
@@ -2123,7 +2124,6 @@
     showMenuOfTheDay();
     loadOperationalStatus();
 
-    // Auto-refresh
     setInterval(() => {
         if (navigator.onLine) {
             loadMenu();
