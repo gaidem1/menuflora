@@ -103,7 +103,7 @@ const els = {
 };
 
 let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
-let editingId = null, isAdmin = false, searchTimeout = null, currentFile = null, isUploading = false, menuUnsubscribe = null;
+let editingId = null, isAdmin = false, searchTimeout = null, currentFile = null, isUploading = false, menuUnsubscribe = null, ordersUnsubscribe = null;
 
 // ===== CATEGORY DATA =====
 const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
@@ -307,27 +307,45 @@ const loadDashboardStats = async () => {
     try {
         const ms = await db.collection('menu').get();
         $('statMenus').textContent = ms.size;
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        const sod = firebase.firestore.Timestamp.fromDate(today);
-        const os = await db.collection('orders').where('timestamp', '>=', sod).where('status', '==', 'completed').get();
-        let rev = 0; os.forEach(d => rev += d.data().total || 0);
-        $('statOrders').textContent = os.size;
-        $('statRevenue').textContent = 'Rp' + rev.toLocaleString('id-ID');
-        $('statCustomers').textContent = os.size || '-';
-        await loadSalesChart();
     } catch (e) { console.error('Dashboard error:', e); }
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const sod = firebase.firestore.Timestamp.fromDate(today);
+    if (ordersUnsubscribe) ordersUnsubscribe();
+    // Single range filter only (no compound where + status ==), so this never needs a
+    // Firestore composite index. Status is filtered client-side instead. Using onSnapshot
+    // (not get()) means the moment an order is confirmed — from this device or any other —
+    // these numbers update live, without needing a page reload.
+    ordersUnsubscribe = db.collection('orders').where('timestamp', '>=', sod)
+        .onSnapshot(snap => {
+            let rev = 0, count = 0;
+            snap.forEach(d => { const data = d.data(); if (data.status === 'completed') { rev += data.total || 0; count++; } });
+            $('statOrders').textContent = count;
+            $('statRevenue').textContent = 'Rp' + rev.toLocaleString('id-ID');
+            $('statCustomers').textContent = count || '-';
+        }, err => console.error('Dashboard stats error:', err));
+    await loadSalesChart();
 };
 const loadSalesChart = async () => {
     const c = $('chartContainer'), b = $('chartBars');
     if (!c || !b) return;
     try {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const start = new Date(today); start.setDate(start.getDate() - 6);
+        const sod = firebase.firestore.Timestamp.fromDate(start);
+        // One query for the whole week (single range filter, no composite index needed)
+        // instead of 7 separate compound queries — also filters status client-side.
+        const snap = await db.collection('orders').where('timestamp', '>=', sod).get();
         const days = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0, 0, 0, 0);
-            const sod = firebase.firestore.Timestamp.fromDate(d);
-            const eod = firebase.firestore.Timestamp.fromDate(new Date(d.getTime() + 86400000));
-            const snap = await db.collection('orders').where('timestamp', '>=', sod).where('timestamp', '<', eod).where('status', '==', 'completed').get();
-            let t = 0; snap.forEach(doc => t += doc.data().total || 0);
+            const dEnd = new Date(d.getTime() + 86400000);
+            let t = 0;
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.status !== 'completed') return;
+                const ts = data.timestamp?.toDate?.();
+                if (ts && ts >= d && ts < dEnd) t += data.total || 0;
+            });
             days.push({ label: d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }), total: t });
         }
         if (!days.some(d => d.total > 0)) { c.style.display = 'none'; return; }
@@ -572,7 +590,10 @@ auth.onAuthStateChanged(user => {
     if (user && ADMIN_EMAILS.includes(user.email)) {
         isAdmin = true; els.adminSection.classList.remove('admin-hidden'); els.adminSection.style.display = 'block';
         els.adminUserEmail.textContent = user.email; loadDashboardStats(); loadOperationalStatus(); loadMenu();
-    } else { isAdmin = false; els.adminSection.classList.add('admin-hidden'); els.adminSection.style.display = 'none'; }
+    } else {
+        isAdmin = false; els.adminSection.classList.add('admin-hidden'); els.adminSection.style.display = 'none';
+        if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
+    }
 });
 let tapCount = 0, tapTimer = null;
 els.secretTrigger?.addEventListener('click', function() {
@@ -588,10 +609,15 @@ els.backupBtn?.addEventListener('click', () => {
 });
 els.exportReportBtn?.addEventListener('click', async () => {
     if (!isAdmin) return;
-    const snap = await db.collection('orders').where('status', '==', 'completed').orderBy('timestamp', 'desc').limit(200).get();
-    const rows = [['Tanggal', 'Total', 'Items']];
-    snap.forEach(d => { const data = d.data(); rows.push([data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-', 'Rp' + (data.total || 0).toLocaleString('id-ID'), data.items || '-']); });
-    const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'flora-report.csv'; a.click();
+    try {
+        // Single equality filter only (no orderBy on a different field), so this never
+        // needs a composite index. Sorted by date client-side, then trimmed to 200.
+        const snap = await db.collection('orders').where('status', '==', 'completed').get();
+        const rows = [['Tanggal', 'Total', 'Items']];
+        const docs = [...snap.docs].sort((a, b) => (b.data().timestamp?.toMillis?.() || 0) - (a.data().timestamp?.toMillis?.() || 0)).slice(0, 200);
+        docs.forEach(d => { const data = d.data(); rows.push([data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-', 'Rp' + (data.total || 0).toLocaleString('id-ID'), data.items || '-']); });
+        const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'flora-report.csv'; a.click();
+    } catch (e) { showToast('❌ Gagal export: ' + e.message); }
 });
 
 // ===== CLEAN GHOST ORDERS =====
