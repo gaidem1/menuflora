@@ -1494,11 +1494,11 @@ footer p {
     color: var(--brass);
 }
 
-/* ===== PENDING ORDERS LIST (new) ===== */
+/* ===== PENDING ORDERS LIST ===== */
 #pendingOrdersList {
     margin-top: 12px;
 }
-#pendingOrdersList .pending-item {
+.pending-item {
     background: var(--bg-body);
     padding: 14px;
     border-radius: 12px;
@@ -1510,22 +1510,32 @@ footer p {
     gap: 8px;
     margin-bottom: 8px;
 }
-#pendingOrdersList .pending-item:last-child {
+.pending-item:last-child {
     margin-bottom: 0;
 }
-#pendingOrdersList .pending-item .date {
+.pending-item .date {
     font-weight: 600;
 }
-#pendingOrdersList .pending-item .items {
+.pending-item .items {
     font-size: 14px;
 }
-#pendingOrdersList .pending-item .total {
+.pending-item .total {
     font-weight: 600;
     color: var(--brass);
 }
-#pendingOrdersList .pending-item .actions {
+.pending-item .actions {
     display: flex;
     gap: 8px;
+}
+@media (max-width: 600px) {
+    .pending-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pending-item .actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
 
 /* ===== HISTORY MODAL ===== */
@@ -1859,16 +1869,6 @@ mark {
     }
     .chart-bar {
         max-width: 18px;
-    }
-
-    /* Pending orders mobile */
-    #pendingOrdersList .pending-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    #pendingOrdersList .pending-item .actions {
-        width: 100%;
-        justify-content: flex-end;
     }
 }
 
