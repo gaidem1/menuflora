@@ -11,7 +11,7 @@
             closed: '🔴 Tutup — Buka lagi 11.00',
             brand: 'Flora',
             brandEm: 'Coffee',
-            tagline: 'Kopi, camilan, dan mie — semua tersedia di sini.',
+            tagline: 'Kopi, camilan, mie, dan signature — semua tersedia di sini.',
             hours: '11.00 – 23.00',
             days: 'Senin–Minggu',
             location: 'Kesugihan, Cilacap',
@@ -26,6 +26,7 @@
             nonCoffee: 'Non Kopi',
             snacks: 'Camilan',
             noodles: 'Mie & Topping',
+            signature: 'Signature',
             search: 'Cari menu...',
             noResult: 'Menu tidak ditemukan. Coba kata kunci lain!',
             total: 'Total',
@@ -46,7 +47,7 @@
             closed: '🔴 Closed — Opens at 11.00',
             brand: 'Flora',
             brandEm: 'Coffee',
-            tagline: 'Coffee, snacks, and noodles — all available here.',
+            tagline: 'Coffee, snacks, noodles, and signatures — all available here.',
             hours: '11.00 – 23.00',
             days: 'Monday–Sunday',
             location: 'Kesugihan, Cilacap',
@@ -61,6 +62,7 @@
             nonCoffee: 'Non Coffee',
             snacks: 'Snacks',
             noodles: 'Noodles & Topping',
+            signature: 'Signature',
             search: 'Search menu...',
             noResult: 'Menu not found. Try another keyword!',
             total: 'Total',
@@ -118,6 +120,7 @@
             'langNonCoffee': t.nonCoffee,
             'langSnacks': t.snacks,
             'langNoodles': t.noodles,
+            'langSignature': t.signature,
             'langNoResult': t.noResult,
             'langTotal': t.total,
             'langEmptyCart': t.emptyCart,
@@ -275,26 +278,29 @@
     let orderInProgress = false;
 
     // ============================================
-    // CATEGORY DATA
+    // CATEGORY DATA (dengan Signature)
     // ============================================
-    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
+    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
     const categoryNames = {
         'kopi-klasik': '☕ Kopi',
         'non-kopi': '🍵 Non Kopi',
         'camilan': '🍽️ Camilan',
-        'mie': '🍜 Mie & Topping'
+        'mie': '🍜 Mie & Topping',
+        'signature': '⭐ Signature'
     };
     const categoryDescs = {
         'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
         'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
         'camilan': 'Camilan gurih untuk mengisi perut.',
-        'mie': 'Mie instan dengan berbagai topping pilihan.'
+        'mie': 'Mie instan dengan berbagai topping pilihan.',
+        'signature': '🌟 Menu andalan Flora Coffee yang wajib dicoba!'
     };
     const categoryIcons = {
         'kopi-klasik': '☕',
         'non-kopi': '🍵',
         'camilan': '🍽️',
-        'mie': '🍜'
+        'mie': '🍜',
+        'signature': '⭐'
     };
 
     // ============================================
@@ -349,7 +355,11 @@
         { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
             tag: '', image: '', stock: 10 },
         { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '', stock: 10 }
+            tag: '', image: '', stock: 10 },
+        { id: '19', name: "Flora's Signature", desc: 'Signature coffee with caramel and cream.', price: 12000,
+            category: 'signature', tag: 'Favorit', image: '', stock: 10 },
+        { id: '20', name: 'New Signature Latte', desc: 'New! Velvety latte with a hint of vanilla.', price: 14000,
+            category: 'signature', tag: 'New', image: '', stock: 10 }
     ];
 
     // ============================================
@@ -1202,7 +1212,7 @@
     }
 
     // ============================================
-    // ORDER HISTORY (customer) — dengan auto-refresh
+    // ORDER HISTORY (customer) — auto-refresh 5 detik
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -1752,7 +1762,7 @@
     }
 
     // ============================================
-    // RENDER MENU (public)
+    // RENDER MENU (public) — dengan Signature & New
     // ============================================
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
@@ -1832,6 +1842,7 @@
                 nameSpan.className = 'item-name';
                 nameSpan.textContent = item.name || 'Unknown';
 
+                // ===== BADGES =====
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
@@ -1847,6 +1858,12 @@
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
                     tag.textContent = '🔥 Promo';
+                    nameSpan.appendChild(tag);
+                }
+                if (item.tag === 'New') {
+                    const tag = document.createElement('span');
+                    tag.className = 'item-tag tag-new';
+                    tag.textContent = '✨ New';
                     nameSpan.appendChild(tag);
                 }
                 if (item.stock === 0) {
@@ -2055,7 +2072,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU
+    // RENDER ADMIN MENU — dengan badge New
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) return;
@@ -2096,6 +2113,7 @@
                 imgDiv.appendChild(placeholder);
             }
 
+            // Badges
             if (item.promoPrice) {
                 const badge = document.createElement('span');
                 badge.className = 'badge-promo';
@@ -2111,6 +2129,12 @@
                 const badge = document.createElement('span');
                 badge.className = 'badge-favorit';
                 badge.textContent = '⭐ Favorit';
+                imgDiv.appendChild(badge);
+            }
+            if (item.tag === 'New') {
+                const badge = document.createElement('span');
+                badge.className = 'badge-new';
+                badge.textContent = '✨ New';
                 imgDiv.appendChild(badge);
             }
             if (item.stock === 0) {
@@ -2147,7 +2171,7 @@
             const catSpan = document.createElement('span');
             catSpan.textContent = categoryNames[item.category] || item.category;
             metaDiv.appendChild(catSpan);
-            if (item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit') {
+            if (item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit' && item.tag !== 'New') {
                 const tagSpan = document.createElement('span');
                 tagSpan.className = 'tag tag-' + item.tag.toLowerCase();
                 tagSpan.textContent = item.tag;
@@ -2531,8 +2555,8 @@
             if (waConfirmModal && waConfirmModal.classList.contains('show')) waConfirmModal.classList.remove('show');
             if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
         }
-        if (e.altKey && e.key >= '1' && e.key <= '4') {
-            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
+        if (e.altKey && e.key >= '1' && e.key <= '5') {
+            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
             const idx = parseInt(e.key);
             const filter = filters[idx] || 'all';
             const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
@@ -2575,6 +2599,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.2 — Archive ghost orders, chart fixed!');
+    console.log('🌿 Flora Coffee Menu v3.3 — Signature, New, auto-refresh history!');
 
 })();
