@@ -944,6 +944,11 @@ h1.brand em {
     display: inline-block;
     line-height: 1.4;
 }
+.tag-new {
+    background: rgba(52, 152, 219, 0.15);
+    border-color: #3498db;
+    color: #3498db;
+}
 .badge-promo {
     font-size: 9px;
     background: #e74c3c;
@@ -967,6 +972,16 @@ h1.brand em {
 .badge-habis {
     font-size: 9px;
     background: #95a5a6;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+.badge-new {
+    font-size: 9px;
+    background: #3498db;
     color: white;
     padding: 1px 8px;
     border-radius: 100px;
@@ -1333,7 +1348,8 @@ footer p {
 }
 .admin-card-img .badge-promo,
 .admin-card-img .badge-favorit,
-.admin-card-img .badge-habis {
+.admin-card-img .badge-habis,
+.admin-card-img .badge-new {
     position: absolute;
     top: 8px;
     right: 8px;
