@@ -257,6 +257,7 @@
     let currentFile = null;
     let isUploading = false;
     let menuUnsubscribe = null;
+    let menuDataCache = []; // cache untuk validasi harga/stok
 
     // ============================================
     // CATEGORY DATA
@@ -288,6 +289,24 @@
         if (!name) return '';
         const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F1E0}-\u{1F1FF}]/gu;
         return name.replace(emojiRegex, '').trim();
+    }
+
+    // ============================================
+    // HELPER: Escape HTML
+    // ============================================
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ============================================
+    // HELPER: Escape for onclick attribute
+    // ============================================
+    function escapeJsString(str) {
+        if (!str) return '';
+        return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
     const defaultMenuData = [
@@ -485,6 +504,20 @@
     // ============================================
     let activeCategoryFilter = 'all';
 
+    // ===== SEARCH HIGHLIGHT - AMAN (tanpa innerHTML berbahaya) =====
+    function highlightText(text, keyword) {
+        if (!keyword || keyword.length < 2) return text;
+        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        const parts = text.split(regex);
+        return parts.map(part => {
+            if (part.toLowerCase() === keyword.toLowerCase()) {
+                return `<mark>${escapeHtml(part)}</mark>`;
+            }
+            return escapeHtml(part);
+        }).join('');
+    }
+
     function filterMenu() {
         const keyword = searchInput.value.toLowerCase().trim();
         const items = document.querySelectorAll('.item');
@@ -528,15 +561,14 @@
             searchTimeout = setTimeout(() => trackSearch(keyword), 1000);
         }
 
+        // ===== HIGHLIGHT AMAN: pakai textContent + DOM, bukan innerHTML berbahaya =====
         document.querySelectorAll('.item:not(.hidden) .item-name, .item:not(.hidden) .item-desc').forEach(el => {
             const original = el.getAttribute('data-original') || el.textContent;
             el.setAttribute('data-original', original);
             if (keyword.length >= 2) {
-                const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escaped})`, 'gi');
-                el.innerHTML = original.replace(regex, '<mark>$1</mark>');
+                el.innerHTML = highlightText(original, keyword);
             } else {
-                el.innerHTML = original;
+                el.textContent = original;
             }
         });
     }
@@ -614,32 +646,90 @@
     }
 
     // ============================================
-    // SAVE ORDER TO FIRESTORE
+    // SAVE ORDER TO FIRESTORE - DENGAN VALIDASI
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
+            // ===== VALIDASI: total harus sesuai dengan harga dari database =====
+            const rawItems = order.rawItems || [];
+            let calculatedTotal = 0;
+            const validItems = [];
+
+            // Ambil harga dari cache atau database
+            for (const item of rawItems) {
+                // Format: "Nama xQty" atau "Nama xQty (Rp...)"
+                const match = item.match(/^(.*?)\s*x\s*(\d+)/);
+                if (match) {
+                    const name = match[1].trim();
+                    const qty = parseInt(match[2]) || 0;
+                    // Cari di cache menuData
+                    const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === name || m.name === name);
+                    if (menuItem) {
+                        const price = menuItem.promoPrice || menuItem.price;
+                        const subtotal = price * qty;
+                        calculatedTotal += subtotal;
+                        validItems.push({ name, qty, price, subtotal });
+                    } else {
+                        // Jika tidak ditemukan di cache, tolak order
+                        showToast('❌ Ada menu yang tidak valid: ' + name);
+                        return false;
+                    }
+                }
+            }
+
+            // Validasi total
+            if (Math.abs(calculatedTotal - (order.total || 0)) > 100) {
+                console.warn('⚠️ Total tidak sesuai! Diharapkan:', calculatedTotal, 'Dikirim:', order.total);
+                showToast('❌ Total pesanan tidak valid. Silakan coba lagi.');
+                return false;
+            }
+
+            // Validasi stok (cek dari cache terbaru)
+            for (const item of validItems) {
+                const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === item.name || m.name === item.name);
+                if (menuItem && menuItem.stock !== undefined && menuItem.stock < item.qty) {
+                    showToast(`❌ Stok ${item.name} tidak mencukupi (tersisa ${menuItem.stock})`);
+                    return false;
+                }
+            }
+
+            // ===== ORDER VALID, SIMPAN =====
             const orderData = {
                 items: order.items || '',
-                total: order.total || 0,
-                rawItems: order.rawItems || [],
+                total: calculatedTotal,
+                rawItems: rawItems,
                 customerNote: order.customerNote || '',
                 status: 'completed',
                 source: 'web',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 orderDate: new Date().toISOString().split('T')[0],
-                orderTime: new Date().toLocaleTimeString('id-ID')
+                orderTime: new Date().toLocaleTimeString('id-ID'),
+                validated: true
             };
 
-            console.log('📦 Saving order:', orderData);
+            console.log('📦 Saving validated order:', orderData);
 
             const docRef = await db.collection('orders').add(orderData);
             console.log('✅ Order saved with ID:', docRef.id);
+
+            // Kurangi stok
+            for (const item of validItems) {
+                const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === item.name || m.name === item.name);
+                if (menuItem) {
+                    const newStock = Math.max(0, (menuItem.stock || 0) - item.qty);
+                    await db.collection('menu').doc(menuItem.id).update({
+                        stock: newStock,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    menuItem.stock = newStock;
+                }
+            }
 
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: docRef.id,
                 items: order.items,
-                total: 'Rp' + (order.total || 0).toLocaleString('id-ID'),
+                total: 'Rp' + (calculatedTotal || 0).toLocaleString('id-ID'),
                 date: new Date().toLocaleString('id-ID'),
                 timestamp: Date.now()
             });
@@ -649,16 +739,7 @@
             return true;
         } catch (err) {
             console.error('❌ Failed to save order:', err);
-            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
-            history.push({
-                id: Date.now(),
-                items: order.items || '',
-                total: 'Rp' + (order.total || 0).toLocaleString('id-ID'),
-                date: new Date().toLocaleString('id-ID'),
-                timestamp: Date.now()
-            });
-            while (history.length > 50) history.shift();
-            localStorage.setItem('flora-order-history', JSON.stringify(history));
+            showToast('❌ Gagal menyimpan pesanan: ' + err.message);
             return false;
         }
     }
@@ -717,7 +798,7 @@
     }
 
     // ============================================
-    // ORDER HISTORY
+    // ORDER HISTORY - AMAN (tanpa innerHTML berbahaya)
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -749,19 +830,38 @@
         const container = document.getElementById('historyList');
         if (!container) return;
 
+        container.innerHTML = ''; // kosongkan dengan aman
+
         if (history.length === 0) {
             const t = translations[currentLang];
-            container.innerHTML = `<div class="history-empty">${t.historyEmpty || '📭 Belum ada riwayat pesanan.'}</div>`;
+            const empty = document.createElement('div');
+            empty.className = 'history-empty';
+            empty.textContent = t.historyEmpty || '📭 Belum ada riwayat pesanan.';
+            container.appendChild(empty);
             return;
         }
 
-        container.innerHTML = history.map(item => `
-            <div class="history-item">
-                <div class="date">📅 ${item.date}</div>
-                <div class="items">${item.items}</div>
-                <div class="total">Total: ${item.total}</div>
-            </div>
-        `).join('');
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'date';
+            dateDiv.textContent = '📅 ' + item.date;
+            div.appendChild(dateDiv);
+
+            const itemsDiv = document.createElement('div');
+            itemsDiv.className = 'items';
+            itemsDiv.textContent = item.items;
+            div.appendChild(itemsDiv);
+
+            const totalDiv = document.createElement('div');
+            totalDiv.className = 'total';
+            totalDiv.textContent = 'Total: ' + item.total;
+            div.appendChild(totalDiv);
+
+            container.appendChild(div);
+        });
     }
 
     const historyBtn = document.getElementById('historyBtn');
@@ -789,11 +889,12 @@
     }
 
     // ============================================
-    // KONFIRMASI PESANAN WHATSAPP
+    // KONFIRMASI PESANAN WHATSAPP - DENGAN DEBOUNCE
     // ============================================
     const waConfirmModal = document.getElementById('waConfirmModal');
     const btnAlreadySent = document.getElementById('btnAlreadySent');
     const btnNotYet = document.getElementById('btnNotYet');
+    let orderInProgress = false;
 
     if (orderBtn) {
         orderBtn.addEventListener('click', function() {
@@ -806,36 +907,79 @@
 
     if (btnAlreadySent) {
         btnAlreadySent.addEventListener('click', async function() {
-            if (waConfirmModal) waConfirmModal.classList.remove('show');
-
-            const items = cartDetail.textContent || 'Pesanan';
-            const total = parseInt((cartTotal.textContent || '0').replace(/[^0-9]/g, '')) || 0;
-            const rawItems = Object.values(cartData).map(i => `${i.name} x${i.qty}`);
-
-            console.log('📝 Saving order:', { items, total, rawItems });
-
-            await saveOrderToFirestore({
-                items: items,
-                total: total,
-                rawItems: rawItems,
-                customerNote: '',
-                status: 'completed'
-            });
-
-            trackOrder(total, Object.keys(cartData).length);
-
-            cartData = {};
-            saveCart();
-            updateCart();
-
-            if (isAdmin) {
-                console.log('🔄 Refreshing dashboard...');
-                setTimeout(() => {
-                    loadDashboardStats();
-                }, 1500);
+            // ===== DEBOUNCE: cegah double submit =====
+            if (orderInProgress) {
+                showToast('⏳ Pesanan sedang diproses...');
+                return;
             }
+            orderInProgress = true;
+            btnAlreadySent.disabled = true;
+            btnAlreadySent.textContent = '⏳ Memproses...';
 
-            showToast('✅ Pesanan tercatat, terima kasih!');
+            try {
+                if (waConfirmModal) waConfirmModal.classList.remove('show');
+
+                const items = cartDetail.textContent || 'Pesanan';
+                const total = parseInt((cartTotal.textContent || '0').replace(/[^0-9]/g, '')) || 0;
+                const rawItems = Object.values(cartData).map(i => `${i.name} x${i.qty}`);
+
+                // Validasi: pastikan total sesuai dengan harga di cache
+                let calculatedTotal = 0;
+                for (const item of rawItems) {
+                    const match = item.match(/^(.*?)\s*x\s*(\d+)/);
+                    if (match) {
+                        const name = match[1].trim();
+                        const qty = parseInt(match[2]) || 0;
+                        const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === name || m.name === name);
+                        if (menuItem) {
+                            const price = menuItem.promoPrice || menuItem.price;
+                            calculatedTotal += price * qty;
+                        }
+                    }
+                }
+
+                if (Math.abs(calculatedTotal - total) > 100) {
+                    showToast('❌ Total pesanan tidak valid. Silakan refresh halaman.');
+                    orderInProgress = false;
+                    btnAlreadySent.disabled = false;
+                    btnAlreadySent.textContent = '✅ Ya, Saya Sudah Kirim';
+                    return;
+                }
+
+                console.log('📝 Saving order:', { items, total: calculatedTotal, rawItems });
+
+                const success = await saveOrderToFirestore({
+                    items: items,
+                    total: calculatedTotal,
+                    rawItems: rawItems,
+                    customerNote: '',
+                    status: 'completed'
+                });
+
+                if (success) {
+                    trackOrder(calculatedTotal, Object.keys(cartData).length);
+
+                    cartData = {};
+                    saveCart();
+                    updateCart();
+
+                    if (isAdmin) {
+                        console.log('🔄 Refreshing dashboard...');
+                        setTimeout(() => {
+                            loadDashboardStats();
+                        }, 1500);
+                    }
+
+                    showToast('✅ Pesanan tercatat, terima kasih!');
+                }
+            } catch (err) {
+                console.error('Error saving order:', err);
+                showToast('❌ Gagal menyimpan pesanan: ' + err.message);
+            } finally {
+                orderInProgress = false;
+                btnAlreadySent.disabled = false;
+                btnAlreadySent.textContent = '✅ Ya, Saya Sudah Kirim';
+            }
         });
     }
 
@@ -1196,12 +1340,15 @@
     }
 
     // ============================================
-    // RENDER MENU (Public) - FIXED BADGE DOUBLE!
+    // RENDER MENU (Public)
     // ============================================
     function renderMenu(data) {
         skeletonContainer.style.display = 'none';
         menuContainer.style.display = 'block';
         menuContainer.innerHTML = '';
+
+        // Simpan cache untuk validasi
+        menuDataCache = data;
 
         const grouped = {};
         data.forEach(item => {
@@ -1219,10 +1366,13 @@
 
             const head = document.createElement('div');
             head.className = 'cat-head';
-            head.innerHTML = `
-                <span class="cat-num">${String(catIndex).padStart(2, '0')}</span>
-                <h2>${categoryNames[catKey] || catKey}</h2>
-            `;
+            const numSpan = document.createElement('span');
+            numSpan.className = 'cat-num';
+            numSpan.textContent = String(catIndex).padStart(2, '0');
+            head.appendChild(numSpan);
+            const h2 = document.createElement('h2');
+            h2.textContent = categoryNames[catKey] || catKey;
+            head.appendChild(h2);
             section.appendChild(head);
 
             const desc = document.createElement('p');
@@ -1272,14 +1422,9 @@
                 info.className = 'item-info';
                 const nameSpan = document.createElement('div');
                 nameSpan.className = 'item-name';
-                
-                const cleanName = cleanNameFromEmoji(item.name);
-                nameSpan.textContent = cleanName;
+                nameSpan.textContent = cleanNameFromEmoji(item.name);
 
-                // ============================================
-                // BADGE HANDLING - FIXED: no double promo
-                // ============================================
-                // 1. Badge Favorit
+                // ===== BADGE HANDLING =====
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
@@ -1287,21 +1432,18 @@
                     nameSpan.appendChild(tag);
                 }
 
-                // 2. Badge Promo (hanya satu, prioritas promoPrice)
                 if (item.promoPrice) {
                     const promo = document.createElement('span');
                     promo.className = 'badge-promo';
                     promo.textContent = '🔥 Promo';
                     nameSpan.appendChild(promo);
                 } else if (item.tag === 'Promo') {
-                    // jika tag Promo tapi tidak ada promoPrice, tampilkan sebagai item-tag biasa
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
                     tag.textContent = '🔥 Promo';
                     nameSpan.appendChild(tag);
                 }
 
-                // 3. Badge Habis
                 if (item.stock === 0) {
                     const habis = document.createElement('span');
                     habis.className = 'badge-habis';
@@ -1515,7 +1657,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU - FIXED BADGE DOUBLE!
+    // RENDER ADMIN MENU - AMAN (tanpa innerHTML berbahaya)
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) {
@@ -1527,12 +1669,17 @@
         adminMenuGrid.innerHTML = '';
         
         if (!data || data.length === 0) {
-            adminMenuGrid.innerHTML = `
-                <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);">
-                    <div style="font-size:48px;margin-bottom:12px;">📭</div>
-                    <p>Belum ada menu. Klik "Tambah Baru" untuk menambahkan.</p>
-                </div>
-            `;
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);';
+            const icon = document.createElement('div');
+            icon.style.fontSize = '48px';
+            icon.style.marginBottom = '12px';
+            icon.textContent = '📭';
+            emptyDiv.appendChild(icon);
+            const p = document.createElement('p');
+            p.textContent = 'Belum ada menu. Klik "Tambah Baru" untuk menambahkan.';
+            emptyDiv.appendChild(p);
+            adminMenuGrid.appendChild(emptyDiv);
             return;
         }
 
@@ -1542,47 +1689,138 @@
             const card = document.createElement('div');
             card.className = 'admin-card';
             
-            // Bangun badge string untuk admin card
-            let badgeHTML = '';
+            // IMG
+            const imgDiv = document.createElement('div');
+            imgDiv.className = 'admin-card-img';
+            if (item.image) {
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.loading = 'lazy';
+                imgDiv.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'admin-card-placeholder';
+                placeholder.textContent = categoryIcons[item.category] || '☕';
+                imgDiv.appendChild(placeholder);
+            }
+            
+            // Badges
             if (item.promoPrice) {
-                badgeHTML += '<span class="badge-promo">🔥 Promo</span>';
+                const badge = document.createElement('span');
+                badge.className = 'badge-promo';
+                badge.textContent = '🔥 Promo';
+                imgDiv.appendChild(badge);
             } else if (item.tag === 'Promo') {
-                // hanya jika tidak ada promoPrice, tampilkan tag Promo sebagai badge biasa
-                badgeHTML += '<span class="badge-promo">🔥 Promo</span>';
+                const badge = document.createElement('span');
+                badge.className = 'badge-promo';
+                badge.textContent = '🔥 Promo';
+                imgDiv.appendChild(badge);
             }
             if (item.tag === 'Favorit') {
-                badgeHTML += '<span class="badge-favorit">⭐ Favorit</span>';
+                const badge = document.createElement('span');
+                badge.className = 'badge-favorit';
+                badge.textContent = '⭐ Favorit';
+                imgDiv.appendChild(badge);
             }
             if (item.stock === 0) {
-                badgeHTML += '<span class="badge-habis">⛔ Habis</span>';
+                const badge = document.createElement('span');
+                badge.className = 'badge-habis';
+                badge.textContent = '⛔ Habis';
+                imgDiv.appendChild(badge);
             }
-
-            card.innerHTML = `
-                <div class="admin-card-img">
-                    ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : `<div class="admin-card-placeholder">${categoryIcons[item.category] || '☕'}</div>`}
-                    ${badgeHTML}
-                </div>
-                <div class="admin-card-info">
-                    <h4>${cleanName}</h4>
-                    <p>${item.desc || ''}</p>
-                    <div class="admin-card-price">
-                        ${item.promoPrice ? `<span class="price-original">Rp${Number(item.price).toLocaleString('id-ID')}</span> Rp${Number(item.promoPrice).toLocaleString('id-ID')}` : `Rp${Number(item.price).toLocaleString('id-ID')}`}
-                    </div>
-                    <div class="admin-card-meta">
-                        <span>${categoryNames[item.category] || item.category}</span>
-                        ${item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit' ? `<span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>` : ''}
-                    </div>
-                </div>
-                <div class="admin-card-stock">
-                    <button onclick="quickUpdateStock('${item.id}', -1)" title="Kurangi stok">−</button>
-                    <span>Stok: ${item.stock !== undefined ? item.stock : 10}</span>
-                    <button onclick="quickUpdateStock('${item.id}', 1)" title="Tambah stok">+</button>
-                </div>
-                <div class="admin-card-actions">
-                    <button class="btn btn-sm" onclick="editMenuItem('${item.id}')">✏️ Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteMenuItem('${item.id}', '${item.name}')">🗑️</button>
-                </div>
-            `;
+            card.appendChild(imgDiv);
+            
+            // INFO
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'admin-card-info';
+            
+            const h4 = document.createElement('h4');
+            h4.textContent = cleanName;
+            infoDiv.appendChild(h4);
+            
+            const p = document.createElement('p');
+            p.textContent = item.desc || '';
+            infoDiv.appendChild(p);
+            
+            const priceDiv = document.createElement('div');
+            priceDiv.className = 'admin-card-price';
+            if (item.promoPrice) {
+                const orig = document.createElement('span');
+                orig.className = 'price-original';
+                orig.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
+                priceDiv.appendChild(orig);
+                const promoText = document.createTextNode(' Rp' + Number(item.promoPrice).toLocaleString('id-ID'));
+                priceDiv.appendChild(promoText);
+            } else {
+                priceDiv.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
+            }
+            infoDiv.appendChild(priceDiv);
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'admin-card-meta';
+            const catSpan = document.createElement('span');
+            catSpan.textContent = categoryNames[item.category] || item.category;
+            metaDiv.appendChild(catSpan);
+            if (item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit') {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag tag-' + item.tag.toLowerCase();
+                tagSpan.textContent = item.tag;
+                metaDiv.appendChild(tagSpan);
+            }
+            infoDiv.appendChild(metaDiv);
+            card.appendChild(infoDiv);
+            
+            // STOCK
+            const stockDiv = document.createElement('div');
+            stockDiv.className = 'admin-card-stock';
+            
+            const minusBtn = document.createElement('button');
+            minusBtn.textContent = '−';
+            minusBtn.title = 'Kurangi stok';
+            minusBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                quickUpdateStock(item.id, -1);
+            });
+            stockDiv.appendChild(minusBtn);
+            
+            const stockSpan = document.createElement('span');
+            stockSpan.textContent = 'Stok: ' + (item.stock !== undefined ? item.stock : 10);
+            stockDiv.appendChild(stockSpan);
+            
+            const plusBtn = document.createElement('button');
+            plusBtn.textContent = '+';
+            plusBtn.title = 'Tambah stok';
+            plusBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                quickUpdateStock(item.id, 1);
+            });
+            stockDiv.appendChild(plusBtn);
+            card.appendChild(stockDiv);
+            
+            // ACTIONS
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'admin-card-actions';
+            
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn btn-sm';
+            editBtn.textContent = '✏️ Edit';
+            editBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                editMenuItem(item.id);
+            });
+            actionDiv.appendChild(editBtn);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-sm btn-danger';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                deleteMenuItem(item.id, item.name);
+            });
+            actionDiv.appendChild(deleteBtn);
+            card.appendChild(actionDiv);
+            
             adminMenuGrid.appendChild(card);
         });
     }
@@ -1783,6 +2021,17 @@
                 inputPromo.focus();
                 return;
             }
+            // Batasi panjang nama untuk mencegah abuse
+            if (name.length > 100) {
+                showToast('❌ Nama terlalu panjang (maks 100 karakter)');
+                inputName.focus();
+                return;
+            }
+            if (desc.length > 500) {
+                showToast('❌ Deskripsi terlalu panjang (maks 500 karakter)');
+                inputDesc.focus();
+                return;
+            }
 
             try {
                 const existing = await db.collection('menu')
@@ -1968,8 +2217,8 @@
                     rows.push([
                         data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
                         'Rp' + (data.total || 0).toLocaleString('id-ID'),
-                        data.items || '-',
-                        data.customerNote || ''
+                        (data.items || '-').replace(/,/g, ';'),
+                        (data.customerNote || '').replace(/,/g, ';')
                     ]);
                 });
 
