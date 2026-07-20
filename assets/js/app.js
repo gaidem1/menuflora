@@ -258,6 +258,7 @@
     let isUploading = false;
     let menuUnsubscribe = null;
     let menuDataCache = []; // cache untuk validasi harga/stok
+    let lastOrderSubmitTime = 0; // lightweight anti-spam throttle (not a substitute for Firebase App Check)
 
     // ============================================
     // CATEGORY DATA
@@ -650,6 +651,17 @@
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
+            // ===== THROTTLE RINGAN: cegah spam order beruntun dari script =====
+            // Ini BUKAN pengganti Firebase App Check / rate limiting sungguhan — cuma
+            // memperlambat penyalahgunaan kasar (mis. loop di console). Proteksi asli
+            // harus di App Check + Firestore Rules, karena ini masih bisa dilewati.
+            const now = Date.now();
+            if (now - lastOrderSubmitTime < 3000) {
+                showToast('⏳ Tunggu sebentar sebelum memesan lagi');
+                return false;
+            }
+            lastOrderSubmitTime = now;
+
             // ===== VALIDASI: total harus sesuai dengan harga dari database =====
             const rawItems = order.rawItems || [];
             let calculatedTotal = 0;
