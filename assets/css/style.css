@@ -69,8 +69,29 @@
 [data-theme="dark"] .hero-btn-map svg .cls-2 {
     fill: #ef4136 !important;
 }
-
-/* ===== DARK MODE — BUTTONS & TOAST ===== */
+[data-theme="dark"] .admin-section {
+    background: rgba(15, 31, 20, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .qty-controls {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .qty-controls button {
+    background: #4a6b50;
+    color: #f6f2e9;
+}
+[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .qty-controls .qty-value {
+    color: #e8e4da !important;
+}
+[data-theme="dark"] .badge-favorit {
+    background: #f39c12;
+    color: #1e2a1e;
+}
 [data-theme="dark"] .btn {
     background: var(--leaf-mid);
     color: #ffffff;
@@ -101,8 +122,6 @@
 [data-theme="dark"] .btn-wa:hover {
     background: #1da85c !important;
 }
-
-/* ===== DARK MODE — PENDING ORDERS ===== */
 [data-theme="dark"] .pending-confirm-btn {
     background: #27ae60 !important;
     color: #ffffff !important;
@@ -117,15 +136,11 @@
 [data-theme="dark"] .pending-cancel-btn:hover {
     background: #e74c3c !important;
 }
-
-/* ===== DARK MODE — TOAST ===== */
 [data-theme="dark"] .toast {
     background: #1a2a1e;
     color: #f6f2e9;
     border-color: var(--brass);
 }
-
-/* ===== DARK MODE — FOOTER ===== */
 [data-theme="dark"] footer {
     background: var(--leaf-deep);
     border-top-color: var(--brass);
@@ -151,34 +166,9 @@
 [data-theme="dark"] footer .btn-wa:hover {
     background: #1da85c !important;
 }
-
-/* ===== DARK MODE — ADMIN ===== */
-[data-theme="dark"] .admin-section {
-    background: rgba(15, 31, 20, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
 [data-theme="dark"] .theme-toggle {
     background: var(--brass);
     color: var(--leaf-deep);
-}
-[data-theme="dark"] .qty-controls {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-[data-theme="dark"] .qty-controls button {
-    background: #4a6b50;
-    color: #f6f2e9;
-}
-[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
-    background: var(--brass);
-    color: var(--leaf-deep);
-}
-[data-theme="dark"] .qty-controls .qty-value {
-    color: #e8e4da !important;
-}
-[data-theme="dark"] .badge-favorit {
-    background: #f39c12;
-    color: #1e2a1e;
 }
 [data-theme="dark"] .scroll-top {
     background: var(--brass);
@@ -324,7 +314,7 @@ a {
     font-size: 12px;
 }
 
-/* ===== THEME TOGGLE (paling bawah) ===== */
+/* ===== THEME TOGGLE ===== */
 .theme-toggle {
     position: fixed;
     bottom: 20px;
@@ -1602,12 +1592,13 @@ footer p {
     }
 }
 
-/* ===== CHART ===== */
+/* ===== CHART — FIXED OVERFLOW ===== */
 .chart-container {
     background: var(--bg-body);
     padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--line);
+    overflow: hidden;
 }
 .chart-bars {
     display: flex;
@@ -1615,6 +1606,7 @@ footer p {
     gap: 8px;
     height: 120px;
     padding: 8px 0;
+    overflow: hidden;
 }
 .chart-bar-wrap {
     flex: 1;
@@ -1622,6 +1614,7 @@ footer p {
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    min-width: 0;
 }
 .chart-bar {
     width: 100%;
@@ -1629,17 +1622,36 @@ footer p {
     border-radius: 4px 4px 0 0;
     background: var(--brass);
     min-height: 4px;
+    max-height: 80px;
     transition: height 0.6s ease;
 }
 .chart-bar-label {
     font-size: 10px;
     color: var(--text-muted);
     text-align: center;
+    white-space: nowrap;
 }
 .chart-bar-value {
     font-size: 9px;
     font-weight: 600;
     color: var(--brass);
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .chart-bars {
+        height: 80px;
+        gap: 4px;
+    }
+    .chart-bar {
+        max-height: 55px;
+        max-width: 20px;
+    }
+    .chart-bar-value {
+        font-size: 7px;
+    }
+    .chart-bar-label {
+        font-size: 8px;
+    }
 }
 
 /* ===== PENDING ORDERS LIST ===== */
@@ -2006,12 +2018,6 @@ mark {
     }
     .stat-number {
         font-size: 18px;
-    }
-    .chart-bars {
-        height: 70px;
-    }
-    .chart-bar {
-        max-width: 18px;
     }
 
     .pending-item {
