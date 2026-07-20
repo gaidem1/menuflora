@@ -586,6 +586,7 @@
         localStorage.setItem('flora-cart', JSON.stringify(cartData));
     }
 
+    // ===== UPDATE CART - DIPERBAIKI: ambil nama dari cache berdasar id =====
     function updateCart() {
         const allItems = document.querySelectorAll('.item');
         let total = 0;
@@ -597,9 +598,11 @@
             const checkbox = item.querySelector('.item-checkbox');
             const qtySpan = item.querySelector('.qty-value');
             const qty = parseInt(qtySpan.textContent) || 0;
+            const id = item.getAttribute('data-id');
+            // Ambil nama dari cache berdasarkan id (menghindari tag tercampur)
+            const menuItem = menuDataCache.find(m => m.id === id);
+            const name = menuItem ? menuItem.name : (item.querySelector('.item-name').textContent.trim() || 'Unknown');
             const price = parseInt(item.getAttribute('data-price')) || 0;
-            const name = item.querySelector('.item-name').textContent.trim();
-            const id = item.getAttribute('data-id') || name;
 
             if (checkbox.checked && qty > 0) {
                 const subtotal = price * qty;
@@ -632,7 +635,7 @@
     }
 
     // ============================================
-    // SAVE ORDER (Pending)
+    // SAVE ORDER (Pending) - DIPERBAIKI: pencarian nama lebih toleran
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
@@ -650,9 +653,22 @@
             for (const item of rawItems) {
                 const match = item.match(/^(.*?)\s*x\s*(\d+)/);
                 if (match) {
-                    const name = match[1].trim();
+                    let name = match[1].trim();
                     const qty = parseInt(match[2]) || 0;
-                    let menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === name || m.name === name);
+                    // Cari di cache dengan berbagai cara
+                    let menuItem = menuDataCache.find(m => {
+                        const clean = cleanNameFromEmoji(m.name);
+                        return clean === name || m.name === name;
+                    });
+                    if (!menuItem) {
+                        // Coba case insensitive dan hapus spasi berlebih
+                        const searchName = name.toLowerCase().replace(/\s+/g, ' ');
+                        menuItem = menuDataCache.find(m => {
+                            const clean = cleanNameFromEmoji(m.name).toLowerCase().replace(/\s+/g, ' ');
+                            return clean === searchName || m.name.toLowerCase().replace(/\s+/g, ' ') === searchName;
+                        });
+                    }
+                    // Fallback ke database jika tidak ditemukan di cache
                     if (!menuItem) {
                         try {
                             const snapshot = await db.collection('menu')
@@ -662,6 +678,16 @@
                             if (!snapshot.empty) {
                                 menuItem = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
                                 menuDataCache.push(menuItem);
+                            } else {
+                                const cleanName = cleanNameFromEmoji(name);
+                                const snapshot2 = await db.collection('menu')
+                                    .where('name', '==', cleanName)
+                                    .limit(1)
+                                    .get();
+                                if (!snapshot2.empty) {
+                                    menuItem = { id: snapshot2.docs[0].id, ...snapshot2.docs[0].data() };
+                                    menuDataCache.push(menuItem);
+                                }
                             }
                         } catch (err) {
                             console.warn('Fallback DB lookup failed for:', name, err);
@@ -686,8 +712,12 @@
                 return false;
             }
 
+            // Validasi stok
             for (const item of validItems) {
-                const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === item.name || m.name === item.name);
+                const menuItem = menuDataCache.find(m => {
+                    const clean = cleanNameFromEmoji(m.name);
+                    return clean === item.name || m.name === item.name;
+                });
                 if (menuItem && menuItem.stock !== undefined && menuItem.stock < item.qty) {
                     showToast(`❌ Stok ${item.name} tidak mencukupi (tersisa ${menuItem.stock})`);
                     return false;
@@ -858,21 +888,34 @@
             for (const item of rawItems) {
                 const match = item.match(/^(.*?)\s*x\s*(\d+)/);
                 if (match) {
-                    const name = match[1].trim();
-                    const qty = parseInt(match[2]) || 0;
-                    const snapshot = await db.collection('menu')
-                        .where('name', '==', name)
-                        .limit(1)
-                        .get();
-                    if (!snapshot.empty) {
-                        const menuDoc = snapshot.docs[0];
-                        const currentStock = menuDoc.data().stock || 0;
+                    let name = match[1].trim();
+                    // Cari menu dengan toleransi
+                    let menuItem = menuDataCache.find(m => {
+                        const clean = cleanNameFromEmoji(m.name);
+                        return clean === name || m.name === name;
+                    });
+                    if (!menuItem) {
+                        const cleanName = cleanNameFromEmoji(name);
+                        const snapshot = await db.collection('menu')
+                            .where('name', '==', cleanName)
+                            .limit(1)
+                            .get();
+                        if (!snapshot.empty) {
+                            menuItem = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                        }
+                    }
+                    if (menuItem) {
+                        const qty = parseInt(match[2]) || 0;
+                        const currentStock = menuItem.stock || 0;
                         const newStock = Math.max(0, currentStock - qty);
-                        await db.collection('menu').doc(menuDoc.id).update({
+                        await db.collection('menu').doc(menuItem.id).update({
                             stock: newStock,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                         console.log(`✅ Stok ${name}: ${currentStock} → ${newStock}`);
+                        // Update cache
+                        const cacheItem = menuDataCache.find(m => m.id === menuItem.id);
+                        if (cacheItem) cacheItem.stock = newStock;
                     }
                 }
             }
@@ -1102,10 +1145,24 @@
                     if (match) {
                         const name = match[1].trim();
                         const qty = parseInt(match[2]) || 0;
-                        const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === name || m.name === name);
+                        let menuItem = menuDataCache.find(m => {
+                            const clean = cleanNameFromEmoji(m.name);
+                            return clean === name || m.name === name;
+                        });
                         if (menuItem) {
                             const price = menuItem.promoPrice || menuItem.price;
                             calculatedTotal += price * qty;
+                        } else {
+                            // fallback ke database
+                            const snapshot = await db.collection('menu')
+                                .where('name', '==', name)
+                                .limit(1)
+                                .get();
+                            if (!snapshot.empty) {
+                                const data = snapshot.docs[0].data();
+                                const price = data.promoPrice || data.price;
+                                calculatedTotal += price * qty;
+                            }
                         }
                     }
                 }
@@ -1487,7 +1544,7 @@
         skeletonContainer.style.display = 'none';
         menuContainer.style.display = 'block';
         menuContainer.innerHTML = '';
-        menuDataCache = data;
+        menuDataCache = data; // store cache
 
         const grouped = {};
         data.forEach(item => {
@@ -1559,7 +1616,9 @@
                 info.className = 'item-info';
                 const nameSpan = document.createElement('div');
                 nameSpan.className = 'item-name';
-                nameSpan.textContent = cleanNameFromEmoji(item.name);
+                // Gunakan nama asli dari database (tanpa tag)
+                const displayName = item.name || 'Unknown';
+                nameSpan.textContent = displayName;
 
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
