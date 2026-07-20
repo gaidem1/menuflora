@@ -254,7 +254,6 @@
 
     // ===== CART DATA: { id: qty } =====
     let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
-    // Konversi format lama ke baru jika diperlukan
     const firstKey = Object.keys(cartData)[0];
     if (firstKey && typeof cartData[firstKey] === 'object' && cartData[firstKey].qty !== undefined) {
         const newCart = {};
@@ -589,7 +588,7 @@
     });
 
     // ============================================
-    // CART — with { id: qty }
+    // CART
     // ============================================
     function saveCart() {
         localStorage.setItem('flora-cart', JSON.stringify(cartData));
@@ -608,7 +607,6 @@
             orderList.push(`${menuItem.name} x${qty} (Rp${subtotal.toLocaleString('id-ID')})`);
         }
 
-        // Update tampilan item
         document.querySelectorAll('.item').forEach(item => {
             const id = item.getAttribute('data-id');
             const checkbox = item.querySelector('.item-checkbox');
@@ -790,7 +788,6 @@
                 return false;
             }
 
-            // Validasi stok
             for (const item of orderItems) {
                 const menu = menuDataCache.find(m => m.id === item.id);
                 if (!menu) {
@@ -804,7 +801,7 @@
             }
 
             const orderData = {
-                items: orderItems,              // array objek
+                items: orderItems,
                 total: calculatedTotal,
                 rawItems: orderItems.map(i => `${i.name} x${i.qty}`),
                 customerNote: order.customerNote || '',
@@ -895,9 +892,6 @@
         }
     }
 
-    // ============================================
-    // RENDER PENDING ORDERS
-    // ============================================
     function renderPendingOrders(docs, container) {
         if (!docs || docs.length === 0) {
             container.innerHTML = `
@@ -914,7 +908,6 @@
             const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
             const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
 
-            // Format items
             let itemsDisplay = '';
             if (Array.isArray(data.items)) {
                 itemsDisplay = data.items.map(item => `${item.name} x${item.qty}`).join(', ');
@@ -971,14 +964,12 @@
                 return;
             }
 
-            // Ambil items dari orderData
             const items = orderData.items || [];
             const menuRefs = [];
 
             for (const item of items) {
                 const menuId = item.id;
                 if (!menuId) {
-                    // fallback cari berdasarkan nama
                     let menuItem = menuDataCache.find(m => {
                         const clean = cleanNameFromEmoji(m.name);
                         return clean === item.name || m.name === item.name;
@@ -1004,7 +995,6 @@
                 }
             }
 
-            // Kurangi stok (coba transaksi, gagal fallback manual)
             try {
                 await db.runTransaction(async (transaction) => {
                     for (const item of menuRefs) {
@@ -1047,14 +1037,12 @@
                 }
             }
 
-            // Update status order menjadi 'completed'
             await db.collection('orders').doc(orderId).update({
                 status: 'completed',
                 confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 confirmedBy: auth.currentUser?.email || 'admin'
             });
 
-            // Update cache
             for (const item of menuRefs) {
                 const cacheItem = menuDataCache.find(m => m.id === item.ref.id);
                 if (cacheItem) {
@@ -1264,7 +1252,6 @@
             dateDiv.textContent = '📅 ' + item.date;
             div.appendChild(dateDiv);
 
-            // Format items
             let itemsDisplay = '';
             if (Array.isArray(item.items)) {
                 itemsDisplay = item.items.map(i => `${i.name} x${i.qty}`).join(', ');
@@ -1315,7 +1302,6 @@
             historyModal.classList.add('show');
             trackEvent('Engagement', 'view_history');
 
-            // Auto-refresh setiap 5 detik saat modal terbuka
             if (historyRefreshInterval) clearInterval(historyRefreshInterval);
             historyRefreshInterval = setInterval(() => {
                 if (historyModal.classList.contains('show')) {
@@ -1511,7 +1497,7 @@
     }
 
     // ============================================
-    // SALES CHART
+    // SALES CHART — FIXED OVERFLOW
     // ============================================
     async function loadSalesChart() {
         const container = document.getElementById('chartContainer');
@@ -1555,13 +1541,18 @@
             if (!hasData) { container.style.display = 'none'; return; }
             container.style.display = 'block';
             const maxTotal = Math.max(...last7Days.map(d => d.total), 1);
-            barsContainer.innerHTML = last7Days.map(day => `
-                <div class="chart-bar-wrap">
-                    <div class="chart-bar-value">${day.total > 0 ? 'Rp' + (day.total/1000).toFixed(0) + 'k' : ''}</div>
-                    <div class="chart-bar" style="height: ${(day.total / maxTotal) * 80 + 10}px;"></div>
-                    <div class="chart-bar-label">${day.label}</div>
-                </div>
-            `).join('');
+
+            barsContainer.innerHTML = last7Days.map(day => {
+                const barHeight = Math.min(80, Math.max(4, (day.total / maxTotal) * 80));
+                return `
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar-value">${day.total > 0 ? 'Rp' + (day.total/1000).toFixed(0) + 'k' : ''}</div>
+                        <div class="chart-bar" style="height: ${barHeight}px;"></div>
+                        <div class="chart-bar-label">${day.label}</div>
+                    </div>
+                `;
+            }).join('');
+
         } catch (err) {
             console.error('Error loading chart:', err);
             container.style.display = 'none';
@@ -2439,7 +2430,7 @@
     }
 
     // ============================================
-    // CLEAN GHOST ORDERS — ARCHIVE (updated)
+    // CLEAN GHOST ORDERS — ARCHIVE
     // ============================================
     if (cleanGhostOrdersBtn) {
         cleanGhostOrdersBtn.addEventListener('click', async function() {
@@ -2456,7 +2447,6 @@
                 const ghosts = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // Cari order dengan status selain yang valid
                     if (data.status !== 'pending' && data.status !== 'completed' && data.status !== 'cancelled') {
                         ghosts.push(doc.id);
                     }
@@ -2585,6 +2575,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.2 — Archive ghost orders, all features fixed!');
+    console.log('🌿 Flora Coffee Menu v3.2 — Archive ghost orders, chart fixed!');
 
 })();
