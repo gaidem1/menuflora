@@ -2439,44 +2439,76 @@
     }
 
     // ============================================
-    // CLEAN GHOST ORDERS
+    // CLEAN GHOST ORDERS — ARCHIVE (updated)
     // ============================================
     if (cleanGhostOrdersBtn) {
         cleanGhostOrdersBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa membersihkan data'); return; }
+            if (!isAdmin) {
+                showToast('❌ Hanya admin yang bisa membersihkan data');
+                return;
+            }
+
             cleanGhostOrdersBtn.disabled = true;
             cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
+
             try {
                 const snapshot = await db.collection('orders').get();
                 const ghosts = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.status !== 'completed' && data.status !== 'pending' && data.status !== 'cancelled') {
+                    // Cari order dengan status selain yang valid
+                    if (data.status !== 'pending' && data.status !== 'completed' && data.status !== 'cancelled') {
                         ghosts.push(doc.id);
                     }
                 });
-                if (ghosts.length === 0) { showToast('✅ Tidak ada ghost order'); return; }
-                const sure = confirm(`Ditemukan ${ghosts.length} ghost order (status tidak dikenal).\n\nHapus?`);
-                if (!sure) { showToast('Dibatalkan'); return; }
-                cleanGhostOrdersBtn.textContent = `⏳ Menghapus 0/${ghosts.length}...`;
-                let deleted = 0;
+
+                if (ghosts.length === 0) {
+                    showToast('✅ Tidak ada ghost order');
+                    cleanGhostOrdersBtn.disabled = false;
+                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
+                    return;
+                }
+
+                const sure = confirm(
+                    `Ditemukan ${ghosts.length} ghost order (status tidak dikenal).\n\n` +
+                    `Semua akan diarsipkan (status menjadi "archived") dan TIDAK akan muncul di daftar aktif.\n\n` +
+                    `Lanjutkan?`
+                );
+                if (!sure) {
+                    showToast('Dibatalkan');
+                    cleanGhostOrdersBtn.disabled = false;
+                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
+                    return;
+                }
+
+                cleanGhostOrdersBtn.textContent = `⏳ Memproses 0/${ghosts.length}...`;
+
+                let processed = 0;
                 for (let i = 0; i < ghosts.length; i += 500) {
                     const chunk = ghosts.slice(i, i + 500);
                     const batch = db.batch();
-                    chunk.forEach(id => batch.delete(db.collection('orders').doc(id)));
+                    chunk.forEach(id => {
+                        const ref = db.collection('orders').doc(id);
+                        batch.update(ref, {
+                            status: 'archived',
+                            archivedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
                     await batch.commit();
-                    deleted += chunk.length;
-                    cleanGhostOrdersBtn.textContent = `⏳ Menghapus ${deleted}/${ghosts.length}...`;
+                    processed += chunk.length;
+                    cleanGhostOrdersBtn.textContent = `⏳ Memproses ${processed}/${ghosts.length}...`;
                 }
-                showToast(`✅ ${deleted} ghost order berhasil dihapus`);
-                trackEvent('Admin', 'clean_ghost_orders', '', deleted);
+
+                showToast(`✅ ${processed} ghost order berhasil diarsipkan`);
+                trackEvent('Admin', 'archive_ghost_orders', '', processed);
                 loadDashboardStats();
+
             } catch (err) {
                 console.error('Clean ghost orders error:', err);
-                showToast('❌ Gagal membersihkan: ' + err.message);
+                showToast('❌ Gagal mengarsipkan: ' + err.message);
             } finally {
                 cleanGhostOrdersBtn.disabled = false;
-                cleanGhostOrdersBtn.textContent = '🧹 Bersihkan Ghost Orders Lama';
+                cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
             }
         });
     }
@@ -2553,6 +2585,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.1 — All features fixed!');
+    console.log('🌿 Flora Coffee Menu v3.2 — Archive ghost orders, all features fixed!');
 
 })();
