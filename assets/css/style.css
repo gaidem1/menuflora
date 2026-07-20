@@ -324,10 +324,10 @@ a {
     font-size: 12px;
 }
 
-/* ===== THEME TOGGLE (sejajar dengan floating buttons) ===== */
+/* ===== THEME TOGGLE (paling bawah) ===== */
 .theme-toggle {
     position: fixed;
-    bottom: 260px;
+    bottom: 20px;
     right: 20px;
     z-index: 100;
     background: var(--leaf-deep);
@@ -395,7 +395,7 @@ a {
     background: #95a5a6;
 }
 
-/* ===== SCROLL TOP (sejajar) ===== */
+/* ===== SCROLL TOP ===== */
 .scroll-top {
     position: fixed;
     bottom: 140px;
@@ -427,7 +427,7 @@ a {
     transform: translateY(-3px) scale(1.05);
 }
 
-/* ===== FLOATING CART MINI (sejajar) ===== */
+/* ===== FLOATING CART MINI ===== */
 .cart-mini {
     position: fixed;
     bottom: 200px;
@@ -1902,7 +1902,7 @@ mark {
     .theme-toggle {
         width: 40px;
         height: 40px;
-        bottom: 220px;
+        bottom: 20px;
         right: 12px;
         font-size: 18px;
     }
@@ -1933,7 +1933,7 @@ mark {
         font-size: 16px;
     }
     .cart-dropdown {
-        bottom: 220px;
+        bottom: 176px;
         right: 12px;
         min-width: 240px;
         max-width: 300px;
@@ -2077,7 +2077,7 @@ mark {
         min-width: 200px;
         max-width: 260px;
         right: 8px;
-        bottom: 190px;
+        bottom: 148px;
         padding: 12px;
     }
     .cart-mini {
@@ -2114,7 +2114,7 @@ mark {
     .theme-toggle {
         width: 36px;
         height: 36px;
-        bottom: 188px;
+        bottom: 20px;
         right: 8px;
         font-size: 16px;
     }
