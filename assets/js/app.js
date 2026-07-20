@@ -896,7 +896,7 @@
     }
 
     // ============================================
-    // RENDER PENDING ORDERS — DIPERBAIKI
+    // RENDER PENDING ORDERS
     // ============================================
     function renderPendingOrders(docs, container) {
         if (!docs || docs.length === 0) {
@@ -914,7 +914,7 @@
             const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
             const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
 
-            // ===== FORMAT ITEMS =====
+            // Format items
             let itemsDisplay = '';
             if (Array.isArray(data.items)) {
                 itemsDisplay = data.items.map(item => `${item.name} x${item.qty}`).join(', ');
@@ -1214,7 +1214,7 @@
     }
 
     // ============================================
-    // ORDER HISTORY (customer) — DIPERBAIKI
+    // ORDER HISTORY (customer) — dengan auto-refresh
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -1264,7 +1264,7 @@
             dateDiv.textContent = '📅 ' + item.date;
             div.appendChild(dateDiv);
 
-            // ===== FORMAT ITEMS =====
+            // Format items
             let itemsDisplay = '';
             if (Array.isArray(item.items)) {
                 itemsDisplay = item.items.map(i => `${i.name} x${i.qty}`).join(', ');
@@ -1307,22 +1307,46 @@
     const historyBtn = document.getElementById('historyBtn');
     const historyModal = document.getElementById('historyModal');
     const historyModalClose = document.getElementById('historyModalClose');
+    let historyRefreshInterval = null;
 
     if (historyBtn) {
         historyBtn.addEventListener('click', function() {
             showOrderHistory();
             historyModal.classList.add('show');
             trackEvent('Engagement', 'view_history');
+
+            // Auto-refresh setiap 5 detik saat modal terbuka
+            if (historyRefreshInterval) clearInterval(historyRefreshInterval);
+            historyRefreshInterval = setInterval(() => {
+                if (historyModal.classList.contains('show')) {
+                    showOrderHistory();
+                } else {
+                    clearInterval(historyRefreshInterval);
+                    historyRefreshInterval = null;
+                }
+            }, 5000);
         });
     }
+
     if (historyModalClose) {
         historyModalClose.addEventListener('click', function() {
             historyModal.classList.remove('show');
+            if (historyRefreshInterval) {
+                clearInterval(historyRefreshInterval);
+                historyRefreshInterval = null;
+            }
         });
     }
+
     if (historyModal) {
         historyModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
+            if (e.target === this) {
+                this.classList.remove('show');
+                if (historyRefreshInterval) {
+                    clearInterval(historyRefreshInterval);
+                    historyRefreshInterval = null;
+                }
+            }
         });
     }
 
@@ -2529,6 +2553,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.1 — Items array fix, pending orders fixed!');
+    console.log('🌿 Flora Coffee Menu v3.1 — All features fixed!');
 
 })();
