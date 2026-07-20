@@ -1,2478 +1,2155 @@
-(function() {
-    'use strict';
+/* ===== ROOT VARIABLES ===== */
+:root {
+    --ink: #1e2a1e;
+    --ivory: #f6f2e9;
+    --leaf-deep: #1f3a2b;
+    --leaf-mid: #4a6b50;
+    --brass: #c49b5c;
+    --gold-light: #e8c87a;
+    --coffee-brown: #5c3a2a;
+    --line: rgba(30, 42, 30, 0.12);
+    --bg-body: #f6f2e9;
+    --bg-nav: rgba(246, 242, 233, 0.92);
+    --text-muted: #5b6356;
+    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
+    --radius: 16px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --skeleton-bg: #ececec;
+    --skeleton-shine: rgba(255, 255, 255, 0.6);
+}
 
-    // ============================================
-    // TRANSLATIONS
-    // ============================================
-    const translations = {
-        'id': {
-            eyebrow: 'Menu · ',
-            open: '🟢 Buka Sekarang',
-            closed: '🔴 Tutup — Buka lagi 11.00',
-            brand: 'Flora',
-            brandEm: 'Coffee',
-            tagline: 'Kopi, camilan, dan mie — semua tersedia di sini.',
-            hours: '11.00 – 23.00',
-            days: 'Senin–Minggu',
-            location: 'Kesugihan, Cilacap',
-            dinein: 'Dine-in & Takeaway',
-            wa: 'Pesan via WhatsApp',
-            maps: 'Lihat di Maps',
-            share: 'Bagikan Menu',
-            print: 'Cetak Menu',
-            history: 'Riwayat',
-            all: 'Semua',
-            coffee: 'Kopi',
-            nonCoffee: 'Non Kopi',
-            snacks: 'Camilan',
-            noodles: 'Mie & Topping',
-            search: 'Cari menu...',
-            noResult: 'Menu tidak ditemukan. Coba kata kunci lain!',
-            total: 'Total',
-            emptyCart: 'Belum ada pesanan',
-            orderNow: 'Pesan Sekarang',
-            footerTitle: 'Mau pesan?',
-            footerDesc: 'Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.',
-            waFooter: 'Pesan via WhatsApp',
-            mapsFooter: 'Lihat di Maps',
-            printFooter: 'Cetak Menu',
-            menuOfTheDay: '🌟 Hari ini rekomendasi: ',
-            historyTitle: '📋 Riwayat Pesanan',
-            historyEmpty: '📭 Belum ada riwayat pesanan.'
-        },
-        'en': {
-            eyebrow: 'Menu · ',
-            open: '🟢 Open Now',
-            closed: '🔴 Closed — Opens at 11.00',
-            brand: 'Flora',
-            brandEm: 'Coffee',
-            tagline: 'Coffee, snacks, and noodles — all available here.',
-            hours: '11.00 – 23.00',
-            days: 'Monday–Sunday',
-            location: 'Kesugihan, Cilacap',
-            dinein: 'Dine-in & Takeaway',
-            wa: 'Order via WhatsApp',
-            maps: 'View on Maps',
-            share: 'Share Menu',
-            print: 'Print Menu',
-            history: 'History',
-            all: 'All',
-            coffee: 'Coffee',
-            nonCoffee: 'Non Coffee',
-            snacks: 'Snacks',
-            noodles: 'Noodles & Topping',
-            search: 'Search menu...',
-            noResult: 'Menu not found. Try another keyword!',
-            total: 'Total',
-            emptyCart: 'No order yet',
-            orderNow: 'Order Now',
-            footerTitle: 'Want to order?',
-            footerDesc: 'Send a message via WhatsApp, mention the menu and quantity — we\'ll prepare it for you.',
-            waFooter: 'Order via WhatsApp',
-            mapsFooter: 'View on Maps',
-            printFooter: 'Print Menu',
-            menuOfTheDay: '🌟 Today\'s recommendation: ',
-            historyTitle: '📋 Order History',
-            historyEmpty: '📭 No order history yet.'
-        }
-    };
+/* ===== DARK MODE ===== */
+[data-theme="dark"] {
+    --ink: #e8e4da;
+    --ivory: #1a2a1e;
+    --leaf-deep: #0f1f14;
+    --leaf-mid: #6a8b70;
+    --brass: #e8c87a;
+    --gold-light: #b58d4a;
+    --coffee-brown: #d4b8a0;
+    --line: rgba(232, 228, 218, 0.12);
+    --bg-body: #0f1f14;
+    --bg-nav: rgba(15, 31, 20, 0.92);
+    --text-muted: #a8b8a4;
+    --skeleton-bg: #1a2a1e;
+    --skeleton-shine: rgba(255, 255, 255, 0.06);
+}
 
-    let currentLang = 'id';
+[data-theme="dark"] h1.brand,
+[data-theme="dark"] h1.brand em {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .hero .tagline {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+[data-theme="dark"] .hero-meta {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+[data-theme="dark"] .hero-meta strong {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .eyebrow {
+    color: var(--gold-light) !important;
+}
+[data-theme="dark"] .eyebrow::before {
+    background: var(--gold-light) !important;
+}
+[data-theme="dark"] .hero-btn-map {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+[data-theme="dark"] .hero-btn-map:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+[data-theme="dark"] .hero-btn-map svg .cls-1 {
+    fill: #ffffff !important;
+}
+[data-theme="dark"] .hero-btn-map svg .cls-2 {
+    fill: #ef4136 !important;
+}
+[data-theme="dark"] .theme-toggle {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .admin-section {
+    background: rgba(15, 31, 20, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .qty-controls {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .qty-controls button {
+    background: #4a6b50;
+    color: #f6f2e9;
+}
+[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .qty-controls .qty-value {
+    color: #e8e4da !important;
+}
 
-    // ============================================
-    // LANGUAGE FUNCTIONS
-    // ============================================
-    function setLang(lang) {
-        currentLang = lang;
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.lang === lang);
-        });
-        updateTranslations();
-        if (typeof trackEvent === 'function') {
-            trackEvent('Language', 'switch', lang);
-        }
-        localStorage.setItem('flora-lang', lang);
-        console.log('✅ Language set to:', lang);
+/* ===== FOOTER DARK MODE FIX ===== */
+[data-theme="dark"] footer {
+    background: var(--leaf-deep);
+    border-top-color: var(--brass);
+}
+[data-theme="dark"] footer h3,
+[data-theme="dark"] footer p,
+[data-theme="dark"] footer .foot-note {
+    color: #ffffff !important;
+}
+[data-theme="dark"] footer .btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+[data-theme="dark"] footer .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+[data-theme="dark"] footer .btn-wa {
+    background: #25D366 !important;
+    color: #ffffff !important;
+    border: none;
+}
+[data-theme="dark"] footer .btn-wa:hover {
+    background: #1da85c !important;
+}
+
+/* ===== CART DROPDOWN DARK MODE ===== */
+[data-theme="dark"] .cart-dropdown {
+    background: var(--bg-body);
+    border-color: var(--line);
+}
+[data-theme="dark"] .cart-dropdown .cart-item {
+    border-color: var(--line);
+}
+
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--bg-body);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 28px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--leaf-deep);
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Work Sans', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--transition);
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn-wa {
+    background: #25D366;
+    color: #fff;
+}
+.btn-wa:hover {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--leaf-deep);
+    color: var(--leaf-deep);
+}
+.btn-outline:hover {
+    background: var(--leaf-deep);
+    color: white;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: #fff;
+}
+.btn-danger:hover {
+    box-shadow: 0 4px 20px rgba(231, 76, 60, 0.35);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    border: none;
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(12deg);
+}
+.theme-toggle:active {
+    transform: scale(0.92);
+}
+
+/* ===== FLOATING WHATSAPP ===== */
+.floating-wa {
+    position: fixed;
+    bottom: 152px;
+    right: 24px;
+    z-index: 99;
+    background: #25D366;
+    color: white;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: all var(--transition);
+}
+.floating-wa:hover {
+    transform: scale(1.1) translateY(-4px);
+}
+.floating-wa:active {
+    transform: scale(0.92);
+}
+.floating-wa svg {
+    width: 28px;
+    height: 28px;
+}
+.floating-wa .wa-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: #95a5a6;
+}
+.floating-wa .wa-status.online {
+    background: #4caf50;
+}
+.floating-wa .wa-status.offline {
+    background: #95a5a6;
+}
+[data-theme="dark"] .floating-wa .wa-status {
+    border-color: var(--bg-body);
+}
+
+/* ===== FLOATING CART MINI ===== */
+.cart-mini {
+    position: fixed;
+    bottom: 224px;
+    right: 24px;
+    z-index: 98;
+    background: var(--brass);
+    color: var(--leaf-deep);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid var(--bg-body);
+}
+.cart-mini:hover {
+    transform: scale(1.1);
+}
+.cart-mini-icon {
+    font-size: 22px;
+}
+.cart-mini-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #e74c3c;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border: 2px solid var(--bg-body);
+    transition: transform 0.2s ease;
+}
+.cart-mini-badge.bounce {
+    animation: badgeBounce 0.4s ease;
+}
+@keyframes badgeBounce {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.4); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+[data-theme="dark"] .cart-mini {
+    border-color: var(--bg-body);
+}
+[data-theme="dark"] .cart-mini-badge {
+    border-color: var(--bg-body);
+}
+
+/* ===== CART DROPDOWN ===== */
+.cart-dropdown {
+    position: fixed;
+    bottom: 290px;
+    right: 24px;
+    z-index: 97;
+    background: var(--bg-body);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--line);
+    min-width: 280px;
+    max-width: 360px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 16px;
+    display: none;
+    transition: all 0.3s ease;
+}
+.cart-dropdown.show {
+    display: block;
+    animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.cart-dropdown .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+.cart-dropdown .cart-item:last-child {
+    border-bottom: none;
+}
+.cart-dropdown .cart-item-name {
+    flex: 1;
+}
+.cart-dropdown .cart-item-qty {
+    color: var(--text-muted);
+    margin: 0 8px;
+}
+.cart-dropdown .cart-item-price {
+    font-weight: 600;
+    color: var(--coffee-brown);
+}
+.cart-dropdown .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 10px 0 6px;
+    border-top: 2px solid var(--brass);
+    margin-top: 4px;
+}
+.cart-dropdown .cart-checkout-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.cart-dropdown .cart-checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+}
+.cart-dropdown .cart-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 16px 0;
+    font-size: 14px;
+}
+
+/* ===== SCROLL TOP ===== */
+.scroll-top {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 99;
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+}
+.scroll-top.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.scroll-top:hover {
+    transform: translateY(-3px) scale(1.05);
+}
+[data-theme="dark"] .scroll-top {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+
+/* ===== HERO ===== */
+.hero {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    position: relative;
+    overflow: hidden;
+    padding: 80px 0 64px;
+    border-bottom: 4px solid var(--brass);
+    transition: background 0.3s ease;
+}
+
+.hero .branch {
+    position: absolute;
+    opacity: 0.35;
+    pointer-events: none;
+}
+.hero .branch.tl {
+    top: -20px;
+    left: -40px;
+    width: 200px;
+    transform: rotate(-10deg);
+}
+.hero .branch.br {
+    bottom: -30px;
+    right: -50px;
+    width: 240px;
+    transform: rotate(170deg);
+}
+
+.eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 2px;
+    background: var(--gold-light);
+    display: inline-block;
+}
+
+h1.brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(48px, 10vw, 80px);
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    color: var(--ivory);
+}
+h1.brand em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass);
+}
+
+.tagline {
+    margin-top: 18px;
+    max-width: 38ch;
+    font-size: 16px;
+    color: rgba(247, 243, 233, 0.85);
+}
+
+.hero-meta {
+    margin-top: 34px;
+    display: flex;
+    gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(247, 243, 233, 0.6);
+    flex-wrap: wrap;
+}
+.hero-meta strong {
+    color: var(--ivory);
+    font-weight: 500;
+}
+
+.hero-buttons {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all var(--transition);
+    border: none;
+    cursor: pointer;
+}
+.hero-btn-wa {
+    background: #25D366;
+    color: #fff;
+}
+.hero-btn-wa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
+}
+.hero-btn-map {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--ivory);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.hero-btn-map:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* ===== NAV ===== */
+.cats {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-nav);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.3s ease;
+}
+.cats .wrap {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 14px 28px;
+    scrollbar-width: none;
+}
+.cats .wrap::-webkit-scrollbar {
+    display: none;
+}
+.cat-filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1.5px solid transparent;
+    background: transparent;
+    color: var(--leaf-mid);
+    transition: all var(--transition);
+    font-weight: 500;
+    cursor: pointer;
+}
+.cat-filter-btn:hover {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    border-color: var(--leaf-deep);
+}
+.cat-filter-btn.active {
+    background: var(--brass);
+    color: var(--leaf-deep);
+    border-color: var(--brass);
+}
+
+/* ===== SEARCH ===== */
+.search-wrap {
+    padding: 24px 0 16px;
+    position: sticky;
+    top: 52px;
+    z-index: 9;
+    background: var(--bg-body);
+    transition: background 0.3s ease;
+}
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-body);
+    border: 1.5px solid var(--line);
+    border-radius: 100px;
+    padding: 12px 20px;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+.search-box:focus-within {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 4px rgba(196, 155, 92, 0.15);
+}
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: 'Work Sans', sans-serif;
+    color: var(--ink);
+}
+.search-box input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+.search-box .icon {
+    font-size: 18px;
+    opacity: 0.5;
+}
+.search-box .clear-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 4px;
+    display: none;
+}
+.search-box .clear-btn.show {
+    display: block;
+}
+
+/* ===== SKELETON ===== */
+.skeleton-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+}
+.skeleton {
+    height: 76px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    background: var(--skeleton-bg);
+}
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ===== CATEGORY ===== */
+.category {
+    margin-bottom: 56px;
+    scroll-margin-top: 120px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.category.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+.category.hidden {
+    display: none;
+}
+
+.cat-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 4px;
+}
+.cat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--brass);
+    font-weight: 500;
+}
+.cat-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 32px;
+    color: var(--leaf-deep);
+    letter-spacing: -0.02em;
+}
+[data-theme="dark"] .cat-head h2 {
+    color: var(--gold-light);
+}
+.cat-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    padding-left: 40px;
+}
+
+/* ===== ITEM ===== */
+.item {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    gap: 2px 12px;
+    padding: 18px 16px;
+    background: var(--bg-body);
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    margin-bottom: 8px;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.item:hover {
+    border-color: var(--brass);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.item.hidden {
+    display: none;
+}
+.item:last-child {
+    margin-bottom: 0;
+}
+
+.item-checkbox {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--brass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.item-checkbox:checked {
+    transform: scale(1.1);
+}
+.item-checkbox:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.item-thumb {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+}
+.item-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: none;
+}
+.item-image.show {
+    display: block;
+}
+.item-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: var(--line);
+}
+
+.item-info {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.item-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.item-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brass);
+    background: rgba(196, 155, 92, 0.15);
+    border: 1px solid var(--brass);
+    border-radius: 100px;
+    padding: 1px 8px;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+.badge-promo {
+    font-size: 9px;
+    background: #e74c3c;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+.badge-favorit {
+    font-size: 9px;
+    background: #f1c40f;
+    color: #1e2a1e;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .badge-favorit {
+    background: #f39c12;
+    color: #1e2a1e;
+}
+
+.badge-habis {
+    font-size: 9px;
+    background: #95a5a6;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+.item-desc {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    word-break: break-word;
+}
+
+.item-price {
+    grid-column: 4;
+    grid-row: 1 / 3;
+    align-self: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--coffee-brown);
+    background: rgba(92, 58, 42, 0.06);
+    padding: 2px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+.price-original {
+    text-decoration: line-through;
+    color: #95a5a6;
+    font-size: 13px;
+    margin-right: 6px;
+}
+
+.qty-controls {
+    grid-column: 5;
+    grid-row: 1 / 3;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-body);
+    border-radius: 100px;
+    padding: 2px 4px;
+    border: 1px solid var(--line);
+    transition: all 0.2s ease;
+}
+.item:hover .qty-controls {
+    border-color: var(--brass);
+}
+
+.qty-controls button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.qty-controls button:hover:not(:disabled) {
+    transform: scale(1.12);
+    background: var(--brass);
+}
+.qty-controls button:active:not(:disabled) {
+    transform: scale(0.88);
+}
+.qty-controls button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.qty-controls .qty-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 24px;
+    text-align: center;
+    color: var(--ink);
+    transition: color 0.3s ease;
+}
+.qty-controls .qty-value.zero {
+    opacity: 0.35;
+}
+
+/* ===== CART ===== */
+.cart-summary {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    background: var(--bg-body);
+    border-top: 2px solid var(--brass);
+    padding: 16px 0;
+    box-shadow: var(--shadow-lg);
+    transition: background 0.3s ease;
+    display: none;
+}
+.cart-summary.show {
+    display: block;
+}
+.cart-summary .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.cart-total {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+}
+.cart-total span {
+    color: var(--brass);
+}
+.cart-detail {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e74c3c;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--bg-body);
+    box-shadow: var(--shadow-sm);
+    font-family: 'JetBrains Mono', monospace;
+    transition: transform 0.2s ease;
+}
+.cart-badge.pulse {
+    animation: badgePulse 0.4s ease;
+}
+@keyframes badgePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+[data-theme="dark"] .cart-badge {
+    border-color: var(--bg-body);
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0 40px;
+}
+.divider svg {
+    flex-shrink: 0;
+    width: 36px;
+    height: 22px;
+}
+.divider .line {
+    flex: 1;
+    height: 1.5px;
+    background: var(--line);
+}
+
+/* ===== FOOTER ===== */
+footer {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    padding: 56px 0 44px;
+    margin-top: 24px;
+    border-top: 4px solid var(--brass);
+}
+footer h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+footer p {
+    font-size: 14px;
+    color: rgba(247, 243, 233, 0.75);
+    max-width: 42ch;
+    margin-bottom: 24px;
+}
+.footer-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.foot-note {
+    margin-top: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(247, 243, 233, 0.4);
+    text-align: center;
+}
+.secret-trigger {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.secret-trigger:hover {
+    color: var(--brass);
+}
+.secret-trigger::after {
+    content: '🔑';
+    font-size: 10px;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.secret-trigger:hover::after {
+    opacity: 1;
+}
+
+/* ===== LANGUAGE SWITCH ===== */
+.lang-switch {
+    position: fixed;
+    top: 20px;
+    right: 80px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--bg-body);
+    border-radius: 100px;
+    padding: 4px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+[data-theme="dark"] .lang-switch {
+    background: var(--bg-body);
+    border-color: var(--line);
+}
+.lang-btn {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-family: 'Work Sans', sans-serif;
+}
+.lang-btn.active {
+    background: var(--leaf-deep);
+    color: white;
+}
+[data-theme="dark"] .lang-btn.active {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+.lang-btn:hover:not(.active) {
+    background: var(--line);
+}
+
+/* ===== MENU OF THE DAY ===== */
+.menu-of-the-day {
+    background: var(--brass);
+    color: var(--leaf-deep);
+    padding: 12px 24px;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 16px auto 8px;
+    max-width: 600px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+[data-theme="dark"] .menu-of-the-day {
+    background: var(--leaf-mid);
+    color: var(--ivory);
+}
+.menu-of-the-day strong {
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .menu-of-the-day strong {
+    color: var(--gold-light);
+}
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+.admin-section {
+    margin-top: 32px;
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-md);
+}
+[data-theme="dark"] .admin-section {
+    background: rgba(15, 31, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.admin-section h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: var(--leaf-deep);
+    margin-bottom: 16px;
+}
+.admin-section .form-group {
+    margin-bottom: 14px;
+}
+.admin-section .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+.admin-section .form-group input,
+.admin-section .form-group textarea,
+.admin-section .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Work Sans', sans-serif;
+    background: var(--bg-body);
+    color: var(--ink);
+}
+.admin-section .form-group input:focus,
+.admin-section .form-group textarea:focus,
+.admin-section .form-group select:focus {
+    border-color: var(--brass);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 155, 92, 0.15);
+}
+.admin-section .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.admin-section .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* ===== ADMIN CARD ===== */
+.admin-section .admin-card {
+    background: var(--bg-body);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+}
+.admin-section .admin-card-img {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: var(--line);
+}
+.admin-section .admin-card-img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.admin-section .admin-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+}
+.admin-card-img .badge-promo,
+.admin-card-img .badge-favorit,
+.admin-card-img .badge-habis {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+.admin-card-img .badge-habis {
+    left: 8px;
+    right: auto;
+}
+.admin-section .admin-card-info h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+.admin-section .admin-card-info p {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.admin-section .admin-card-price {
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+.admin-section .admin-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.admin-section .admin-card-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.admin-section .admin-card-actions button {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: 11px;
+    min-width: 60px;
+}
+
+/* ===== QUICK STOCK CONTROL ===== */
+.admin-card-stock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    margin-bottom: 8px;
+}
+.admin-card-stock button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--leaf-deep);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.admin-card-stock button:hover {
+    transform: scale(1.1);
+    background: var(--brass);
+}
+.admin-card-stock button:active {
+    transform: scale(0.9);
+}
+.admin-card-stock span {
+    font-weight: 500;
+    font-size: 14px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.tag-favorit {
+    background: #f1c40f;
+    color: #1e2a1e;
+}
+.tag-promo {
+    background: #e74c3c;
+    color: white;
+}
+.tag-habis {
+    background: #95a5a6;
+    color: white;
+}
+
+/* ============================================
+   UPLOAD & PREVIEW
+   ============================================ */
+.upload-zone {
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--bg-body);
+    position: relative;
+}
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--brass);
+    background: rgba(196, 155, 92, 0.05);
+}
+.upload-zone.dragover {
+    transform: scale(1.01);
+}
+.upload-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+.upload-text strong {
+    font-size: 16px;
+    color: var(--ink);
+}
+.upload-text span {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.upload-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    opacity: 0.6;
+}
+[data-theme="dark"] .upload-zone {
+    border-color: var(--line);
+}
+[data-theme="dark"] .upload-zone:hover,
+[data-theme="dark"] .upload-zone.dragover {
+    border-color: var(--brass);
+    background: rgba(232, 200, 122, 0.05);
+}
+
+.upload-progress {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: var(--bg-body);
+    border-radius: 8px;
+    border: 1px solid var(--line);
+}
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brass), var(--gold-light));
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+.progress-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: center;
+}
+
+.upload-preview-wrapper {
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--bg-body);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+#previewImage {
+    display: block;
+    width: 160px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: var(--skeleton-bg);
+    flex-shrink: 0;
+}
+.upload-preview-img {
+    width: 160px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+}
+.preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+.preview-status {
+    font-size: 13px;
+    font-weight: 500;
+}
+.preview-status.success {
+    color: #27ae60;
+}
+.preview-status.error {
+    color: #e74c3c;
+}
+.preview-status.uploading {
+    color: var(--brass);
+}
+
+@media (max-width: 600px) {
+    .upload-preview-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #previewImage,
+    .upload-preview-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+}
+
+/* ===== ADMIN DASHBOARD ===== */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.stat-card {
+    background: var(--bg-body);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--line);
+    transition: all var(--transition);
+}
+.stat-card:hover {
+    border-color: var(--brass);
+    transform: translateY(-2px);
+}
+.stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--brass);
+    font-family: 'Fraunces', serif;
+}
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+@media (max-width: 600px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .stat-number {
+        font-size: 20px;
+    }
+    .stat-card {
+        padding: 12px;
+    }
+}
+
+/* ===== CHART ===== */
+.chart-container {
+    background: var(--bg-body);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+}
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding: 8px 0;
+}
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.chart-bar {
+    width: 100%;
+    max-width: 30px;
+    border-radius: 4px 4px 0 0;
+    background: var(--brass);
+    min-height: 4px;
+    transition: height 0.6s ease;
+}
+.chart-bar-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+}
+.chart-bar-value {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--brass);
+}
+
+/* ===== PENDING ORDERS LIST ===== */
+#pendingOrdersList {
+    margin-top: 12px;
+}
+.pending-item {
+    background: var(--bg-body);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.pending-item:last-child {
+    margin-bottom: 0;
+}
+.pending-item .date {
+    font-weight: 600;
+}
+.pending-item .items {
+    font-size: 14px;
+}
+.pending-item .total {
+    font-weight: 600;
+    color: var(--brass);
+}
+.pending-item .actions {
+    display: flex;
+    gap: 8px;
+}
+@media (max-width: 600px) {
+    .pending-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pending-item .actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* ===== HISTORY MODAL ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.modal.show {
+    display: flex;
+}
+.modal-content {
+    background: var(--bg-body);
+    max-width: 500px;
+    width: 90%;
+    padding: 28px;
+    border-radius: 16px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--line);
+    animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-close {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    line-height: 1;
+}
+.modal-close:hover {
+    color: var(--ink);
+}
+.modal-content h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .modal-content h3 {
+    color: var(--gold-light);
+}
+.history-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+}
+.history-item:last-child {
+    border-bottom: none;
+}
+.history-item .date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.history-item .items {
+    font-size: 14px;
+    margin: 4px 0;
+}
+.history-item .total {
+    font-weight: 600;
+    color: var(--brass);
+}
+.history-item .status-badge {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-top: 4px;
+}
+.history-item .status-badge.pending {
+    background: #f39c12;
+    color: white;
+}
+.history-item .status-badge.completed {
+    background: #27ae60;
+    color: white;
+}
+.history-item .status-badge.cancelled {
+    background: #e74c3c;
+    color: white;
+}
+.history-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px 0;
+}
+
+/* ===== SEARCH HIGHLIGHT ===== */
+mark {
+    background: var(--brass);
+    color: var(--leaf-deep);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+[data-theme="dark"] mark {
+    background: var(--gold-light);
+    color: var(--leaf-deep);
+}
+
+/* ===== TOAST ===== */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.4s ease;
+    pointer-events: none;
+    max-width: 90%;
+    text-align: center;
+    border: 1px solid var(--brass);
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+[data-theme="dark"] .toast {
+    background: var(--leaf-deep);
+    border-color: var(--brass);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .wrap {
+        padding: 0 14px;
+    }
+    .cat-desc {
+        padding-left: 0;
     }
 
-    function updateTranslations() {
-        const t = translations[currentLang];
-        if (!t) return;
-
-        const elements = {
-            'langEyebrow': t.eyebrow,
-            'langBrand': t.brand,
-            'langBrandEm': t.brandEm,
-            'langTagline': t.tagline,
-            'langHours': t.hours,
-            'langDays': t.days,
-            'langLocation': t.location,
-            'langDinein': t.dinein,
-            'langWa': t.wa,
-            'langMaps': t.maps,
-            'langShare': t.share,
-            'langPrint': t.print,
-            'langHistory': t.history,
-            'langAll': t.all,
-            'langCoffee': t.coffee,
-            'langNonCoffee': t.nonCoffee,
-            'langSnacks': t.snacks,
-            'langNoodles': t.noodles,
-            'langNoResult': t.noResult,
-            'langTotal': t.total,
-            'langEmptyCart': t.emptyCart,
-            'langOrderNow': t.orderNow,
-            'langFooterTitle': t.footerTitle,
-            'langFooterDesc': t.footerDesc,
-            'langWaFooter': t.waFooter,
-            'langMapsFooter': t.mapsFooter,
-            'langPrintFooter': t.printFooter,
-            'langMenuOfTheDay': t.menuOfTheDay,
-            'langHistoryTitle': t.historyTitle
-        };
-
-        Object.keys(elements).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = elements[id];
-        });
-
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) searchInput.placeholder = t.search;
-
-        updateOpenStatus();
+    .item {
+        grid-template-columns: auto auto 1fr auto;
+        gap: 2px 6px;
+        padding: 10px 8px;
+        border-radius: 12px;
+    }
+    .item-checkbox {
+        grid-row: 1 / 3;
+        width: 16px;
+        height: 16px;
+    }
+    .item-thumb {
+        grid-row: 1 / 3;
+    }
+    .item-image {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+    }
+    .item-placeholder {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    .item-info {
+        grid-row: 1 / 3;
+    }
+    .item-name {
+        font-size: 15px;
+        gap: 4px;
+    }
+    .item-desc {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .item-price {
+        grid-column: 4;
+        grid-row: 1;
+        font-size: 13px;
+        padding: 2px 8px;
+        white-space: nowrap;
+        justify-self: end;
+        align-self: center;
+    }
+    .qty-controls {
+        grid-column: 4;
+        grid-row: 2;
+        justify-self: end;
+        align-self: center;
+        padding: 1px 3px;
+        gap: 4px;
+        border-radius: 20px;
+    }
+    .qty-controls button {
+        width: 22px;
+        height: 22px;
+        font-size: 13px;
+    }
+    .qty-controls .qty-value {
+        font-size: 12px;
+        min-width: 18px;
     }
 
-    // ============================================
-    // MENU OF THE DAY
-    // ============================================
-    function getMenuOfTheDay() {
-        const day = new Date().getDay();
-        const recommendations = {
-            0: "Flora's Coffee",
-            1: 'Ice Rost Latte',
-            2: 'Mango Yakult',
-            3: 'Indomie Goreng',
-            4: "Flora's Matcha",
-            5: 'Mix Plater',
-            6: 'Ice Lemon Tea'
-        };
-        return recommendations[day] || "Flora's Coffee";
+    .cats .wrap {
+        padding: 10px 14px;
+    }
+    .hero {
+        padding: 40px 0 32px;
+    }
+    .hero-meta {
+        gap: 14px;
+        font-size: 11px;
+    }
+    
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        bottom: 16px;
+        right: 12px;
+    }
+    .floating-wa {
+        width: 44px;
+        height: 44px;
+        bottom: 112px;
+        right: 12px;
+    }
+    .floating-wa svg {
+        width: 22px;
+        height: 22px;
+    }
+    .cart-mini {
+        width: 44px;
+        height: 44px;
+        bottom: 184px;
+        right: 12px;
+    }
+    .cart-mini-icon {
+        font-size: 18px;
+    }
+    .cart-dropdown {
+        bottom: 240px;
+        right: 12px;
+        min-width: 240px;
+        max-width: 300px;
+    }
+    .scroll-top {
+        bottom: 68px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+    
+    .search-wrap {
+        top: 44px;
+        padding: 10px 0 6px;
+    }
+    .search-box {
+        padding: 6px 14px;
+        gap: 8px;
+    }
+    .search-box input {
+        font-size: 13px;
+    }
+    .hero-buttons {
+        gap: 6px;
+    }
+    .hero-btn {
+        font-size: 11px;
+        padding: 6px 14px;
+    }
+    .cart-summary .wrap {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .cart-summary .btn-wa {
+        justify-content: center;
+    }
+    .admin-section .form-row {
+        grid-template-columns: 1fr;
+    }
+    .admin-section .menu-grid {
+        grid-template-columns: 1fr;
+    }
+    .admin-section {
+        padding: 14px;
     }
 
-    function showMenuOfTheDay() {
-        const el = document.getElementById('recommendationName');
-        if (el) el.textContent = getMenuOfTheDay();
+    .lang-switch {
+        top: 10px;
+        right: 60px;
+        padding: 2px;
+    }
+    .lang-btn {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    .menu-of-the-day {
+        font-size: 12px;
+        padding: 6px 16px;
+        margin: 8px auto 4px;
+        border-radius: 16px;
+    }
+    .upload-zone {
+        padding: 16px 12px;
+    }
+    .upload-icon {
+        font-size: 28px;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    .stat-card {
+        padding: 10px;
+    }
+    .stat-number {
+        font-size: 18px;
+    }
+    .chart-bars {
+        height: 70px;
+    }
+    .chart-bar {
+        max-width: 18px;
     }
 
-    // ============================================
-    // FIREBASE KONFIGURASI
-    // ============================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyB-0wDqKOm1bZphQ4Qglmto6O3hsvduZoA",
-        authDomain: "menuflora-5d08a.firebaseapp.com",
-        projectId: "menuflora-5d08a",
-        storageBucket: "menuflora-5d08a.firebasestorage.app",
-        messagingSenderId: "219274188593",
-        appId: "1:219274188593:web:c25a9599b0ab3a88e64210"
-    };
+    .pending-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pending-item .actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+@media (max-width: 400px) {
+    .item {
+        padding: 8px 6px;
+        gap: 2px 4px;
+    }
+    .item-checkbox {
+        width: 14px;
+        height: 14px;
+    }
+    .item-image {
+        width: 30px;
+        height: 30px;
+    }
+    .item-placeholder {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+    .item-name {
+        font-size: 13px;
+    }
+    .item-desc {
+        font-size: 10px;
+    }
+    .item-price {
+        font-size: 11px;
+        padding: 1px 6px;
+    }
+    .qty-controls button {
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+    }
+    .qty-controls .qty-value {
+        font-size: 10px;
+        min-width: 14px;
+    }
+    .lang-switch {
+        top: 8px;
+        right: 48px;
+        padding: 2px;
+    }
+    .lang-btn {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+    .wrap {
+        padding: 0 10px;
+    }
+    .cart-dropdown {
+        min-width: 200px;
+        max-width: 260px;
+        right: 8px;
+        bottom: 210px;
+        padding: 12px;
+    }
+    .cart-mini {
+        width: 38px;
+        height: 38px;
+        bottom: 160px;
+        right: 8px;
+    }
+    .cart-mini-icon {
+        font-size: 16px;
+    }
+    .cart-mini-badge {
+        font-size: 9px;
+        min-width: 18px;
+        height: 18px;
+    }
+}
 
-    // ============================================
-    // OFFLINE PERSISTENCE
-    // ============================================
-    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-
-    // ============================================
-    // ADMIN EMAIL VALIDATION
-    // ============================================
-    const ADMIN_EMAILS = ["danielalthof1@gmail.com", "kedaiflora1@gmail.com"];
-
-    // ============================================
-    // CLOUDINARY KONFIGURASI
-    // ============================================
-    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/vmny1hra/image/upload';
-    const CLOUDINARY_UPLOAD_PRESET = 'emvx2to2';
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
-    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-
-    // ============================================
-    // DOM ELEMENTS
-    // ============================================
-    const searchInput = document.getElementById('searchInput');
-    const clearBtn = document.getElementById('clearSearch');
-    const cartSummary = document.getElementById('cartSummary');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartDetail = document.getElementById('cartDetail');
-    const orderBtn = document.getElementById('orderBtn');
-    const menuContainer = document.getElementById('menuContainer');
-    const skeletonContainer = document.getElementById('skeletonContainer');
-    const secretTrigger = document.getElementById('secretAdminTrigger');
-    const themeToggle = document.getElementById('themeToggle');
-    const scrollBtn = document.getElementById('scrollTop');
-    const cartBadge = document.getElementById('cartBadge');
-    const cartMini = document.getElementById('cartMini');
-    const cartMiniBadge = document.getElementById('cartMiniBadge');
-    const cartDropdown = document.getElementById('cartDropdown');
-    const cartDropdownContent = document.getElementById('cartDropdownContent');
-
-    const adminSection = document.getElementById('adminSection');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const adminUserEmail = document.getElementById('adminUserEmail');
-    const adminMenuGrid = document.getElementById('adminMenuGrid');
-    const loadingMenu = document.getElementById('loadingMenu');
-    const formTitle = document.getElementById('formTitle');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const newMenuBtn = document.getElementById('newMenuBtn');
-    const backupBtn = document.getElementById('backupBtn');
-    const exportReportBtn = document.getElementById('exportReportBtn');
-    const cleanGhostOrdersBtn = document.getElementById('cleanGhostOrdersBtn');
-
-    const fileInput = document.getElementById('fileInput');
-    const uploadZone = document.getElementById('uploadZone');
-    const previewWrapper = document.getElementById('previewWrapper');
-    const previewImage = document.getElementById('previewImage');
-    const previewStatus = document.getElementById('previewStatus');
-    const inputImage = document.getElementById('inputImage');
-    const inputImagePublicId = document.getElementById('inputImagePublicId');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const removeImageBtn = document.getElementById('removeImageBtn');
-
-    const inputName = document.getElementById('inputName');
-    const inputPrice = document.getElementById('inputPrice');
-    const inputDesc = document.getElementById('inputDesc');
-    const inputCategory = document.getElementById('inputCategory');
-    const inputTag = document.getElementById('inputTag');
-    const inputStock = document.getElementById('inputStock');
-    const inputPromo = document.getElementById('inputPromo');
-    const operationalStatus = document.getElementById('operationalStatus');
-
-    let cartData = JSON.parse(localStorage.getItem('flora-cart')) || {};
-    let editingId = null;
-    let isAdmin = false;
-    let searchTimeout = null;
-    let currentFile = null;
-    let isUploading = false;
-    let menuUnsubscribe = null;
-    let menuDataCache = [];
-    let lastOrderSubmitTime = 0;
-    let orderInProgress = false;
-
-    // ============================================
-    // CATEGORY DATA
-    // ============================================
-    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie'];
-    const categoryNames = {
-        'kopi-klasik': '☕ Kopi',
-        'non-kopi': '🍵 Non Kopi',
-        'camilan': '🍽️ Camilan',
-        'mie': '🍜 Mie & Topping'
-    };
-    const categoryDescs = {
-        'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
-        'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
-        'camilan': 'Camilan gurih untuk mengisi perut.',
-        'mie': 'Mie instan dengan berbagai topping pilihan.'
-    };
-    const categoryIcons = {
-        'kopi-klasik': '☕',
-        'non-kopi': '🍵',
-        'camilan': '🍽️',
-        'mie': '🍜'
-    };
-
-    // ============================================
-    // HELPERS
-    // ============================================
-    function cleanNameFromEmoji(name) {
-        if (!name) return '';
-        const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F1E0}-\u{1F1FF}]/gu;
-        return name.replace(emojiRegex, '').trim();
+/* ===== PRINT STYLES ===== */
+@media print {
+    .theme-toggle,
+    .floating-wa,
+    .cart-mini,
+    .cart-dropdown,
+    .scroll-top,
+    .cats,
+    .search-wrap,
+    .cart-summary,
+    .admin-section,
+    .hero-buttons,
+    .footer-buttons,
+    .cart-badge,
+    .lang-switch,
+    .menu-of-the-day,
+    .modal {
+        display: none !important;
     }
 
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    body {
+        background: white !important;
+        color: black !important;
+        padding: 20px !important;
     }
 
-    function escapeJsString(str) {
-        if (!str) return '';
-        return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    .hero {
+        background: white !important;
+        color: black !important;
+        padding: 30px 0 !important;
+        border-bottom: 2px solid #c49b5c !important;
     }
 
-    const defaultMenuData = [
-        { id: '1', name: 'Ice Rost Latte', desc: 'Kopi dingin dengan rasa yang segar.', price: 7000,
-            category: 'kopi-klasik', tag: '', image: '', stock: 10 },
-        { id: '2', name: "Flora's Coffee", desc: 'Kopi khas Flora dengan rasa yang khas.', price: 8000,
-            category: 'kopi-klasik', tag: 'Favorit', image: '', stock: 10 },
-        { id: '3', name: 'Nescafe', desc: 'Kopi sachet klasik yang nikmat.', price: 4000, category: 'kopi-klasik',
-            tag: '', image: '', stock: 10 },
-        { id: '4', name: 'Ice Tea', desc: 'Teh dingin segar.', price: 3000, category: 'non-kopi',
-            tag: 'Favorit', image: '', stock: 10 },
-        { id: '5', name: 'Ice Lemon Tea', desc: 'Teh dingin dengan perasan lemon segar.', price: 5000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '6', name: "Flora's Matcha", desc: 'Matcha khas Flora dengan susu segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '7', name: 'All Varian Sachet', desc: 'Berbagai varian minuman sachet.', price: 5000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '8', name: 'Mango Yakult', desc: 'Yakult dengan rasa mangga segar.', price: 8000, category: 'non-kopi',
-            tag: '', image: '', stock: 10 },
-        { id: '9', name: 'Strawberry Yakult', desc: 'Yakult dengan rasa stroberi segar.', price: 8000,
-            category: 'non-kopi', tag: '', image: '', stock: 10 },
-        { id: '10', name: 'All Varian Suki', desc: 'Berbagai varian suki yang gurih.', price: 2500,
-            category: 'camilan', tag: '', image: '', stock: 10 },
-        { id: '11', name: 'Sosis Bakar', desc: 'Sosis panggang yang gurih.', price: 4000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '12', name: 'Kentang Goreng', desc: 'Kentang goreng renyah.', price: 5000, category: 'camilan',
-            tag: 'Promo', image: '', stock: 10 },
-        { id: '13', name: 'Mix Plater', desc: 'Kentang goreng dan sosis bakar.', price: 8000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '14', name: 'Roti Bakar', desc: 'Roti panggang dengan selai.', price: 5000, category: 'camilan',
-            tag: '', image: '', stock: 10 },
-        { id: '15', name: 'Indomie Kuah', desc: 'Indomie dengan kuah hangat.', price: 6000, category: 'mie',
-            tag: '', image: '', stock: 10 },
-        { id: '16', name: 'Indomie Goreng', desc: 'Indomie goreng dengan bumbu spesial.', price: 6000,
-            category: 'mie', tag: '', image: '', stock: 10 },
-        { id: '17', name: 'Telur (Topping)', desc: 'Tambahan telur untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '', stock: 10 },
-        { id: '18', name: 'Sosis (Topping)', desc: 'Tambahan sosis untuk mie.', price: 3000, category: 'mie',
-            tag: '', image: '', stock: 10 }
-    ];
-
-    // ============================================
-    // DARK MODE & SCROLL
-    // ============================================
-    const savedTheme = localStorage.getItem('flora-theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.textContent = '☀️';
+    h1.brand {
+        color: black !important;
+        font-size: 36px !important;
+    }
+    h1.brand em {
+        color: #c49b5c !important;
     }
 
-    themeToggle.addEventListener('click', function() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        if (isDark) {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('flora-theme', 'light');
-            this.textContent = '🌙';
-        } else {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('flora-theme', 'dark');
-            this.textContent = '☀️';
-        }
-    });
-
-    window.addEventListener('scroll', function() {
-        scrollBtn.classList.toggle('show', window.scrollY > 400);
-    });
-    scrollBtn.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // ============================================
-    // STATUS BUKA/TUTUP
-    // ============================================
-    let operationalOverride = null;
-
-    async function loadOperationalStatus() {
-        try {
-            const doc = await db.collection('settings').doc('operational').get();
-            if (doc.exists) {
-                operationalOverride = doc.data().status;
-                if (operationalStatus) {
-                    operationalStatus.value = operationalOverride || 'auto';
-                }
-            }
-        } catch (e) {
-            console.log('No operational setting found, using auto');
-        }
+    .item {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
+        margin-bottom: 8px !important;
+        background: white !important;
     }
 
-    function updateOpenStatus() {
-        const el = document.getElementById('openStatus');
-        if (!el) return;
-        const t = translations[currentLang] || translations['id'];
-        if (operationalOverride === 'open') {
-            el.textContent = '🟢 ' + (currentLang === 'en' ? 'Open (Override)' : 'Buka (Override)');
-            return;
-        }
-        if (operationalOverride === 'closed') {
-            el.textContent = '🔴 ' + (currentLang === 'en' ? 'Closed (Override)' : 'Tutup (Override)');
-            return;
-        }
-        const hour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
-        const isOpen = (hour >= 11 && hour < 23);
-        el.textContent = isOpen ? t.open : t.closed;
+    .item:hover {
+        transform: none !important;
     }
 
-    if (operationalStatus) {
-        operationalStatus.addEventListener('change', async function() {
-            if (!isAdmin) return;
-            const value = this.value;
-            try {
-                await db.collection('settings').doc('operational').set({
-                    status: value,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: auth.currentUser?.email || 'unknown'
-                });
-                operationalOverride = value;
-                updateOpenStatus();
-                showToast('✅ Status operasional diperbarui');
-                trackEvent('Admin', 'operational_status', value);
-            } catch (err) {
-                showToast('❌ Gagal menyimpan status: ' + err.message);
-            }
-        });
+    .wrap {
+        max-width: 100% !important;
+        padding: 0 20px !important;
     }
 
-    // ============================================
-    // SHARE
-    // ============================================
-    const shareBtn = document.getElementById('shareBtn');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', async function() {
-            const shareData = { title: 'Flora Coffee — Menu', text: 'Cek menu Flora Coffee di sini!', url: window.location.href };
-            const method = navigator.share ? 'navigator.share' : 'clipboard';
-            trackEvent('Engagement', 'share', method);
-            if (navigator.share) {
-                try { await navigator.share(shareData); } catch (e) {}
-            } else if (navigator.clipboard) {
-                try {
-                    await navigator.clipboard.writeText(shareData.url);
-                    showToast('🔗 Link menu disalin ke clipboard!');
-                } catch (e) {
-                    alert('Gagal menyalin link. Salin manual dari address bar ya.');
-                }
-            }
-        });
+    .qty-controls button {
+        display: none !important;
+    }
+    .qty-controls .qty-value {
+        min-width: auto !important;
     }
 
-    // ============================================
-    // TRACKING
-    // ============================================
-    function trackEvent(category, action, label, value) {
-        if (typeof gtag !== 'undefined') {
-            gtag('event', action, {
-                'event_category': category,
-                'event_label': label || '',
-                'value': value || 0
-            });
-        }
+    .item-checkbox {
+        display: none !important;
     }
 
-    function trackMenuView(menuName) {
-        trackEvent('Menu', 'view', menuName);
+    .item-image {
+        width: 40px !important;
+        height: 40px !important;
     }
 
-    function trackAddToCart(menuName, price, quantity) {
-        trackEvent('Ecommerce', 'add_to_cart', menuName, price * quantity);
+    .item-placeholder {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 16px !important;
     }
 
-    function trackRemoveFromCart(menuName) {
-        trackEvent('Ecommerce', 'remove_from_cart', menuName);
+    .cat-head h2 {
+        font-size: 24px !important;
     }
 
-    function trackOrder(total, itemCount) {
-        trackEvent('Ecommerce', 'checkout', 'Order Completed', total);
-        trackEvent('Ecommerce', 'purchase', `${itemCount} items`, total);
+    .item-thumb {
+        margin-right: 12px !important;
     }
-
-    function trackSearch(keyword) {
-        if (keyword.length > 0) trackEvent('Search', 'search', keyword);
-    }
-
-    function trackCategoryFilter(category) {
-        trackEvent('Navigation', 'filter_category', category);
-    }
-
-    // ============================================
-    // SEARCH & FILTER
-    // ============================================
-    let activeCategoryFilter = 'all';
-
-    function highlightText(text, keyword) {
-        if (!keyword || keyword.length < 2) return text;
-        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`(${escaped})`, 'gi');
-        const parts = text.split(regex);
-        return parts.map(part => {
-            if (part.toLowerCase() === keyword.toLowerCase()) {
-                return `<mark>${escapeHtml(part)}</mark>`;
-            }
-            return escapeHtml(part);
-        }).join('');
-    }
-
-    function filterMenu() {
-        const keyword = searchInput.value.toLowerCase().trim();
-        const items = document.querySelectorAll('.item');
-        const cats = document.querySelectorAll('.category');
-        const noResult = document.getElementById('noResult');
-
-        items.forEach(item => {
-            const name = item.getAttribute('data-name') || '';
-            const desc = item.getAttribute('data-desc') || '';
-            const cat = item.getAttribute('data-category') || '';
-            const matchKeyword = keyword === '' || name.includes(keyword) || desc.includes(keyword);
-            const matchCategory = activeCategoryFilter === 'all' || cat === activeCategoryFilter;
-            if (matchKeyword && matchCategory) {
-                item.classList.remove('hidden');
-            } else {
-                item.classList.add('hidden');
-            }
-        });
-
-        cats.forEach(cat => {
-            const matchCategory = activeCategoryFilter === 'all' || cat.id === activeCategoryFilter;
-            const visibleItems = cat.querySelectorAll('.item:not(.hidden)');
-            if (!matchCategory || visibleItems.length === 0) {
-                cat.classList.add('hidden');
-            } else {
-                cat.classList.remove('hidden');
-            }
-        });
-
-        document.querySelectorAll('.divider').forEach(d => {
-            d.style.display = (activeCategoryFilter === 'all') ? '' : 'none';
-        });
-
-        const anyVisible = document.querySelectorAll('.item:not(.hidden)').length > 0;
-        noResult.style.display = !anyVisible ? 'block' : 'none';
-        clearBtn.classList.toggle('show', keyword.length > 0);
-
-        if (keyword.length > 2) {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => trackSearch(keyword), 1000);
-        }
-
-        document.querySelectorAll('.item:not(.hidden) .item-name, .item:not(.hidden) .item-desc').forEach(el => {
-            const original = el.getAttribute('data-original') || el.textContent;
-            el.setAttribute('data-original', original);
-            if (keyword.length >= 2) {
-                el.innerHTML = highlightText(original, keyword);
-            } else {
-                el.textContent = original;
-            }
-        });
-    }
-
-    document.querySelectorAll('.cat-filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            activeCategoryFilter = this.getAttribute('data-filter');
-            document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            if (activeCategoryFilter !== 'all') {
-                trackCategoryFilter(activeCategoryFilter);
-            }
-            filterMenu();
-        });
-    });
-
-    searchInput.addEventListener('input', filterMenu);
-    clearBtn.addEventListener('click', function() {
-        searchInput.value = '';
-        filterMenu();
-        searchInput.focus();
-    });
-
-    // ============================================
-    // CART
-    // ============================================
-    function saveCart() {
-        localStorage.setItem('flora-cart', JSON.stringify(cartData));
-    }
-
-    function updateCart() {
-        const allItems = document.querySelectorAll('.item');
-        let total = 0;
-        let orderList = [];
-        let hasOrder = false;
-        let newCart = {};
-
-        allItems.forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-            const qtySpan = item.querySelector('.qty-value');
-            const qty = parseInt(qtySpan.textContent) || 0;
-            const id = item.getAttribute('data-id');
-            const menuItem = menuDataCache.find(m => m.id === id);
-            const name = menuItem ? menuItem.name : (item.querySelector('.item-name').textContent.trim() || 'Unknown');
-            const price = parseInt(item.getAttribute('data-price')) || 0;
-
-            if (checkbox.checked && qty > 0) {
-                const subtotal = price * qty;
-                total += subtotal;
-                orderList.push(`${name} x${qty} (Rp${(price * qty).toLocaleString('id-ID')})`);
-                hasOrder = true;
-                newCart[id] = { name, qty, price };
-            }
-        });
-
-        cartData = newCart;
-        saveCart();
-
-        if (hasOrder) {
-            cartSummary.classList.add('show');
-            cartTotal.textContent = 'Rp' + total.toLocaleString('id-ID');
-            cartDetail.textContent = orderList.join(' · ') || 'Belum ada pesanan';
-            const message = encodeURIComponent(
-                'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
-                orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
-                '\n\nTotal: Rp' + total.toLocaleString('id-ID')
-            );
-            orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
-        } else {
-            cartSummary.classList.remove('show');
-        }
-
-        updateCartBadge();
-        updateCartMini();
-        renderCartDropdown();
-    }
-
-    // ============================================
-    // CART DROPDOWN
-    // ============================================
-    function renderCartDropdown() {
-        if (!cartDropdownContent) {
-            console.warn('cartDropdownContent not found');
-            return;
-        }
-        const items = Object.values(cartData);
-        if (items.length === 0) {
-            cartDropdownContent.innerHTML = `<div class="cart-empty">🛒 Belum ada pesanan</div>`;
-            return;
-        }
-        let total = 0;
-        let html = '';
-        items.forEach(item => {
-            const subtotal = item.price * item.qty;
-            total += subtotal;
-            html += `
-                <div class="cart-item">
-                    <span class="cart-item-name">${escapeHtml(item.name)}</span>
-                    <span class="cart-item-qty">×${item.qty}</span>
-                    <span class="cart-item-price">Rp${subtotal.toLocaleString('id-ID')}</span>
-                </div>
-            `;
-        });
-        html += `
-            <div class="cart-total-row">
-                <span>Total</span>
-                <span>Rp${total.toLocaleString('id-ID')}</span>
-            </div>
-            <button class="cart-checkout-btn" id="dropdownCheckoutBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 510 512.459" fill="white">
-                    <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
-                </svg>
-                Pesan Sekarang
-            </button>
-        `;
-        cartDropdownContent.innerHTML = html;
-
-        const checkoutBtn = document.getElementById('dropdownCheckoutBtn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', function() {
-                cartDropdown.classList.remove('show');
-                if (orderBtn) orderBtn.click();
-            });
-        }
-    }
-
-    // ============================================
-    // CART BADGE (dengan animasi bounce)
-    // ============================================
-    function updateCartBadge() {
-        if (!cartBadge) return;
-        let totalItems = 0;
-        document.querySelectorAll('.item').forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-            const qtySpan = item.querySelector('.qty-value');
-            if (checkbox && checkbox.checked) {
-                totalItems += parseInt(qtySpan?.textContent) || 0;
-            }
-        });
-
-        if (totalItems > 0) {
-            cartBadge.style.display = 'flex';
-            const oldValue = parseInt(cartBadge.textContent) || 0;
-            cartBadge.textContent = totalItems;
-            if (totalItems > oldValue) {
-                cartBadge.classList.remove('pulse');
-                void cartBadge.offsetWidth;
-                cartBadge.classList.add('pulse');
-            }
-        } else {
-            cartBadge.style.display = 'none';
-        }
-    }
-
-    function updateCartMini() {
-        if (!cartMini || !cartMiniBadge) return;
-        let totalItems = 0;
-        document.querySelectorAll('.item').forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-            const qtySpan = item.querySelector('.qty-value');
-            if (checkbox && checkbox.checked) {
-                totalItems += parseInt(qtySpan?.textContent) || 0;
-            }
-        });
-
-        if (totalItems > 0) {
-            cartMini.style.display = 'flex';
-            const oldValue = parseInt(cartMiniBadge.textContent) || 0;
-            cartMiniBadge.textContent = totalItems;
-            if (totalItems > oldValue) {
-                cartMiniBadge.classList.remove('bounce');
-                void cartMiniBadge.offsetWidth;
-                cartMiniBadge.classList.add('bounce');
-            }
-        } else {
-            cartMini.style.display = 'none';
-            if (cartDropdown) cartDropdown.classList.remove('show');
-        }
-    }
-
-    // ============================================
-    // CART MINI CLICK - TOGGLE DROPDOWN
-    // ============================================
-    if (cartMini) {
-        cartMini.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (Object.keys(cartData).length === 0) {
-                showToast('🛒 Keranjang kosong');
-                return;
-            }
-            if (!cartDropdown) return;
-            cartDropdown.classList.toggle('show');
-            renderCartDropdown();
-        });
-    }
-
-    // Tutup dropdown saat klik di luar
-    document.addEventListener('click', function(e) {
-        if (cartDropdown && !cartDropdown.contains(e.target) && e.target !== cartMini && !cartMini.contains(e.target)) {
-            cartDropdown.classList.remove('show');
-        }
-    });
-
-    // ============================================
-    // SAVE ORDER (Pending)
-    // ============================================
-    async function saveOrderToFirestore(order) {
-        try {
-            const now = Date.now();
-            if (now - lastOrderSubmitTime < 3000) {
-                showToast('⏳ Tunggu sebentar sebelum memesan lagi');
-                return false;
-            }
-            lastOrderSubmitTime = now;
-
-            const rawItems = order.rawItems || [];
-            let calculatedTotal = 0;
-            const validItems = [];
-
-            for (const item of rawItems) {
-                const match = item.match(/^(.*?)\s*x\s*(\d+)/);
-                if (match) {
-                    let name = match[1].trim();
-                    const qty = parseInt(match[2]) || 0;
-                    let menuItem = menuDataCache.find(m => {
-                        const clean = cleanNameFromEmoji(m.name);
-                        return clean === name || m.name === name;
-                    });
-                    if (!menuItem) {
-                        const searchName = name.toLowerCase().replace(/\s+/g, ' ');
-                        menuItem = menuDataCache.find(m => {
-                            const clean = cleanNameFromEmoji(m.name).toLowerCase().replace(/\s+/g, ' ');
-                            return clean === searchName || m.name.toLowerCase().replace(/\s+/g, ' ') === searchName;
-                        });
-                    }
-                    if (!menuItem) {
-                        try {
-                            const snapshot = await db.collection('menu')
-                                .where('name', '==', name)
-                                .limit(1)
-                                .get();
-                            if (!snapshot.empty) {
-                                menuItem = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                                menuDataCache.push(menuItem);
-                            } else {
-                                const cleanName = cleanNameFromEmoji(name);
-                                const snapshot2 = await db.collection('menu')
-                                    .where('name', '==', cleanName)
-                                    .limit(1)
-                                    .get();
-                                if (!snapshot2.empty) {
-                                    menuItem = { id: snapshot2.docs[0].id, ...snapshot2.docs[0].data() };
-                                    menuDataCache.push(menuItem);
-                                }
-                            }
-                        } catch (err) {
-                            console.warn('Fallback DB lookup failed for:', name, err);
-                        }
-                    }
-                    if (menuItem) {
-                        const price = menuItem.promoPrice || menuItem.price;
-                        const subtotal = price * qty;
-                        calculatedTotal += subtotal;
-                        validItems.push({ name, qty, price, subtotal });
-                    } else {
-                        showToast('❌ Menu "' + name + '" tidak ditemukan. Refresh halaman.');
-                        return false;
-                    }
-                }
-            }
-
-            const tolerance = Math.max(500, calculatedTotal * 0.05);
-            if (Math.abs(calculatedTotal - (order.total || 0)) > tolerance) {
-                console.warn('⚠️ Total tidak sesuai! Diharapkan:', calculatedTotal, 'Dikirim:', order.total);
-                showToast('❌ Total pesanan tidak valid. Silakan coba lagi.');
-                return false;
-            }
-
-            for (const item of validItems) {
-                const menuItem = menuDataCache.find(m => {
-                    const clean = cleanNameFromEmoji(m.name);
-                    return clean === item.name || m.name === item.name;
-                });
-                if (menuItem && menuItem.stock !== undefined && menuItem.stock < item.qty) {
-                    showToast(`❌ Stok ${item.name} tidak mencukupi (tersisa ${menuItem.stock})`);
-                    return false;
-                }
-            }
-
-            const orderData = {
-                items: order.items || '',
-                total: calculatedTotal,
-                rawItems: rawItems,
-                customerNote: order.customerNote || '',
-                status: 'pending',
-                source: 'web',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                orderDate: new Date().toISOString().split('T')[0],
-                orderTime: new Date().toLocaleTimeString('id-ID'),
-                validated: true
-            };
-
-            console.log('📦 Saving pending order:', orderData);
-            const docRef = await db.collection('orders').add(orderData);
-            console.log('✅ Pending order saved with ID:', docRef.id);
-
-            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
-            history.push({
-                id: docRef.id,
-                items: order.items,
-                total: 'Rp' + (calculatedTotal || 0).toLocaleString('id-ID'),
-                date: new Date().toLocaleString('id-ID'),
-                status: 'pending',
-                timestamp: Date.now()
-            });
-            while (history.length > 50) history.shift();
-            localStorage.setItem('flora-order-history', JSON.stringify(history));
-
-            return true;
-        } catch (err) {
-            console.error('❌ Failed to save order:', err);
-            if (err.code === 'permission-denied') {
-                showToast('❌ Gagal menyimpan: izin ditolak. Coba refresh.');
-            } else {
-                showToast('❌ Gagal menyimpan pesanan: ' + err.message);
-            }
-            return false;
-        }
-    }
-
-    // ============================================
-    // ADMIN: Load Pending Orders
-    // ============================================
-    async function loadPendingOrders() {
-        if (!isAdmin) return;
-        const container = document.getElementById('pendingOrdersList');
-        if (!container) return;
-
-        try {
-            let snapshot;
-            try {
-                snapshot = await db.collection('orders')
-                    .where('status', '==', 'pending')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-            } catch (indexError) {
-                console.warn('⚠️ Indeks belum siap, pakai fallback sorting client-side');
-                snapshot = await db.collection('orders')
-                    .where('status', '==', 'pending')
-                    .limit(50)
-                    .get();
-                const docs = [];
-                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-                docs.sort((a, b) => {
-                    const timeA = a.timestamp?.toDate?.()?.getTime() || 0;
-                    const timeB = b.timestamp?.toDate?.()?.getTime() || 0;
-                    return timeB - timeA;
-                });
-                renderPendingOrders(docs, container);
-                return;
-            }
-
-            const docs = [];
-            snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-            renderPendingOrders(docs, container);
-
-        } catch (err) {
-            console.error('Error loading pending orders:', err);
-            container.innerHTML = `
-                <div style="padding:20px;text-align:center;color:var(--text-muted);">
-                    ❌ Gagal memuat: ${err.message}
-                    <br><br>
-                    <button class="btn btn-sm" onclick="loadPendingOrders()" style="margin-top:8px;">
-                        🔄 Coba Lagi
-                    </button>
-                </div>
-            `;
-        }
-    }
-
-    // ============================================
-    // RENDER PENDING ORDERS
-    // ============================================
-    function renderPendingOrders(docs, container) {
-        if (!docs || docs.length === 0) {
-            container.innerHTML = `
-                <div style="padding:20px;text-align:center;color:var(--text-muted);">
-                    ✅ Tidak ada order pending
-                </div>
-            `;
-            return;
-        }
-
-        let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
-        docs.forEach(doc => {
-            const data = doc;
-            const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
-            const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
-            html += `
-                <div class="pending-item">
-                    <div>
-                        <div class="date">📅 ${date}</div>
-                        <div class="items">${escapeHtml(data.items || '-')}</div>
-                        <div class="total">${total}</div>
-                    </div>
-                    <div class="actions">
-                        <button onclick="confirmOrder('${data.id}')" class="btn btn-sm" style="background:#27ae60;">
-                            ✅ Konfirmasi
-                        </button>
-                        <button onclick="cancelOrder('${data.id}')" class="btn btn-sm btn-danger">
-                            ❌ Batalkan
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-    }
-
-    // ============================================
-    // ADMIN: Confirm Order
-    // ============================================
-    window.confirmOrder = async function(orderId) {
-        if (!isAdmin) {
-            showToast('❌ Hanya admin yang bisa konfirmasi');
-            return;
-        }
-
-        try {
-            const orderDoc = await db.collection('orders').doc(orderId).get();
-            if (!orderDoc.exists) {
-                showToast('❌ Order tidak ditemukan');
-                return;
-            }
-
-            const orderData = orderDoc.data();
-            if (orderData.status === 'completed') {
-                showToast('ℹ️ Order sudah dikonfirmasi sebelumnya');
-                return;
-            }
-            if (orderData.status !== 'pending') {
-                showToast('❌ Order tidak dalam status pending');
-                return;
-            }
-
-            const rawItems = orderData.rawItems || [];
-            for (const item of rawItems) {
-                const match = item.match(/^(.*?)\s*x\s*(\d+)/);
-                if (match) {
-                    let name = match[1].trim();
-                    let menuItem = menuDataCache.find(m => {
-                        const clean = cleanNameFromEmoji(m.name);
-                        return clean === name || m.name === name;
-                    });
-                    if (!menuItem) {
-                        const cleanName = cleanNameFromEmoji(name);
-                        const snapshot = await db.collection('menu')
-                            .where('name', '==', cleanName)
-                            .limit(1)
-                            .get();
-                        if (!snapshot.empty) {
-                            menuItem = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                        }
-                    }
-                    if (menuItem) {
-                        const qty = parseInt(match[2]) || 0;
-                        const currentStock = menuItem.stock || 0;
-                        const newStock = Math.max(0, currentStock - qty);
-                        await db.collection('menu').doc(menuItem.id).update({
-                            stock: newStock,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        console.log(`✅ Stok ${name}: ${currentStock} → ${newStock}`);
-                        const cacheItem = menuDataCache.find(m => m.id === menuItem.id);
-                        if (cacheItem) cacheItem.stock = newStock;
-                    }
-                }
-            }
-
-            await db.collection('orders').doc(orderId).update({
-                status: 'completed',
-                confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                confirmedBy: auth.currentUser?.email || 'admin'
-            });
-
-            showToast('✅ Order dikonfirmasi dan stok diperbarui!');
-            trackEvent('Admin', 'confirm_order', orderId);
-            loadPendingOrders();
-            loadDashboardStats();
-
-        } catch (err) {
-            console.error('❌ Gagal konfirmasi order:', err);
-            showToast('❌ Gagal konfirmasi: ' + err.message);
-        }
-    };
-
-    // ============================================
-    // ADMIN: Cancel Order
-    // ============================================
-    window.cancelOrder = async function(orderId) {
-        if (!isAdmin) return;
-        if (!confirm('Batalkan order ini? Status akan menjadi "cancelled".')) return;
-        try {
-            await db.collection('orders').doc(orderId).update({
-                status: 'cancelled',
-                cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast('✅ Order dibatalkan');
-            loadPendingOrders();
-            loadDashboardStats();
-        } catch (err) {
-            showToast('❌ Gagal batalkan: ' + err.message);
-        }
-    };
-
-    // ============================================
-    // ORDER HISTORY
-    // ============================================
-    async function loadOrderHistoryFromFirestore() {
-        try {
-            const snapshot = await db.collection('orders')
-                .orderBy('timestamp', 'desc')
-                .limit(50)
-                .get();
-            const history = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                history.push({
-                    id: doc.id,
-                    items: data.items || '',
-                    total: 'Rp' + (data.total || 0).toLocaleString('id-ID'),
-                    date: data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja',
-                    status: data.status || 'pending'
-                });
-            });
-            return history;
-        } catch (err) {
-            console.error('Error loading history from Firestore:', err);
-            return JSON.parse(localStorage.getItem('flora-order-history')) || [];
-        }
-    }
-
-    async function showOrderHistory() {
-        const history = await loadOrderHistoryFromFirestore();
-        const container = document.getElementById('historyList');
-        if (!container) return;
-
-        container.innerHTML = '';
-        if (history.length === 0) {
-            const t = translations[currentLang];
-            const empty = document.createElement('div');
-            empty.className = 'history-empty';
-            empty.textContent = t.historyEmpty || '📭 Belum ada riwayat pesanan.';
-            container.appendChild(empty);
-            return;
-        }
-
-        history.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            const dateDiv = document.createElement('div');
-            dateDiv.className = 'date';
-            dateDiv.textContent = '📅 ' + item.date;
-            div.appendChild(dateDiv);
-
-            const itemsDiv = document.createElement('div');
-            itemsDiv.className = 'items';
-            itemsDiv.textContent = item.items;
-            div.appendChild(itemsDiv);
-
-            const totalDiv = document.createElement('div');
-            totalDiv.className = 'total';
-            totalDiv.textContent = 'Total: ' + item.total;
-            div.appendChild(totalDiv);
-
-            const statusSpan = document.createElement('span');
-            statusSpan.className = 'status-badge';
-            if (item.status === 'pending') {
-                statusSpan.classList.add('pending');
-                statusSpan.textContent = '⏳ Menunggu konfirmasi';
-            } else if (item.status === 'completed') {
-                statusSpan.classList.add('completed');
-                statusSpan.textContent = '✅ Selesai';
-            } else if (item.status === 'cancelled') {
-                statusSpan.classList.add('cancelled');
-                statusSpan.textContent = '❌ Dibatalkan';
-            } else {
-                statusSpan.textContent = '📌 ' + item.status;
-            }
-            div.appendChild(statusSpan);
-
-            container.appendChild(div);
-        });
-    }
-
-    const historyBtn = document.getElementById('historyBtn');
-    const historyModal = document.getElementById('historyModal');
-    const historyModalClose = document.getElementById('historyModalClose');
-
-    if (historyBtn) {
-        historyBtn.addEventListener('click', function() {
-            showOrderHistory();
-            historyModal.classList.add('show');
-            trackEvent('Engagement', 'view_history');
-        });
-    }
-    if (historyModalClose) {
-        historyModalClose.addEventListener('click', function() {
-            historyModal.classList.remove('show');
-        });
-    }
-    if (historyModal) {
-        historyModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
-        });
-    }
-
-    // ============================================
-    // ORDER BUTTON (Pesan Sekarang)
-    // ============================================
-    const waConfirmModal = document.getElementById('waConfirmModal');
-    const btnAlreadySent = document.getElementById('btnAlreadySent');
-    const btnNotYet = document.getElementById('btnNotYet');
-
-    if (orderBtn) {
-        orderBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (Object.keys(cartData).length === 0) {
-                showToast('🛒 Tambahkan menu dulu ya!');
-                return;
-            }
-            if (waConfirmModal) waConfirmModal.classList.add('show');
-        });
-    }
-
-    if (btnAlreadySent) {
-        btnAlreadySent.addEventListener('click', async function() {
-            if (orderInProgress) {
-                showToast('⏳ Pesanan sedang diproses...');
-                return;
-            }
-            orderInProgress = true;
-            btnAlreadySent.disabled = true;
-            btnAlreadySent.textContent = '⏳ Memproses...';
-
-            try {
-                const items = cartDetail.textContent || 'Pesanan';
-                const total = parseInt((cartTotal.textContent || '0').replace(/[^0-9]/g, '')) || 0;
-                const rawItems = Object.values(cartData).map(i => `${i.name} x${i.qty}`);
-
-                let calculatedTotal = 0;
-                for (const item of rawItems) {
-                    const match = item.match(/^(.*?)\s*x\s*(\d+)/);
-                    if (match) {
-                        const name = match[1].trim();
-                        const qty = parseInt(match[2]) || 0;
-                        let menuItem = menuDataCache.find(m => {
-                            const clean = cleanNameFromEmoji(m.name);
-                            return clean === name || m.name === name;
-                        });
-                        if (menuItem) {
-                            const price = menuItem.promoPrice || menuItem.price;
-                            calculatedTotal += price * qty;
-                        } else {
-                            const snapshot = await db.collection('menu')
-                                .where('name', '==', name)
-                                .limit(1)
-                                .get();
-                            if (!snapshot.empty) {
-                                const data = snapshot.docs[0].data();
-                                const price = data.promoPrice || data.price;
-                                calculatedTotal += price * qty;
-                            }
-                        }
-                    }
-                }
-
-                if (Math.abs(calculatedTotal - total) > 100) {
-                    showToast('❌ Total pesanan tidak valid. Refresh halaman.');
-                    orderInProgress = false;
-                    btnAlreadySent.disabled = false;
-                    btnAlreadySent.textContent = '✅ Konfirmasi Pesanan';
-                    return;
-                }
-
-                const success = await saveOrderToFirestore({
-                    items: items,
-                    total: calculatedTotal,
-                    rawItems: rawItems,
-                    customerNote: '',
-                    status: 'pending'
-                });
-
-                if (success) {
-                    trackOrder(calculatedTotal, Object.keys(cartData).length);
-                    cartData = {};
-                    saveCart();
-                    updateCart();
-
-                    const message = encodeURIComponent(
-                        'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
-                        rawItems.map((item, i) => `${i+1}. ${item}`).join('\n') +
-                        '\n\nTotal: Rp' + calculatedTotal.toLocaleString('id-ID') +
-                        '\n\nMohon dikonfirmasi setelah pembayaran.'
-                    );
-                    window.open('https://wa.me/6285175012418?text=' + message, '_blank');
-
-                    if (waConfirmModal) waConfirmModal.classList.remove('show');
-                    showToast('✅ Pesanan tercatat! Silakan bayar dan kirim bukti via WA.');
-
-                    if (isAdmin) {
-                        setTimeout(() => {
-                            loadDashboardStats();
-                            loadPendingOrders();
-                        }, 1500);
-                    }
-                }
-            } catch (err) {
-                console.error('Error saving order:', err);
-                showToast('❌ Gagal menyimpan pesanan: ' + err.message);
-            } finally {
-                orderInProgress = false;
-                btnAlreadySent.disabled = false;
-                btnAlreadySent.textContent = '✅ Konfirmasi Pesanan';
-            }
-        });
-    }
-
-    if (btnNotYet) {
-        btnNotYet.addEventListener('click', function() {
-            if (waConfirmModal) waConfirmModal.classList.remove('show');
-            showToast('ℹ️ Pesanan dibatalkan.');
-        });
-    }
-
-    if (waConfirmModal) {
-        waConfirmModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
-        });
-    }
-
-    // ============================================
-    // DASHBOARD STATS
-    // ============================================
-    async function loadDashboardStats() {
-        try {
-            const menuSnapshot = await db.collection('menu').get();
-            document.getElementById('statMenus').textContent = menuSnapshot.size;
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const startOfDay = firebase.firestore.Timestamp.fromDate(today);
-            const endOfDay = firebase.firestore.Timestamp.fromDate(new Date(today.getTime() + 86400000));
-
-            let completedOrders = 0;
-            let totalRevenue = 0;
-            let customerSet = new Set();
-
-            try {
-                const ordersSnapshot = await db.collection('orders')
-                    .where('status', '==', 'completed')
-                    .where('timestamp', '>=', startOfDay)
-                    .where('timestamp', '<', endOfDay)
-                    .get();
-                ordersSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    completedOrders++;
-                    totalRevenue += data.total || 0;
-                });
-            } catch (indexError) {
-                const ordersSnapshot = await db.collection('orders')
-                    .where('timestamp', '>=', startOfDay)
-                    .where('timestamp', '<', endOfDay)
-                    .get();
-                ordersSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.status === 'completed') {
-                        completedOrders++;
-                        totalRevenue += data.total || 0;
-                    }
-                });
-            }
-
-            document.getElementById('statOrders').textContent = completedOrders;
-            document.getElementById('statRevenue').textContent = 'Rp' + totalRevenue.toLocaleString('id-ID');
-            document.getElementById('statCustomers').textContent = customerSet.size || '-';
-
-            await loadSalesChart();
-            loadPendingOrders();
-
-        } catch (error) {
-            console.error('❌ Error loading dashboard:', error);
-            const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
-            document.getElementById('statOrders').textContent = history.filter(h => h.status === 'completed').length;
-        }
-    }
-
-    // ============================================
-    // SALES CHART
-    // ============================================
-    async function loadSalesChart() {
-        const container = document.getElementById('chartContainer');
-        const barsContainer = document.getElementById('chartBars');
-        if (!container || !barsContainer) return;
-
-        try {
-            const last7Days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                date.setHours(0, 0, 0, 0);
-                const startOfDay = firebase.firestore.Timestamp.fromDate(date);
-                const endOfDay = firebase.firestore.Timestamp.fromDate(new Date(date.getTime() + 86400000));
-
-                let dailyTotal = 0;
-                try {
-                    const snapshot = await db.collection('orders')
-                        .where('status', '==', 'completed')
-                        .where('timestamp', '>=', startOfDay)
-                        .where('timestamp', '<', endOfDay)
-                        .get();
-                    snapshot.forEach(doc => { dailyTotal += doc.data().total || 0; });
-                } catch (e) {
-                    const snapshot = await db.collection('orders')
-                        .where('timestamp', '>=', startOfDay)
-                        .where('timestamp', '<', endOfDay)
-                        .get();
-                    snapshot.forEach(doc => {
-                        if (doc.data().status === 'completed') dailyTotal += doc.data().total || 0;
-                    });
-                }
-                last7Days.push({
-                    date: date.toLocaleDateString('id-ID', { weekday: 'short' }),
-                    total: dailyTotal,
-                    label: date.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })
-                });
-            }
-
-            const hasData = last7Days.some(d => d.total > 0);
-            if (!hasData) { container.style.display = 'none'; return; }
-            container.style.display = 'block';
-            const maxTotal = Math.max(...last7Days.map(d => d.total), 1);
-            barsContainer.innerHTML = last7Days.map(day => `
-                <div class="chart-bar-wrap">
-                    <div class="chart-bar-value">${day.total > 0 ? 'Rp' + (day.total/1000).toFixed(0) + 'k' : ''}</div>
-                    <div class="chart-bar" style="height: ${(day.total / maxTotal) * 80 + 10}px;"></div>
-                    <div class="chart-bar-label">${day.label}</div>
-                </div>
-            `).join('');
-        } catch (err) {
-            console.error('Error loading chart:', err);
-            container.style.display = 'none';
-        }
-    }
-
-    // ============================================
-    // CLOUDINARY UPLOAD
-    // ============================================
-    function validateFile(file) {
-        if (!file) return { valid: false, message: 'Tidak ada file.' };
-        if (!ALLOWED_TYPES.includes(file.type)) {
-            return { valid: false, message: '❌ Format tidak didukung. Gunakan JPG, PNG, atau WebP.' };
-        }
-        if (file.size > MAX_FILE_SIZE) {
-            return { valid: false, message: `❌ File terlalu besar (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal 5MB.` };
-        }
-        return { valid: true };
-    }
-
-    async function uploadToCloudinary(file) {
-        const validation = validateFile(file);
-        if (!validation.valid) {
-            showToast(validation.message);
-            return null;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-        isUploading = true;
-        uploadProgress.classList.remove('hidden');
-        progressFill.style.width = '0%';
-        progressText.textContent = '⏳ Mengupload... 0%';
-        previewWrapper.classList.add('hidden');
-
-        try {
-            const xhr = new XMLHttpRequest();
-
-            xhr.upload.addEventListener('progress', (e) => {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    progressFill.style.width = percent + '%';
-                    progressText.textContent = `⏳ Mengupload... ${percent}%`;
-                }
-            });
-
-            const response = await new Promise((resolve, reject) => {
-                xhr.open('POST', CLOUDINARY_URL);
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        let errorMsg = xhr.statusText || 'Upload gagal';
-                        try {
-                            const errData = JSON.parse(xhr.responseText);
-                            if (errData.error && errData.error.message) {
-                                errorMsg = errData.error.message;
-                            }
-                        } catch (e) {}
-                        reject(new Error(errorMsg));
-                    }
-                };
-                xhr.onerror = () => reject(new Error('Network error - cek koneksi internet'));
-                xhr.send(formData);
-            });
-
-            isUploading = false;
-            progressFill.style.width = '100%';
-            progressText.textContent = '✅ Upload berhasil!';
-
-            previewImage.src = response.secure_url;
-            previewWrapper.classList.remove('hidden');
-            inputImage.value = response.secure_url;
-            inputImagePublicId.value = response.public_id || '';
-            currentFile = file;
-
-            if (previewStatus) {
-                previewStatus.textContent = '✅ Upload berhasil';
-                previewStatus.className = 'preview-status success';
-            }
-
-            setTimeout(() => {
-                uploadProgress.classList.add('hidden');
-            }, 1500);
-
-            showToast('✅ Gambar berhasil diupload!');
-            trackEvent('Admin', 'upload_image', file.name);
-
-            return { url: response.secure_url, publicId: response.public_id || '' };
-
-        } catch (error) {
-            console.error('Upload error:', error);
-            isUploading = false;
-            progressFill.style.width = '0%';
-            progressText.textContent = '❌ Upload gagal!';
-            uploadProgress.classList.remove('hidden');
-
-            let errorMessage = error.message || 'Terjadi kesalahan';
-            showToast('❌ Gagal upload: ' + errorMessage);
-
-            if (previewStatus) {
-                previewStatus.textContent = '❌ ' + errorMessage;
-                previewStatus.className = 'preview-status error';
-            }
-
-            return null;
-        }
-    }
-
-    async function deleteImageFromCloudinary(publicId) {
-        if (!publicId) return;
-        try {
-            console.log('🗑️ Would delete image:', publicId);
-        } catch (err) {
-            console.error('Failed to delete image:', err);
-        }
-    }
-
-    // ============================================
-    // UPLOAD EVENT LISTENERS
-    // ============================================
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            currentFile = file;
-            uploadToCloudinary(file);
-        });
-    }
-
-    if (uploadZone) {
-        uploadZone.addEventListener('click', function() {
-            if (isUploading) {
-                showToast('⏳ Tunggu upload selesai dulu ya!');
-                return;
-            }
-            if (fileInput) fileInput.click();
-        });
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        });
-
-        uploadZone.addEventListener('dragover', function() {
-            if (!isUploading) this.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', function() {
-            this.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', function(e) {
-            this.classList.remove('dragover');
-            if (isUploading) {
-                showToast('⏳ Tunggu upload selesai dulu ya!');
-                return;
-            }
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                currentFile = files[0];
-                if (fileInput) fileInput.files = files;
-                uploadToCloudinary(files[0]);
-            }
-        });
-    }
-
-    if (removeImageBtn) {
-        removeImageBtn.addEventListener('click', function() {
-            if (editingId && inputImage.value) {
-                if (!confirm('⚠️ Hapus gambar saat ini?\n\nAnda harus upload gambar baru sebelum menyimpan.')) {
-                    return;
-                }
-            }
-
-            currentFile = null;
-            inputImage.value = '';
-            inputImagePublicId.value = '';
-            previewWrapper.classList.add('hidden');
-            previewImage.src = '';
-            if (fileInput) fileInput.value = '';
-            uploadProgress.classList.add('hidden');
-            progressFill.style.width = '0%';
-            progressText.textContent = '';
-
-            if (previewStatus) {
-                previewStatus.textContent = '🗑️ Gambar dihapus';
-                previewStatus.className = 'preview-status';
-            }
-
-            showToast('🗑️ Gambar dihapus dari form');
-        });
-    }
-
-    // ============================================
-    // RENDER MENU (Public)
-    // ============================================
-    function renderMenu(data) {
-        skeletonContainer.style.display = 'none';
-        menuContainer.style.display = 'block';
-        menuContainer.innerHTML = '';
-        menuDataCache = data;
-
-        const grouped = {};
-        data.forEach(item => {
-            if (!grouped[item.category]) grouped[item.category] = [];
-            grouped[item.category].push(item);
-        });
-
-        let catIndex = 1;
-        categories.forEach(catKey => {
-            if (!grouped[catKey]) return;
-            const section = document.createElement('section');
-            section.className = 'category';
-            section.id = catKey;
-
-            const head = document.createElement('div');
-            head.className = 'cat-head';
-            const numSpan = document.createElement('span');
-            numSpan.className = 'cat-num';
-            numSpan.textContent = String(catIndex).padStart(2, '0');
-            head.appendChild(numSpan);
-            const h2 = document.createElement('h2');
-            h2.textContent = categoryNames[catKey] || catKey;
-            head.appendChild(h2);
-            section.appendChild(head);
-
-            const desc = document.createElement('p');
-            desc.className = 'cat-desc';
-            desc.textContent = categoryDescs[catKey] || '';
-            section.appendChild(desc);
-
-            grouped[catKey].forEach((item) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
-                itemDiv.setAttribute('data-name', (item.name || '').toLowerCase());
-                itemDiv.setAttribute('data-desc', (item.desc || '').toLowerCase());
-                itemDiv.setAttribute('data-category', item.category || '');
-                const activePrice = item.promoPrice ? item.promoPrice : item.price;
-                itemDiv.setAttribute('data-price', activePrice);
-                itemDiv.setAttribute('data-id', item.id);
-
-                trackMenuView(item.name);
-
-                const thumb = document.createElement('div');
-                thumb.className = 'item-thumb';
-                const hasImage = item.image && item.image.trim() !== '';
-                if (hasImage) {
-                    const img = document.createElement('img');
-                    img.className = 'item-image show';
-                    img.src = item.image;
-                    img.alt = item.name;
-                    img.loading = 'lazy';
-                    thumb.appendChild(img);
-                } else {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'item-placeholder';
-                    placeholder.textContent = categoryIcons[item.category] || '☕';
-                    placeholder.setAttribute('aria-hidden', 'true');
-                    thumb.appendChild(placeholder);
-                }
-                itemDiv.appendChild(thumb);
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'item-checkbox';
-                if (item.stock === 0) { checkbox.disabled = true; checkbox.style.opacity = '0.4'; }
-                itemDiv.appendChild(checkbox);
-
-                const info = document.createElement('div');
-                info.className = 'item-info';
-                const nameSpan = document.createElement('div');
-                nameSpan.className = 'item-name';
-                nameSpan.textContent = item.name || 'Unknown';
-
-                // ===== BADGE HANDLING - no double promo =====
-                if (item.tag === 'Favorit') {
-                    const tag = document.createElement('span');
-                    tag.className = 'item-tag';
-                    tag.textContent = '⭐ Favorit';
-                    nameSpan.appendChild(tag);
-                }
-
-                if (item.promoPrice) {
-                    const promo = document.createElement('span');
-                    promo.className = 'badge-promo';
-                    promo.textContent = '🔥 Promo';
-                    nameSpan.appendChild(promo);
-                } else if (item.tag === 'Promo') {
-                    const tag = document.createElement('span');
-                    tag.className = 'item-tag';
-                    tag.textContent = '🔥 Promo';
-                    nameSpan.appendChild(tag);
-                }
-
-                if (item.stock === 0) {
-                    const habis = document.createElement('span');
-                    habis.className = 'badge-habis';
-                    habis.textContent = '⛔ Habis';
-                    nameSpan.appendChild(habis);
-                }
-
-                info.appendChild(nameSpan);
-
-                const descSpan = document.createElement('div');
-                descSpan.className = 'item-desc';
-                descSpan.textContent = item.desc || '';
-                info.appendChild(descSpan);
-                itemDiv.appendChild(info);
-
-                const priceSpan = document.createElement('div');
-                priceSpan.className = 'item-price';
-                if (item.promoPrice) {
-                    const original = document.createElement('span');
-                    original.className = 'price-original';
-                    original.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
-                    priceSpan.appendChild(original);
-                    const promoPriceSpan = document.createElement('span');
-                    promoPriceSpan.textContent = 'Rp' + Number(item.promoPrice).toLocaleString('id-ID');
-                    priceSpan.appendChild(promoPriceSpan);
-                } else {
-                    priceSpan.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
-                }
-                itemDiv.appendChild(priceSpan);
-
-                const qtyDiv = document.createElement('div');
-                qtyDiv.className = 'qty-controls';
-                const minusBtn = document.createElement('button');
-                minusBtn.className = 'qty-minus';
-                minusBtn.textContent = '−';
-                if (item.stock === 0) minusBtn.disabled = true;
-                qtyDiv.appendChild(minusBtn);
-
-                const qtySpan = document.createElement('span');
-                qtySpan.className = 'qty-value zero';
-                qtySpan.textContent = '0';
-                qtyDiv.appendChild(qtySpan);
-
-                const plusBtn = document.createElement('button');
-                plusBtn.className = 'qty-plus';
-                plusBtn.textContent = '+';
-                if (item.stock === 0) plusBtn.disabled = true;
-                qtyDiv.appendChild(plusBtn);
-                itemDiv.appendChild(qtyDiv);
-
-                const saved = cartData[item.id];
-                if (saved && saved.qty > 0 && item.stock !== 0) {
-                    checkbox.checked = true;
-                    qtySpan.textContent = saved.qty;
-                    qtySpan.classList.remove('zero');
-                }
-
-                checkbox.addEventListener('change', function() {
-                    if (item.stock === 0) return;
-                    const qty = parseInt(qtySpan.textContent) || 0;
-                    if (!this.checked) {
-                        qtySpan.textContent = '0';
-                        qtySpan.classList.add('zero');
-                        trackRemoveFromCart(item.name);
-                    } else if (qty === 0) {
-                        qtySpan.textContent = '1';
-                        qtySpan.classList.remove('zero');
-                        trackAddToCart(item.name, activePrice, 1);
-                        showToast(`✅ ${item.name} ×1 ditambahkan`);
-                    } else {
-                        trackAddToCart(item.name, activePrice, qty);
-                        showToast(`✅ ${item.name} ×${qty} ditambahkan`);
-                    }
-                    updateCart();
-                });
-
-                function updateQty(change) {
-                    if (item.stock === 0) return;
-                    let val = parseInt(qtySpan.textContent) || 0;
-                    val = Math.max(0, Math.min(item.stock, val + change));
-                    qtySpan.textContent = val;
-                    qtySpan.classList.toggle('zero', val === 0);
-                    if (val > 0) {
-                        checkbox.checked = true;
-                        trackAddToCart(item.name, activePrice, val);
-                        showToast(`✅ ${item.name} ×${val} ditambahkan`);
-                    } else {
-                        checkbox.checked = false;
-                        trackRemoveFromCart(item.name);
-                    }
-                    updateCart();
-                }
-                minusBtn.addEventListener('click', function(e) { e.stopPropagation(); updateQty(-1); });
-                plusBtn.addEventListener('click', function(e) { e.stopPropagation(); updateQty(1); });
-                qtySpan.addEventListener('click', function() { updateQty(-parseInt(qtySpan.textContent) || 0); });
-
-                section.appendChild(itemDiv);
-            });
-
-            menuContainer.appendChild(section);
-            if (catIndex < Object.keys(grouped).length) {
-                const divider = document.createElement('div');
-                divider.className = 'divider';
-                divider.innerHTML = `
-                    <svg viewBox="0 0 34 20" fill="none"><path d="M2 18C8 10 12 6 17 6C22 6 26 10 32 18" stroke="#b58d4a" stroke-width="1.4" /><circle cx="17" cy="5" r="2.6" fill="#b58d4a" /></svg>
-                    <div class="line"></div>
-                `;
-                menuContainer.appendChild(divider);
-            }
-            catIndex++;
-        });
-
-        updateCart();
-        filterMenu();
-        setupScrollReveal();
-    }
-
-    // ============================================
-    // SCROLL REVEAL
-    // ============================================
-    let revealObserver = null;
-    function setupScrollReveal() {
-        if (!('IntersectionObserver' in window)) {
-            document.querySelectorAll('.category').forEach(el => el.classList.add('revealed'));
-            return;
-        }
-        if (revealObserver) revealObserver.disconnect();
-        revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        document.querySelectorAll('.category').forEach(el => revealObserver.observe(el));
-    }
-
-    // ============================================
-    // LOAD MENU
-    // ============================================
-    function loadMenu() {
-        skeletonContainer.style.display = 'block';
-        menuContainer.style.display = 'none';
-        if (menuUnsubscribe) menuUnsubscribe();
-        menuUnsubscribe = db.collection('menu').orderBy('name').onSnapshot(snapshot => {
-            skeletonContainer.style.display = 'none';
-            menuContainer.style.display = 'block';
-            if (snapshot.empty) {
-                defaultMenuData.forEach(item => {
-                    db.collection('menu').doc(item.id).set(item).catch(() => {});
-                });
-                renderMenu(defaultMenuData);
-                if (isAdmin) renderAdminMenu(defaultMenuData);
-                return;
-            }
-            const data = [];
-            snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
-            renderMenu(data);
-            if (isAdmin) renderAdminMenu(data);
-        }, (error) => {
-            console.error('Firestore error:', error);
-            skeletonContainer.style.display = 'none';
-            menuContainer.style.display = 'block';
-            renderMenu(defaultMenuData);
-            if (isAdmin) renderAdminMenu(defaultMenuData);
-        });
-    }
-
-    // ============================================
-    // LOAD MENU FOR ADMIN
-    // ============================================
-    async function loadMenuForAdmin() {
-        if (!isAdmin) return;
-        try {
-            loadingMenu.classList.remove('hidden');
-            loadingMenu.textContent = '⏳ Memuat menu...';
-            const snapshot = await db.collection('menu').orderBy('name').get();
-            if (snapshot.empty) {
-                defaultMenuData.forEach(item => {
-                    db.collection('menu').doc(item.id).set(item).catch(() => {});
-                });
-                renderAdminMenu(defaultMenuData);
-            } else {
-                const data = [];
-                snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
-                renderAdminMenu(data);
-            }
-            loadingMenu.classList.add('hidden');
-        } catch (err) {
-            console.error('Error loading admin menu:', err);
-            loadingMenu.textContent = '❌ Gagal memuat menu';
-            renderAdminMenu(defaultMenuData);
-            setTimeout(() => { loadingMenu.classList.add('hidden'); }, 2000);
-        }
-    }
-
-    // ============================================
-    // RENDER ADMIN MENU (AMAN)
-    // ============================================
-    function renderAdminMenu(data) {
-        if (!adminMenuGrid) return;
-        loadingMenu.classList.add('hidden');
-        adminMenuGrid.innerHTML = '';
-        if (!data || data.length === 0) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);';
-            const icon = document.createElement('div');
-            icon.style.fontSize = '48px';
-            icon.style.marginBottom = '12px';
-            icon.textContent = '📭';
-            emptyDiv.appendChild(icon);
-            const p = document.createElement('p');
-            p.textContent = 'Belum ada menu. Klik "Tambah Baru" untuk menambahkan.';
-            emptyDiv.appendChild(p);
-            adminMenuGrid.appendChild(emptyDiv);
-            return;
-        }
-
-        data.forEach(item => {
-            const cleanName = cleanNameFromEmoji(item.name);
-            const card = document.createElement('div');
-            card.className = 'admin-card';
-
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'admin-card-img';
-            if (item.image) {
-                const img = document.createElement('img');
-                img.src = item.image;
-                img.alt = item.name;
-                img.loading = 'lazy';
-                imgDiv.appendChild(img);
-            } else {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'admin-card-placeholder';
-                placeholder.textContent = categoryIcons[item.category] || '☕';
-                imgDiv.appendChild(placeholder);
-            }
-
-            // Badges
-            if (item.promoPrice) {
-                const badge = document.createElement('span');
-                badge.className = 'badge-promo';
-                badge.textContent = '🔥 Promo';
-                imgDiv.appendChild(badge);
-            } else if (item.tag === 'Promo') {
-                const badge = document.createElement('span');
-                badge.className = 'badge-promo';
-                badge.textContent = '🔥 Promo';
-                imgDiv.appendChild(badge);
-            }
-            if (item.tag === 'Favorit') {
-                const badge = document.createElement('span');
-                badge.className = 'badge-favorit';
-                badge.textContent = '⭐ Favorit';
-                imgDiv.appendChild(badge);
-            }
-            if (item.stock === 0) {
-                const badge = document.createElement('span');
-                badge.className = 'badge-habis';
-                badge.textContent = '⛔ Habis';
-                imgDiv.appendChild(badge);
-            }
-            card.appendChild(imgDiv);
-
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'admin-card-info';
-            const h4 = document.createElement('h4');
-            h4.textContent = cleanName;
-            infoDiv.appendChild(h4);
-            const p = document.createElement('p');
-            p.textContent = item.desc || '';
-            infoDiv.appendChild(p);
-            const priceDiv = document.createElement('div');
-            priceDiv.className = 'admin-card-price';
-            if (item.promoPrice) {
-                const orig = document.createElement('span');
-                orig.className = 'price-original';
-                orig.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
-                priceDiv.appendChild(orig);
-                const promoText = document.createTextNode(' Rp' + Number(item.promoPrice).toLocaleString('id-ID'));
-                priceDiv.appendChild(promoText);
-            } else {
-                priceDiv.textContent = 'Rp' + Number(item.price).toLocaleString('id-ID');
-            }
-            infoDiv.appendChild(priceDiv);
-            const metaDiv = document.createElement('div');
-            metaDiv.className = 'admin-card-meta';
-            const catSpan = document.createElement('span');
-            catSpan.textContent = categoryNames[item.category] || item.category;
-            metaDiv.appendChild(catSpan);
-            if (item.tag && item.tag !== 'Promo' && item.tag !== 'Favorit') {
-                const tagSpan = document.createElement('span');
-                tagSpan.className = 'tag tag-' + item.tag.toLowerCase();
-                tagSpan.textContent = item.tag;
-                metaDiv.appendChild(tagSpan);
-            }
-            infoDiv.appendChild(metaDiv);
-            card.appendChild(infoDiv);
-
-            const stockDiv = document.createElement('div');
-            stockDiv.className = 'admin-card-stock';
-            const minusBtn = document.createElement('button');
-            minusBtn.textContent = '−';
-            minusBtn.title = 'Kurangi stok';
-            minusBtn.addEventListener('click', function(e) { e.stopPropagation(); quickUpdateStock(item.id, -1); });
-            stockDiv.appendChild(minusBtn);
-            const stockSpan = document.createElement('span');
-            stockSpan.textContent = 'Stok: ' + (item.stock !== undefined ? item.stock : 10);
-            stockDiv.appendChild(stockSpan);
-            const plusBtn = document.createElement('button');
-            plusBtn.textContent = '+';
-            plusBtn.title = 'Tambah stok';
-            plusBtn.addEventListener('click', function(e) { e.stopPropagation(); quickUpdateStock(item.id, 1); });
-            stockDiv.appendChild(plusBtn);
-            card.appendChild(stockDiv);
-
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'admin-card-actions';
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn btn-sm';
-            editBtn.textContent = '✏️ Edit';
-            editBtn.addEventListener('click', function(e) { e.stopPropagation(); editMenuItem(item.id); });
-            actionDiv.appendChild(editBtn);
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-sm btn-danger';
-            deleteBtn.textContent = '🗑️';
-            deleteBtn.addEventListener('click', function(e) { e.stopPropagation(); deleteMenuItem(item.id, item.name); });
-            actionDiv.appendChild(deleteBtn);
-            card.appendChild(actionDiv);
-
-            adminMenuGrid.appendChild(card);
-        });
-    }
-
-    // ============================================
-    // QUICK STOCK UPDATE (Admin)
-    // ============================================
-    window.quickUpdateStock = async function(id, change) {
-        if (!isAdmin) { showToast('❌ Hanya admin yang bisa mengubah stok'); return; }
-        try {
-            const doc = await db.collection('menu').doc(id).get();
-            if (!doc.exists) { showToast('❌ Menu tidak ditemukan'); return; }
-            const currentStock = doc.data().stock || 0;
-            const newStock = Math.max(0, currentStock + change);
-            await db.collection('menu').doc(id).update({
-                stock: newStock,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast(`✅ Stok diperbarui menjadi ${newStock}`);
-            trackEvent('Admin', 'quick_stock_update', `${id}: ${currentStock}→${newStock}`);
-        } catch (err) {
-            console.error('Error updating stock:', err);
-            showToast('❌ Gagal update stok: ' + err.message);
-        }
-    };
-
-    // ============================================
-    // CRUD OPERATIONS (Admin)
-    // ============================================
-    window.editMenuItem = function(id) {
-        if (!isAdmin) { showToast('❌ Anda tidak memiliki akses admin'); return; }
-        db.collection('menu').doc(id).get()
-            .then(doc => {
-                if (!doc.exists) { showToast('❌ Menu tidak ditemukan'); return; }
-                const data = doc.data();
-                editingId = id;
-                formTitle.textContent = '✏️ Edit Menu';
-                saveBtn.textContent = '💾 Update Menu';
-                inputName.value = data.name || '';
-                inputPrice.value = data.price || '';
-                inputDesc.value = data.desc || '';
-                inputCategory.value = data.category || 'kopi-klasik';
-                inputTag.value = data.tag || '';
-                inputStock.value = data.stock !== undefined ? data.stock : 10;
-                inputPromo.value = data.promoPrice || '';
-                currentFile = null;
-                if (fileInput) fileInput.value = '';
-                uploadProgress.classList.add('hidden');
-                progressFill.style.width = '0%';
-                progressText.textContent = '';
-                if (data.image && data.image.trim() !== '') {
-                    inputImage.value = data.image;
-                    inputImagePublicId.value = data.imagePublicId || '';
-                    previewImage.src = data.image;
-                    previewWrapper.classList.remove('hidden');
-                    if (previewStatus) {
-                        previewStatus.textContent = '📷 Gambar saat ini';
-                        previewStatus.className = 'preview-status';
-                    }
-                } else {
-                    inputImage.value = '';
-                    inputImagePublicId.value = '';
-                    previewWrapper.classList.add('hidden');
-                    previewImage.src = '';
-                }
-                document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                trackEvent('Admin', 'edit_menu', data.name);
-            })
-            .catch(err => { console.error('Error loading menu:', err); showToast('❌ Gagal memuat data menu: ' + err.message); });
-    };
-
-    window.deleteMenuItem = function(id, name) {
-        if (!isAdmin) return;
-        const confirmText = prompt(`⚠️ HAPUS PERMANEN\n\nMenu "${name}" akan dihapus.\nKetik "HAPUS" untuk konfirmasi:`);
-        if (confirmText !== 'HAPUS') { showToast('❌ Penghapusan dibatalkan'); return; }
-        db.collection('menu').doc(id).get().then(doc => {
-            const data = doc.data();
-            if (data.imagePublicId) deleteImageFromCloudinary(data.imagePublicId);
-            return db.collection('menu').doc(id).delete();
-        }).then(() => {
-            showToast('✅ Menu berhasil dihapus');
-            trackEvent('Admin', 'delete_menu', name);
-        }).catch(err => {
-            console.error('Error deleting:', err);
-            showToast('❌ Gagal menghapus menu: ' + err.message);
-        });
-    };
-
-    // ============================================
-    // FORM HANDLING
-    // ============================================
-    function resetForm() {
-        editingId = null;
-        formTitle.textContent = '📝 Tambah Menu Baru';
-        saveBtn.textContent = '💾 Simpan Menu';
-        inputName.value = '';
-        inputPrice.value = '';
-        inputDesc.value = '';
-        inputCategory.value = 'kopi-klasik';
-        inputTag.value = '';
-        inputStock.value = '10';
-        inputPromo.value = '';
-        inputImage.value = '';
-        inputImagePublicId.value = '';
-        previewWrapper.classList.add('hidden');
-        previewImage.src = '';
-        currentFile = null;
-        if (fileInput) fileInput.value = '';
-        uploadProgress.classList.add('hidden');
-        progressFill.style.width = '0%';
-        progressText.textContent = '';
-        if (previewStatus) {
-            previewStatus.textContent = '';
-            previewStatus.className = 'preview-status';
-        }
-    }
-
-    if (newMenuBtn) newMenuBtn.addEventListener('click', resetForm);
-    if (cancelBtn) cancelBtn.addEventListener('click', resetForm);
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Anda tidak memiliki akses admin'); return; }
-            const name = inputName.value.trim();
-            const price = parseInt(inputPrice.value);
-            const desc = inputDesc.value.trim();
-            const category = inputCategory.value;
-            const tag = inputTag.value.trim();
-            const stock = parseInt(inputStock.value);
-            const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
-            const image = inputImage.value.trim();
-            const imagePublicId = inputImagePublicId.value.trim();
-
-            if (!name) { showToast('❌ Nama menu wajib diisi'); inputName.focus(); return; }
-            if (isNaN(price) || price < 0) { showToast('❌ Harga harus diisi dengan angka valid'); inputPrice.focus(); return; }
-            if (isNaN(stock) || stock < 0) { showToast('❌ Stok harus diisi dengan angka valid'); inputStock.focus(); return; }
-            if (promoPrice !== null && (isNaN(promoPrice) || promoPrice < 0 || promoPrice >= price)) {
-                showToast('❌ Harga promo harus lebih kecil dari harga normal'); inputPromo.focus(); return;
-            }
-            if (name.length > 100) { showToast('❌ Nama terlalu panjang (maks 100 karakter)'); inputName.focus(); return; }
-            if (desc.length > 500) { showToast('❌ Deskripsi terlalu panjang (maks 500 karakter)'); inputDesc.focus(); return; }
-
-            try {
-                const existing = await db.collection('menu').where('name', '==', name).get();
-                if (!existing.empty && existing.docs[0].id !== editingId) {
-                    showToast('❌ Nama menu sudah ada! Gunakan nama lain.'); inputName.focus(); return;
-                }
-            } catch (err) { console.error('Error checking duplicate:', err); }
-
-            const data = {
-                name, price, desc: desc || '', category, tag: tag || '', stock,
-                promoPrice: promoPrice, image: image || '', imagePublicId: imagePublicId || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                if (editingId) {
-                    const oldDoc = await db.collection('menu').doc(editingId).get();
-                    if (oldDoc.exists && oldDoc.data().imagePublicId && oldDoc.data().imagePublicId !== imagePublicId) {
-                        deleteImageFromCloudinary(oldDoc.data().imagePublicId);
-                    }
-                    await db.collection('menu').doc(editingId).update(data);
-                    showToast('✅ Menu berhasil diupdate!');
-                    trackEvent('Admin', 'update_menu', name);
-                } else {
-                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    const newId = Date.now().toString();
-                    await db.collection('menu').doc(newId).set(data);
-                    showToast('✅ Menu baru berhasil ditambahkan!');
-                    trackEvent('Admin', 'add_menu', name);
-                }
-                resetForm();
-                loadDashboardStats();
-            } catch (err) {
-                console.error('Error saving:', err);
-                showToast('❌ Gagal menyimpan menu: ' + err.message);
-            }
-        });
-    }
-
-    // ============================================
-    // AUTHENTICATION
-    // ============================================
-    auth.onAuthStateChanged(user => {
-        if (user && ADMIN_EMAILS.includes(user.email)) {
-            isAdmin = true;
-            adminSection.classList.remove('admin-hidden');
-            adminSection.style.display = 'block';
-            adminUserEmail.textContent = user.email;
-            loadDashboardStats();
-            loadOperationalStatus();
-            loadMenuForAdmin();
-            loadMenu();
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            trackEvent('Auth', 'admin_login', user.email);
-            console.log('✅ Admin logged in, menu loaded');
-        } else {
-            isAdmin = false;
-            adminSection.classList.add('admin-hidden');
-            adminSection.style.display = 'none';
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        }
-    });
-
-    // ============================================
-    // SECRET TRIGGER (Tap 5x)
-    // ============================================
-    let tapCount = 0;
-    let tapTimer = null;
-    if (secretTrigger) {
-        secretTrigger.addEventListener('click', function() {
-            tapCount++;
-            if (tapTimer) clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => { tapCount = 0; }, 1000);
-            if (tapCount >= 5) {
-                tapCount = 0;
-                if (!isAdmin) {
-                    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-                        .then(result => {
-                            if (ADMIN_EMAILS.includes(result.user.email)) {
-                                showToast('✅ Selamat datang Admin!');
-                                trackEvent('Auth', 'admin_login_popup', result.user.email);
-                            } else {
-                                showToast('❌ Email tidak terdaftar sebagai admin');
-                                auth.signOut();
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Auth error:', err);
-                            showToast('❌ Gagal login: ' + err.message);
-                        });
-                } else {
-                    showToast('👋 Anda sudah login sebagai admin');
-                }
-            }
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            auth.signOut().then(() => {
-                showToast('👋 Logout berhasil');
-                trackEvent('Auth', 'admin_logout');
-                isAdmin = false;
-                adminSection.classList.add('admin-hidden');
-                adminSection.style.display = 'none';
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-            }).catch(err => {
-                console.error('Logout error:', err);
-                showToast('❌ Gagal logout');
-            });
-        });
-    }
-
-    // ============================================
-    // BACKUP & EXPORT
-    // ============================================
-    if (backupBtn) {
-        backupBtn.addEventListener('click', function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa backup'); return; }
-            db.collection('menu').get().then(snapshot => {
-                const data = [];
-                snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `flora-backup-${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('✅ Backup berhasil diunduh');
-                trackEvent('Admin', 'backup');
-            }).catch(err => {
-                console.error('Backup error:', err);
-                showToast('❌ Gagal backup data');
-            });
-        });
-    }
-
-    if (exportReportBtn) {
-        exportReportBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa export'); return; }
-            try {
-                const snapshot = await db.collection('orders')
-                    .where('status', '==', 'completed')
-                    .orderBy('timestamp', 'desc')
-                    .limit(200)
-                    .get();
-                const rows = [['Tanggal', 'Total', 'Items', 'Note']];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    rows.push([
-                        data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
-                        'Rp' + (data.total || 0).toLocaleString('id-ID'),
-                        (data.items || '-').replace(/,/g, ';'),
-                        (data.customerNote || '').replace(/,/g, ';')
-                    ]);
-                });
-                const csv = rows.map(row => row.join(',')).join('\n');
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `flora-report-${new Date().toISOString().slice(0,10)}.csv`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('✅ Laporan berhasil diexport');
-                trackEvent('Admin', 'export_report');
-            } catch (err) {
-                console.error('Export error:', err);
-                showToast('❌ Gagal export laporan: ' + err.message);
-            }
-        });
-    }
-
-    // ============================================
-    // CLEAN GHOST ORDERS
-    // ============================================
-    if (cleanGhostOrdersBtn) {
-        cleanGhostOrdersBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa membersihkan data'); return; }
-            cleanGhostOrdersBtn.disabled = true;
-            cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
-            try {
-                const snapshot = await db.collection('orders').get();
-                const ghosts = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.status !== 'completed' && data.status !== 'pending' && data.status !== 'cancelled') {
-                        ghosts.push(doc.id);
-                    }
-                });
-                if (ghosts.length === 0) { showToast('✅ Tidak ada ghost order'); return; }
-                const sure = confirm(`Ditemukan ${ghosts.length} ghost order (status tidak dikenal).\n\nHapus?`);
-                if (!sure) { showToast('Dibatalkan'); return; }
-                cleanGhostOrdersBtn.textContent = `⏳ Menghapus 0/${ghosts.length}...`;
-                let deleted = 0;
-                for (let i = 0; i < ghosts.length; i += 500) {
-                    const chunk = ghosts.slice(i, i + 500);
-                    const batch = db.batch();
-                    chunk.forEach(id => batch.delete(db.collection('orders').doc(id)));
-                    await batch.commit();
-                    deleted += chunk.length;
-                    cleanGhostOrdersBtn.textContent = `⏳ Menghapus ${deleted}/${ghosts.length}...`;
-                }
-                showToast(`✅ ${deleted} ghost order berhasil dihapus`);
-                trackEvent('Admin', 'clean_ghost_orders', '', deleted);
-                loadDashboardStats();
-            } catch (err) {
-                console.error('Clean ghost orders error:', err);
-                showToast('❌ Gagal membersihkan: ' + err.message);
-            } finally {
-                cleanGhostOrdersBtn.disabled = false;
-                cleanGhostOrdersBtn.textContent = '🧹 Bersihkan Ghost Orders Lama';
-            }
-        });
-    }
-
-    // ============================================
-    // TOAST SYSTEM
-    // ============================================
-    function showToast(message, duration = 2500) {
-        const existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        requestAnimationFrame(() => { toast.classList.add('show'); });
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => { toast.remove(); }, 400);
-        }, duration);
-    }
-
-    // ============================================
-    // KEYBOARD SHORTCUTS
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); searchInput.focus(); }
-        if (e.key === 'Escape') {
-            if (searchInput.value) { searchInput.value = ''; filterMenu(); searchInput.blur(); }
-            if (historyModal && historyModal.classList.contains('show')) historyModal.classList.remove('show');
-            if (waConfirmModal && waConfirmModal.classList.contains('show')) waConfirmModal.classList.remove('show');
-            if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
-        }
-        if (e.altKey && e.key >= '1' && e.key <= '4') {
-            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
-            const idx = parseInt(e.key);
-            const filter = filters[idx] || 'all';
-            const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
-            if (btn) btn.click();
-        }
-    });
-
-    // ============================================
-    // LANGUAGE SWITCH
-    // ============================================
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() { setLang(this.dataset.lang); });
-    });
-
-    // ============================================
-    // NETWORK STATUS
-    // ============================================
-    window.addEventListener('online', function() {
-        showToast('🔄 Koneksi kembali online!');
-        loadMenu();
-        if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
-    });
-    window.addEventListener('offline', function() {
-        showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
-    });
-
-    // ============================================
-    // INIT
-    // ============================================
-    const savedLang = localStorage.getItem('flora-lang') || 'id';
-    setLang(savedLang);
-    loadMenu();
-    showMenuOfTheDay();
-    loadOperationalStatus();
-
-    setInterval(() => {
-        if (navigator.onLine) {
-            loadMenu();
-            if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
-        }
-    }, 300000);
-
-    console.log('🌿 Flora Coffee Menu v2.0 loaded successfully!');
-    console.log('📊 Analytics tracking enabled');
-    console.log('🔐 Admin panel protected with Firestore stats');
-    console.log('🌍 Multi-language support:', currentLang);
-    console.log('📦 PWA ready');
-
-})();
+}
