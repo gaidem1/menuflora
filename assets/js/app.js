@@ -750,7 +750,7 @@
     });
 
     // ============================================
-    // SAVE ORDER (pending) — dengan cartData { id: qty }
+    // SAVE ORDER (pending)
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
@@ -804,7 +804,7 @@
             }
 
             const orderData = {
-                items: orderItems,
+                items: orderItems,              // array objek
                 total: calculatedTotal,
                 rawItems: orderItems.map(i => `${i.name} x${i.qty}`),
                 customerNote: order.customerNote || '',
@@ -823,7 +823,7 @@
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: docRef.id,
-                items: orderData.items.map(i => `${i.name} x${i.qty}`).join(', '),
+                items: orderData.items,
                 total: 'Rp' + (calculatedTotal || 0).toLocaleString('id-ID'),
                 date: new Date().toLocaleString('id-ID'),
                 status: 'pending',
@@ -895,6 +895,9 @@
         }
     }
 
+    // ============================================
+    // RENDER PENDING ORDERS — DIPERBAIKI
+    // ============================================
     function renderPendingOrders(docs, container) {
         if (!docs || docs.length === 0) {
             container.innerHTML = `
@@ -910,11 +913,22 @@
             const data = doc;
             const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
             const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
+
+            // ===== FORMAT ITEMS =====
+            let itemsDisplay = '';
+            if (Array.isArray(data.items)) {
+                itemsDisplay = data.items.map(item => `${item.name} x${item.qty}`).join(', ');
+            } else if (typeof data.items === 'string') {
+                itemsDisplay = data.items;
+            } else {
+                itemsDisplay = '-';
+            }
+
             html += `
                 <div class="pending-item">
                     <div>
                         <div class="date">📅 ${date}</div>
-                        <div class="items">${escapeHtml(data.items || '-')}</div>
+                        <div class="items">${escapeHtml(itemsDisplay)}</div>
                         <div class="total">${total}</div>
                     </div>
                     <div class="actions">
@@ -957,11 +971,14 @@
                 return;
             }
 
-            const menuRefs = [];
+            // Ambil items dari orderData
             const items = orderData.items || [];
+            const menuRefs = [];
+
             for (const item of items) {
                 const menuId = item.id;
                 if (!menuId) {
+                    // fallback cari berdasarkan nama
                     let menuItem = menuDataCache.find(m => {
                         const clean = cleanNameFromEmoji(m.name);
                         return clean === item.name || m.name === item.name;
@@ -987,23 +1004,50 @@
                 }
             }
 
-            await db.runTransaction(async (transaction) => {
-                for (const item of menuRefs) {
-                    const doc = await transaction.get(item.ref);
-                    if (!doc.exists) {
-                        throw new Error(`Menu ${item.name} tidak ada.`);
+            // Kurangi stok (coba transaksi, gagal fallback manual)
+            try {
+                await db.runTransaction(async (transaction) => {
+                    for (const item of menuRefs) {
+                        const doc = await transaction.get(item.ref);
+                        if (!doc.exists) {
+                            throw new Error(`Menu ${item.name} tidak ada.`);
+                        }
+                        const currentStock = doc.data().stock || 0;
+                        if (currentStock < item.qty) {
+                            throw new Error(`Stok ${item.name} tidak cukup (sisa ${currentStock}).`);
+                        }
+                        transaction.update(item.ref, {
+                            stock: currentStock - item.qty,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
                     }
-                    const currentStock = doc.data().stock || 0;
-                    if (currentStock < item.qty) {
-                        throw new Error(`Stok ${item.name} tidak cukup (sisa ${currentStock}).`);
+                });
+            } catch (txError) {
+                console.warn('⚠️ Transaksi gagal, coba manual:', txError);
+                if (txError.code === 'permission-denied') {
+                    showToast('⚠️ Transaksi ditolak, mencoba update manual...');
+                    for (const item of menuRefs) {
+                        const doc = await item.ref.get();
+                        if (!doc.exists) {
+                            showToast(`❌ Menu ${item.name} tidak ditemukan.`);
+                            return;
+                        }
+                        const currentStock = doc.data().stock || 0;
+                        if (currentStock < item.qty) {
+                            showToast(`❌ Stok ${item.name} tidak cukup.`);
+                            return;
+                        }
+                        await item.ref.update({
+                            stock: currentStock - item.qty,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
                     }
-                    transaction.update(item.ref, {
-                        stock: currentStock - item.qty,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                } else {
+                    throw txError;
                 }
-            });
+            }
 
+            // Update status order menjadi 'completed'
             await db.collection('orders').doc(orderId).update({
                 status: 'completed',
                 confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1025,7 +1069,13 @@
 
         } catch (err) {
             console.error('❌ Gagal konfirmasi order:', err);
-            showToast('❌ Gagal konfirmasi: ' + err.message);
+            let msg = 'Gagal konfirmasi: ';
+            if (err.code === 'permission-denied') {
+                msg += 'Izin ditolak. Pastikan Anda login sebagai admin dan email terdaftar.';
+            } else {
+                msg += err.message;
+            }
+            showToast('❌ ' + msg);
         }
     }
 
@@ -1164,7 +1214,7 @@
     }
 
     // ============================================
-    // ORDER HISTORY (customer)
+    // ORDER HISTORY (customer) — DIPERBAIKI
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -1177,7 +1227,7 @@
                 const data = doc.data();
                 history.push({
                     id: doc.id,
-                    items: data.items || '',
+                    items: data.items || [],
                     total: 'Rp' + (data.total || 0).toLocaleString('id-ID'),
                     date: data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja',
                     status: data.status || 'pending'
@@ -1208,14 +1258,25 @@
         history.forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item';
+
             const dateDiv = document.createElement('div');
             dateDiv.className = 'date';
             dateDiv.textContent = '📅 ' + item.date;
             div.appendChild(dateDiv);
 
+            // ===== FORMAT ITEMS =====
+            let itemsDisplay = '';
+            if (Array.isArray(item.items)) {
+                itemsDisplay = item.items.map(i => `${i.name} x${i.qty}`).join(', ');
+            } else if (typeof item.items === 'string') {
+                itemsDisplay = item.items;
+            } else {
+                itemsDisplay = '-';
+            }
+
             const itemsDiv = document.createElement('div');
             itemsDiv.className = 'items';
-            itemsDiv.textContent = item.items;
+            itemsDiv.textContent = itemsDisplay;
             div.appendChild(itemsDiv);
 
             const totalDiv = document.createElement('div');
@@ -1484,7 +1545,7 @@
     }
 
     // ============================================
-    // CLOUDINARY UPLOAD (sama seperti sebelumnya)
+    // CLOUDINARY UPLOAD
     // ============================================
     function validateFile(file) {
         if (!file) return { valid: false, message: 'Tidak ada file.' };
@@ -1979,7 +2040,7 @@
     }
 
     // ============================================
-    // RENDER ADMIN MENU (dengan data-*)
+    // RENDER ADMIN MENU
     // ============================================
     function renderAdminMenu(data) {
         if (!adminMenuGrid) return;
@@ -2468,6 +2529,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.0 — Secure, Transacted, Clean!');
+    console.log('🌿 Flora Coffee Menu v3.1 — Items array fix, pending orders fixed!');
 
 })();
