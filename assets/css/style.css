@@ -120,6 +120,61 @@
     background: #1da85c !important;
 }
 
+/* ===== BUTTONS — DARK MODE IMPROVEMENTS ===== */
+[data-theme="dark"] .btn {
+    background: var(--leaf-mid);
+    color: #ffffff;
+}
+[data-theme="dark"] .btn:hover {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .btn-danger {
+    background: #c0392b;
+    color: #ffffff;
+}
+[data-theme="dark"] .btn-danger:hover {
+    background: #e74c3c;
+}
+[data-theme="dark"] .btn-outline {
+    border-color: #ffffff;
+    color: #ffffff;
+}
+[data-theme="dark"] .btn-outline:hover {
+    background: #ffffff;
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .btn-wa {
+    background: #25D366 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .btn-wa:hover {
+    background: #1da85c !important;
+}
+
+/* ===== PENDING ORDERS – DARK MODE ===== */
+[data-theme="dark"] .pending-confirm-btn {
+    background: #27ae60 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .pending-confirm-btn:hover {
+    background: #2ecc71 !important;
+}
+[data-theme="dark"] .pending-cancel-btn {
+    background: #c0392b !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .pending-cancel-btn:hover {
+    background: #e74c3c !important;
+}
+
+/* ===== TOAST – DARK MODE FIX ===== */
+[data-theme="dark"] .toast {
+    background: #1a2a1e;
+    color: #f6f2e9;
+    border-color: var(--brass);
+}
+
 /* ===== CART DROPDOWN DARK MODE ===== */
 [data-theme="dark"] .cart-dropdown {
     background: var(--bg-body);
@@ -162,7 +217,7 @@ a {
     z-index: 1;
 }
 
-/* ===== BUTTONS ===== */
+/* ===== BUTTONS (light mode) ===== */
 .btn {
     padding: 10px 20px;
     border: none;
@@ -1778,10 +1833,6 @@ mark {
 .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
-}
-[data-theme="dark"] .toast {
-    background: var(--leaf-deep);
-    border-color: var(--brass);
 }
 
 /* ===== RESPONSIVE ===== */
