@@ -622,7 +622,6 @@
                 orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
                 '\n\nTotal: Rp' + total.toLocaleString('id-ID')
             );
-            // orderBtn href diisi untuk fallback, tapi kita override di event listener
             orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
         } else {
             cartSummary.classList.remove('show');
@@ -687,7 +686,6 @@
                 return false;
             }
 
-            // Validasi stok (tapi tidak dikurangi dulu)
             for (const item of validItems) {
                 const menuItem = menuDataCache.find(m => cleanNameFromEmoji(m.name) === item.name || m.name === item.name);
                 if (menuItem && menuItem.stock !== undefined && menuItem.stock < item.qty) {
@@ -696,7 +694,6 @@
                 }
             }
 
-            // ===== SIMPAN ORDER DENGAN STATUS 'pending' =====
             const orderData = {
                 items: order.items || '',
                 total: calculatedTotal,
@@ -714,7 +711,6 @@
             const docRef = await db.collection('orders').add(orderData);
             console.log('✅ Pending order saved with ID:', docRef.id);
 
-            // Simpan ke riwayat lokal
             const history = JSON.parse(localStorage.getItem('flora-order-history')) || [];
             history.push({
                 id: docRef.id,
@@ -740,7 +736,7 @@
     }
 
     // ============================================
-    // ADMIN: Load Pending Orders
+    // ADMIN: Load Pending Orders (dengan fallback)
     // ============================================
     async function loadPendingOrders() {
         if (!isAdmin) return;
@@ -748,51 +744,87 @@
         if (!container) return;
 
         try {
-            const snapshot = await db.collection('orders')
-                .where('status', '==', 'pending')
-                .orderBy('timestamp', 'desc')
-                .limit(50)
-                .get();
-
-            if (snapshot.empty) {
-                container.innerHTML = `
-                    <div style="padding:20px;text-align:center;color:var(--text-muted);">
-                        ✅ Tidak ada order pending
-                    </div>
-                `;
+            let snapshot;
+            try {
+                snapshot = await db.collection('orders')
+                    .where('status', '==', 'pending')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+            } catch (indexError) {
+                console.warn('⚠️ Indeks belum siap, pakai fallback sorting client-side');
+                snapshot = await db.collection('orders')
+                    .where('status', '==', 'pending')
+                    .limit(50)
+                    .get();
+                
+                const docs = [];
+                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                docs.sort((a, b) => {
+                    const timeA = a.timestamp?.toDate?.()?.getTime() || 0;
+                    const timeB = b.timestamp?.toDate?.()?.getTime() || 0;
+                    return timeB - timeA;
+                });
+                renderPendingOrders(docs, container);
                 return;
             }
 
-            let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
-                const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
-                html += `
-                    <div style="background:var(--bg-body);padding:14px;border-radius:12px;border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <div>
-                            <div style="font-weight:600;">📅 ${date}</div>
-                            <div style="font-size:14px;">${escapeHtml(data.items || '-')}</div>
-                            <div style="font-weight:600;color:var(--brass);">${total}</div>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button onclick="confirmOrder('${doc.id}')" class="btn btn-sm" style="background:#27ae60;">
-                                ✅ Konfirmasi
-                            </button>
-                            <button onclick="cancelOrder('${doc.id}')" class="btn btn-sm btn-danger">
-                                ❌ Batalkan
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
+            const docs = [];
+            snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+            renderPendingOrders(docs, container);
 
         } catch (err) {
             console.error('Error loading pending orders:', err);
-            container.innerHTML = `<p style="color:var(--text-muted);">❌ Gagal memuat: ${err.message}</p>`;
+            container.innerHTML = `
+                <div style="padding:20px;text-align:center;color:var(--text-muted);">
+                    ❌ Gagal memuat: ${err.message}
+                    <br><br>
+                    <button class="btn btn-sm" onclick="loadPendingOrders()" style="margin-top:8px;">
+                        🔄 Coba Lagi
+                    </button>
+                </div>
+            `;
         }
+    }
+
+    // ============================================
+    // RENDER PENDING ORDERS
+    // ============================================
+    function renderPendingOrders(docs, container) {
+        if (!docs || docs.length === 0) {
+            container.innerHTML = `
+                <div style="padding:20px;text-align:center;color:var(--text-muted);">
+                    ✅ Tidak ada order pending
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+        docs.forEach(doc => {
+            const data = doc;
+            const date = data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja';
+            const total = 'Rp' + (data.total || 0).toLocaleString('id-ID');
+            html += `
+                <div class="pending-item">
+                    <div>
+                        <div class="date">📅 ${date}</div>
+                        <div class="items">${escapeHtml(data.items || '-')}</div>
+                        <div class="total">${total}</div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="confirmOrder('${data.id}')" class="btn btn-sm" style="background:#27ae60;">
+                            ✅ Konfirmasi
+                        </button>
+                        <button onclick="cancelOrder('${data.id}')" class="btn btn-sm btn-danger">
+                            ❌ Batalkan
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     // ============================================
@@ -821,7 +853,7 @@
                 return;
             }
 
-            // ===== KURANGI STOK =====
+            // Kurangi stok
             const rawItems = orderData.rawItems || [];
             for (const item of rawItems) {
                 const match = item.match(/^(.*?)\s*x\s*(\d+)/);
@@ -845,7 +877,6 @@
                 }
             }
 
-            // ===== UPDATE STATUS ORDER =====
             await db.collection('orders').doc(orderId).update({
                 status: 'completed',
                 confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -991,15 +1022,15 @@
             div.appendChild(totalDiv);
 
             const statusSpan = document.createElement('span');
-            statusSpan.style.cssText = 'font-size:11px;padding:2px 10px;border-radius:100px;display:inline-block;margin-top:4px;';
+            statusSpan.className = 'status-badge';
             if (item.status === 'pending') {
-                statusSpan.style.cssText += 'background:#f39c12;color:white;';
+                statusSpan.classList.add('pending');
                 statusSpan.textContent = '⏳ Menunggu konfirmasi';
             } else if (item.status === 'completed') {
-                statusSpan.style.cssText += 'background:#27ae60;color:white;';
+                statusSpan.classList.add('completed');
                 statusSpan.textContent = '✅ Selesai';
             } else if (item.status === 'cancelled') {
-                statusSpan.style.cssText += 'background:#e74c3c;color:white;';
+                statusSpan.classList.add('cancelled');
                 statusSpan.textContent = '❌ Dibatalkan';
             } else {
                 statusSpan.textContent = '📌 ' + item.status;
@@ -1101,7 +1132,6 @@
                     saveCart();
                     updateCart();
 
-                    // Buka WhatsApp
                     const message = encodeURIComponent(
                         'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
                         rawItems.map((item, i) => `${i+1}. ${item}`).join('\n') +
@@ -1259,9 +1289,196 @@
     }
 
     // ============================================
-    // CLOUDINARY UPLOAD (sama seperti sebelumnya)
+    // CLOUDINARY UPLOAD
     // ============================================
-    // ... (kode Cloudinary tidak diubah, tetap sama)
+    function validateFile(file) {
+        if (!file) return { valid: false, message: 'Tidak ada file.' };
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            return { valid: false, message: '❌ Format tidak didukung. Gunakan JPG, PNG, atau WebP.' };
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            return { valid: false, message: `❌ File terlalu besar (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal 5MB.` };
+        }
+        return { valid: true };
+    }
+
+    async function uploadToCloudinary(file) {
+        const validation = validateFile(file);
+        if (!validation.valid) {
+            showToast(validation.message);
+            return null;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        isUploading = true;
+        uploadProgress.classList.remove('hidden');
+        progressFill.style.width = '0%';
+        progressText.textContent = '⏳ Mengupload... 0%';
+        previewWrapper.classList.add('hidden');
+
+        try {
+            const xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressFill.style.width = percent + '%';
+                    progressText.textContent = `⏳ Mengupload... ${percent}%`;
+                }
+            });
+
+            const response = await new Promise((resolve, reject) => {
+                xhr.open('POST', CLOUDINARY_URL);
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        let errorMsg = xhr.statusText || 'Upload gagal';
+                        try {
+                            const errData = JSON.parse(xhr.responseText);
+                            if (errData.error && errData.error.message) {
+                                errorMsg = errData.error.message;
+                            }
+                        } catch (e) {}
+                        reject(new Error(errorMsg));
+                    }
+                };
+                xhr.onerror = () => reject(new Error('Network error - cek koneksi internet'));
+                xhr.send(formData);
+            });
+
+            isUploading = false;
+            progressFill.style.width = '100%';
+            progressText.textContent = '✅ Upload berhasil!';
+
+            previewImage.src = response.secure_url;
+            previewWrapper.classList.remove('hidden');
+            inputImage.value = response.secure_url;
+            inputImagePublicId.value = response.public_id || '';
+            currentFile = file;
+
+            if (previewStatus) {
+                previewStatus.textContent = '✅ Upload berhasil';
+                previewStatus.className = 'preview-status success';
+            }
+
+            setTimeout(() => {
+                uploadProgress.classList.add('hidden');
+            }, 1500);
+
+            showToast('✅ Gambar berhasil diupload!');
+            trackEvent('Admin', 'upload_image', file.name);
+
+            return { url: response.secure_url, publicId: response.public_id || '' };
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            isUploading = false;
+            progressFill.style.width = '0%';
+            progressText.textContent = '❌ Upload gagal!';
+            uploadProgress.classList.remove('hidden');
+
+            let errorMessage = error.message || 'Terjadi kesalahan';
+            showToast('❌ Gagal upload: ' + errorMessage);
+
+            if (previewStatus) {
+                previewStatus.textContent = '❌ ' + errorMessage;
+                previewStatus.className = 'preview-status error';
+            }
+
+            return null;
+        }
+    }
+
+    async function deleteImageFromCloudinary(publicId) {
+        if (!publicId) return;
+        try {
+            console.log('🗑️ Would delete image:', publicId);
+        } catch (err) {
+            console.error('Failed to delete image:', err);
+        }
+    }
+
+    // ============================================
+    // UPLOAD EVENT LISTENERS
+    // ============================================
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            currentFile = file;
+            uploadToCloudinary(file);
+        });
+    }
+
+    if (uploadZone) {
+        uploadZone.addEventListener('click', function() {
+            if (isUploading) {
+                showToast('⏳ Tunggu upload selesai dulu ya!');
+                return;
+            }
+            if (fileInput) fileInput.click();
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        uploadZone.addEventListener('dragover', function() {
+            if (!isUploading) this.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            this.classList.remove('dragover');
+            if (isUploading) {
+                showToast('⏳ Tunggu upload selesai dulu ya!');
+                return;
+            }
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                currentFile = files[0];
+                if (fileInput) fileInput.files = files;
+                uploadToCloudinary(files[0]);
+            }
+        });
+    }
+
+    if (removeImageBtn) {
+        removeImageBtn.addEventListener('click', function() {
+            if (editingId && inputImage.value) {
+                if (!confirm('⚠️ Hapus gambar saat ini?\n\nAnda harus upload gambar baru sebelum menyimpan.')) {
+                    return;
+                }
+            }
+
+            currentFile = null;
+            inputImage.value = '';
+            inputImagePublicId.value = '';
+            previewWrapper.classList.add('hidden');
+            previewImage.src = '';
+            if (fileInput) fileInput.value = '';
+            uploadProgress.classList.add('hidden');
+            progressFill.style.width = '0%';
+            progressText.textContent = '';
+
+            if (previewStatus) {
+                previewStatus.textContent = '🗑️ Gambar dihapus';
+                previewStatus.className = 'preview-status';
+            }
+
+            showToast('🗑️ Gambar dihapus dari form');
+        });
+    }
 
     // ============================================
     // RENDER MENU (Public)
@@ -1344,7 +1561,6 @@
                 nameSpan.className = 'item-name';
                 nameSpan.textContent = cleanNameFromEmoji(item.name);
 
-                // Badges
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
