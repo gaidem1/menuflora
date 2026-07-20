@@ -215,6 +215,8 @@
     const cartBadge = document.getElementById('cartBadge');
     const cartMini = document.getElementById('cartMini');
     const cartMiniBadge = document.getElementById('cartMiniBadge');
+    const cartDropdown = document.getElementById('cartDropdown');
+    const cartDropdownContent = document.getElementById('cartDropdownContent');
 
     const adminSection = document.getElementById('adminSection');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -586,7 +588,7 @@
         localStorage.setItem('flora-cart', JSON.stringify(cartData));
     }
 
-    // ===== UPDATE CART - DIPERBAIKI: ambil nama dari cache berdasar id =====
+    // ===== UPDATE CART - ambil nama dari cache berdasar id =====
     function updateCart() {
         const allItems = document.querySelectorAll('.item');
         let total = 0;
@@ -599,7 +601,6 @@
             const qtySpan = item.querySelector('.qty-value');
             const qty = parseInt(qtySpan.textContent) || 0;
             const id = item.getAttribute('data-id');
-            // Ambil nama dari cache berdasarkan id (menghindari tag tercampur)
             const menuItem = menuDataCache.find(m => m.id === id);
             const name = menuItem ? menuItem.name : (item.querySelector('.item-name').textContent.trim() || 'Unknown');
             const price = parseInt(item.getAttribute('data-price')) || 0;
@@ -632,10 +633,133 @@
 
         updateCartBadge();
         updateCartMini();
+        renderCartDropdown();
     }
 
     // ============================================
-    // SAVE ORDER (Pending) - DIPERBAIKI: pencarian nama lebih toleran
+    // CART DROPDOWN
+    // ============================================
+    function renderCartDropdown() {
+        if (!cartDropdownContent) return;
+        const items = Object.values(cartData);
+        if (items.length === 0) {
+            cartDropdownContent.innerHTML = `<div class="cart-empty">🛒 Belum ada pesanan</div>`;
+            return;
+        }
+        let total = 0;
+        let html = '';
+        items.forEach(item => {
+            const subtotal = item.price * item.qty;
+            total += subtotal;
+            html += `
+                <div class="cart-item">
+                    <span class="cart-item-name">${escapeHtml(item.name)}</span>
+                    <span class="cart-item-qty">×${item.qty}</span>
+                    <span class="cart-item-price">Rp${subtotal.toLocaleString('id-ID')}</span>
+                </div>
+            `;
+        });
+        html += `
+            <div class="cart-total-row">
+                <span>Total</span>
+                <span>Rp${total.toLocaleString('id-ID')}</span>
+            </div>
+            <button class="cart-checkout-btn" id="dropdownCheckoutBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 510 512.459" fill="white">
+                    <path d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z"/>
+                </svg>
+                Pesan Sekarang
+            </button>
+        `;
+        cartDropdownContent.innerHTML = html;
+
+        const checkoutBtn = document.getElementById('dropdownCheckoutBtn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                cartDropdown.classList.remove('show');
+                if (orderBtn) orderBtn.click();
+            });
+        }
+    }
+
+    // ============================================
+    // CART BADGE (dengan animasi bounce)
+    // ============================================
+    function updateCartBadge() {
+        if (!cartBadge) return;
+        let totalItems = 0;
+        document.querySelectorAll('.item').forEach(item => {
+            const checkbox = item.querySelector('.item-checkbox');
+            const qtySpan = item.querySelector('.qty-value');
+            if (checkbox && checkbox.checked) {
+                totalItems += parseInt(qtySpan?.textContent) || 0;
+            }
+        });
+
+        if (totalItems > 0) {
+            cartBadge.style.display = 'flex';
+            const oldValue = parseInt(cartBadge.textContent) || 0;
+            cartBadge.textContent = totalItems;
+            if (totalItems > oldValue) {
+                cartBadge.classList.remove('pulse');
+                void cartBadge.offsetWidth;
+                cartBadge.classList.add('pulse');
+            }
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    }
+
+    function updateCartMini() {
+        if (!cartMini || !cartMiniBadge) return;
+        let totalItems = 0;
+        document.querySelectorAll('.item').forEach(item => {
+            const checkbox = item.querySelector('.item-checkbox');
+            const qtySpan = item.querySelector('.qty-value');
+            if (checkbox && checkbox.checked) {
+                totalItems += parseInt(qtySpan?.textContent) || 0;
+            }
+        });
+
+        if (totalItems > 0) {
+            cartMini.style.display = 'flex';
+            const oldValue = parseInt(cartMiniBadge.textContent) || 0;
+            cartMiniBadge.textContent = totalItems;
+            if (totalItems > oldValue) {
+                cartMiniBadge.classList.remove('bounce');
+                void cartMiniBadge.offsetWidth;
+                cartMiniBadge.classList.add('bounce');
+            }
+        } else {
+            cartMini.style.display = 'none';
+            cartDropdown.classList.remove('show');
+        }
+    }
+
+    // ============================================
+    // CART MINI CLICK - TOGGLE DROPDOWN
+    // ============================================
+    if (cartMini) {
+        cartMini.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (Object.keys(cartData).length === 0) {
+                showToast('🛒 Keranjang kosong');
+                return;
+            }
+            cartDropdown.classList.toggle('show');
+            renderCartDropdown();
+        });
+    }
+
+    // Tutup dropdown saat klik di luar
+    document.addEventListener('click', function(e) {
+        if (cartDropdown && !cartDropdown.contains(e.target) && e.target !== cartMini && !cartMini.contains(e.target)) {
+            cartDropdown.classList.remove('show');
+        }
+    });
+
+    // ============================================
+    // SAVE ORDER (Pending)
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
@@ -655,20 +779,17 @@
                 if (match) {
                     let name = match[1].trim();
                     const qty = parseInt(match[2]) || 0;
-                    // Cari di cache dengan berbagai cara
                     let menuItem = menuDataCache.find(m => {
                         const clean = cleanNameFromEmoji(m.name);
                         return clean === name || m.name === name;
                     });
                     if (!menuItem) {
-                        // Coba case insensitive dan hapus spasi berlebih
                         const searchName = name.toLowerCase().replace(/\s+/g, ' ');
                         menuItem = menuDataCache.find(m => {
                             const clean = cleanNameFromEmoji(m.name).toLowerCase().replace(/\s+/g, ' ');
                             return clean === searchName || m.name.toLowerCase().replace(/\s+/g, ' ') === searchName;
                         });
                     }
-                    // Fallback ke database jika tidak ditemukan di cache
                     if (!menuItem) {
                         try {
                             const snapshot = await db.collection('menu')
@@ -712,7 +833,6 @@
                 return false;
             }
 
-            // Validasi stok
             for (const item of validItems) {
                 const menuItem = menuDataCache.find(m => {
                     const clean = cleanNameFromEmoji(m.name);
@@ -766,7 +886,7 @@
     }
 
     // ============================================
-    // ADMIN: Load Pending Orders (dengan fallback)
+    // ADMIN: Load Pending Orders
     // ============================================
     async function loadPendingOrders() {
         if (!isAdmin) return;
@@ -787,7 +907,6 @@
                     .where('status', '==', 'pending')
                     .limit(50)
                     .get();
-                
                 const docs = [];
                 snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
                 docs.sort((a, b) => {
@@ -883,13 +1002,11 @@
                 return;
             }
 
-            // Kurangi stok
             const rawItems = orderData.rawItems || [];
             for (const item of rawItems) {
                 const match = item.match(/^(.*?)\s*x\s*(\d+)/);
                 if (match) {
                     let name = match[1].trim();
-                    // Cari menu dengan toleransi
                     let menuItem = menuDataCache.find(m => {
                         const clean = cleanNameFromEmoji(m.name);
                         return clean === name || m.name === name;
@@ -913,7 +1030,6 @@
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                         console.log(`✅ Stok ${name}: ${currentStock} → ${newStock}`);
-                        // Update cache
                         const cacheItem = menuDataCache.find(m => m.id === menuItem.id);
                         if (cacheItem) cacheItem.stock = newStock;
                     }
@@ -957,55 +1073,7 @@
     };
 
     // ============================================
-    // CART BADGE
-    // ============================================
-    function updateCartBadge() {
-        if (!cartBadge) return;
-        let totalItems = 0;
-        document.querySelectorAll('.item').forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-            const qtySpan = item.querySelector('.qty-value');
-            if (checkbox && checkbox.checked) {
-                totalItems += parseInt(qtySpan?.textContent) || 0;
-            }
-        });
-        if (totalItems > 0) {
-            cartBadge.style.display = 'flex';
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.remove('pulse');
-            void cartBadge.offsetWidth;
-            cartBadge.classList.add('pulse');
-        } else {
-            cartBadge.style.display = 'none';
-        }
-    }
-
-    function updateCartMini() {
-        if (!cartMini || !cartMiniBadge) return;
-        let totalItems = 0;
-        document.querySelectorAll('.item').forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-            const qtySpan = item.querySelector('.qty-value');
-            if (checkbox && checkbox.checked) {
-                totalItems += parseInt(qtySpan?.textContent) || 0;
-            }
-        });
-        if (totalItems > 0) {
-            cartMini.style.display = 'flex';
-            cartMiniBadge.textContent = totalItems;
-        } else {
-            cartMini.style.display = 'none';
-        }
-    }
-
-    if (cartMini) {
-        cartMini.addEventListener('click', function() {
-            document.getElementById('cartSummary').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-
-    // ============================================
-    // ORDER HISTORY (Customer)
+    // ORDER HISTORY
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
@@ -1153,7 +1221,6 @@
                             const price = menuItem.promoPrice || menuItem.price;
                             calculatedTotal += price * qty;
                         } else {
-                            // fallback ke database
                             const snapshot = await db.collection('menu')
                                 .where('name', '==', name)
                                 .limit(1)
@@ -1544,7 +1611,7 @@
         skeletonContainer.style.display = 'none';
         menuContainer.style.display = 'block';
         menuContainer.innerHTML = '';
-        menuDataCache = data; // store cache
+        menuDataCache = data;
 
         const grouped = {};
         data.forEach(item => {
@@ -1616,16 +1683,16 @@
                 info.className = 'item-info';
                 const nameSpan = document.createElement('div');
                 nameSpan.className = 'item-name';
-                // Gunakan nama asli dari database (tanpa tag)
-                const displayName = item.name || 'Unknown';
-                nameSpan.textContent = displayName;
+                nameSpan.textContent = item.name || 'Unknown';
 
+                // ===== BADGE HANDLING - FIXED: no double promo =====
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
                     tag.textContent = '⭐ Favorit';
                     nameSpan.appendChild(tag);
                 }
+
                 if (item.promoPrice) {
                     const promo = document.createElement('span');
                     promo.className = 'badge-promo';
@@ -1637,12 +1704,14 @@
                     tag.textContent = '🔥 Promo';
                     nameSpan.appendChild(tag);
                 }
+
                 if (item.stock === 0) {
                     const habis = document.createElement('span');
                     habis.className = 'badge-habis';
                     habis.textContent = '⛔ Habis';
                     nameSpan.appendChild(habis);
                 }
+
                 info.appendChild(nameSpan);
 
                 const descSpan = document.createElement('div');
@@ -1704,8 +1773,10 @@
                         qtySpan.textContent = '1';
                         qtySpan.classList.remove('zero');
                         trackAddToCart(item.name, activePrice, 1);
+                        showToast(`✅ ${item.name} ×1 ditambahkan`);
                     } else {
                         trackAddToCart(item.name, activePrice, qty);
+                        showToast(`✅ ${item.name} ×${qty} ditambahkan`);
                     }
                     updateCart();
                 });
@@ -1719,6 +1790,7 @@
                     if (val > 0) {
                         checkbox.checked = true;
                         trackAddToCart(item.name, activePrice, val);
+                        showToast(`✅ ${item.name} ×${val} ditambahkan`);
                     } else {
                         checkbox.checked = false;
                         trackRemoveFromCart(item.name);
@@ -1872,6 +1944,7 @@
                 imgDiv.appendChild(placeholder);
             }
 
+            // Badges
             if (item.promoPrice) {
                 const badge = document.createElement('span');
                 badge.className = 'badge-promo';
@@ -2324,7 +2397,7 @@
     // ============================================
     // TOAST SYSTEM
     // ============================================
-    function showToast(message, duration = 3000) {
+    function showToast(message, duration = 2500) {
         const existing = document.querySelector('.toast');
         if (existing) existing.remove();
         const toast = document.createElement('div');
@@ -2347,6 +2420,7 @@
             if (searchInput.value) { searchInput.value = ''; filterMenu(); searchInput.blur(); }
             if (historyModal && historyModal.classList.contains('show')) historyModal.classList.remove('show');
             if (waConfirmModal && waConfirmModal.classList.contains('show')) waConfirmModal.classList.remove('show');
+            if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
         }
         if (e.altKey && e.key >= '1' && e.key <= '4') {
             const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
