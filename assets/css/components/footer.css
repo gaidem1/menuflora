@@ -1,0 +1,51 @@
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    padding: 56px 0 44px;
+    margin-top: 24px;
+    border-top: 4px solid var(--brass);
+}
+footer h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+footer p {
+    font-size: 14px;
+    color: rgba(247, 243, 233, 0.75);
+    max-width: 42ch;
+    margin-bottom: 24px;
+}
+.footer-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.foot-note {
+    margin-top: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(247, 243, 233, 0.4);
+    text-align: center;
+}
+.secret-trigger {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.secret-trigger:hover {
+    color: var(--brass);
+}
+.secret-trigger::after {
+    content: '🔑';
+    font-size: 10px;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.secret-trigger:hover::after {
+    opacity: 1;
+}
