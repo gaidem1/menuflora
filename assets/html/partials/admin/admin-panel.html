@@ -1,5 +1,50 @@
+<!-- ============================================
+   ADMIN PANEL — MAIN WRAPPER
+   ============================================ -->
 <div class="admin-section admin-hidden" id="adminSection">
     <div id="adminContent">
-        <!-- Admin content will be injected by JavaScript -->
+
+        <!-- ===== DASHBOARD ===== -->
+        @@include('admin-dashboard.html')
+
+        <!-- ===== CLEAN GHOST ORDERS ===== -->
+        <div style="margin:-8px 0 20px;">
+            <button class="btn btn-outline" id="cleanGhostOrdersBtn" style="font-size:13px;padding:8px 14px;">
+                🧹 Arsipkan Ghost Orders
+            </button>
+        </div>
+
+        <!-- ===== ADMIN HEADER ===== -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+            <h2>☕ Admin Panel</h2>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span id="adminUserEmail" style="font-size:13px;color:var(--text-muted);"></span>
+                <span class="admin-badge">🔐 Admin</span>
+                <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+
+        <!-- ===== OPERATIONAL STATUS ===== -->
+        <div class="form-group" style="margin-bottom:16px;">
+            <label>🔧 Status Operasional</label>
+            <select id="operationalStatus">
+                <option value="auto">🔄 Otomatis (sesuai jam)</option>
+                <option value="open">🟢 Buka (override)</option>
+                <option value="closed">🔴 Tutup (override)</option>
+            </select>
+            <span style="font-size:12px;color:var(--text-muted);margin-top:4px;display:block;">
+                Gunakan override jika kedai libur atau tutup lebih awal.
+            </span>
+        </div>
+
+        <!-- ===== PENDING ORDERS ===== -->
+        @@include('admin-orders.html')
+
+        <!-- ===== FORM ===== -->
+        @@include('admin-form.html')
+
+        <!-- ===== MENU GRID ===== -->
+        @@include('admin-menu-grid.html')
+
     </div>
 </div>
