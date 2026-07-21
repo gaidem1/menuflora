@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://www.google-analytics.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google-analytics.com https://api.cloudinary.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.gstatic.com https://www.google-analytics.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google-analytics.com https://api.cloudinary.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self';">
     <title>Kedai Flora — Menu Kesugihan, Cilacap</title>
     <meta name="description" content="Menu Kedai Flora: kopi, non-kopi, camilan, mie, dan signature di Kesugihan, Cilacap. Buka setiap hari, harga terjangkau.">
     <meta name="theme-color" content="#2a4230">
@@ -30,12 +30,6 @@
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-NEQFWC7W4X"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-NEQFWC7W4X');
-    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,31 +48,6 @@
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="assets/images/icon-192.png">
 
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "CafeOrCoffeeShop",
-            "name": "Kedai Flora",
-            "image": "https://menu-flora.vercel.app/og-image.png",
-            "url": "https://menu-flora.vercel.app/",
-            "telephone": "+628562622436",
-            "priceRange": "Rp2.500–Rp14.000",
-            "servesCuisine": "Coffee, Snacks, Noodles, Signature",
-            "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Kesugihan",
-                "addressRegion": "Cilacap, Jawa Tengah",
-                "addressCountry": "ID"
-            },
-            "openingHoursSpecification": [{
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                "opens": "11:00",
-                "closes": "23:00"
-            }]
-        }
-    </script>
 </head>
 <body>
 
@@ -171,7 +140,7 @@
                 <button type="button" id="shareBtn" class="hero-btn hero-btn-map">
                     🔗 <span id="langShare">Bagikan Menu</span>
                 </button>
-                <button type="button" onclick="window.print()" class="hero-btn hero-btn-map">
+                <button type="button" id="heroPrintBtn" class="hero-btn hero-btn-map">
                     🖨️ <span id="langPrint">Cetak Menu</span>
                 </button>
                 <button type="button" id="historyBtn" class="hero-btn hero-btn-map">
@@ -499,7 +468,7 @@
                     <span id="langMapsFooter">Lihat di Maps</span>
                 </a>
                 
-                <button type="button" onclick="window.print()" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
+                <button type="button" id="footerPrintBtn" class="btn" style="background:rgba(255,255,255,0.15);color:var(--ivory);display:inline-flex;align-items:center;gap:8px;">
                     🖨️ <span id="langPrintFooter">Cetak Menu</span>
                 </button>
             </div>
@@ -511,16 +480,8 @@
     </footer>
 
     <!-- JavaScript -->
+    <script src="assets/js/bootstrap.js" defer></script>
     <script src="assets/js/app.js" defer></script>
-
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('✅ Service Worker registered'))
-                .catch(err => console.log('❌ SW registration failed:', err));
-        }
-    </script>
 
 </body>
 </html>
