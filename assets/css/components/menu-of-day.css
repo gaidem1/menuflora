@@ -1,0 +1,19 @@
+/* ============================================
+   MENU OF THE DAY
+   ============================================ */
+.menu-of-the-day {
+    background: var(--brass);
+    color: var(--leaf-deep);
+    padding: 12px 24px;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 16px auto 8px;
+    max-width: 600px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+.menu-of-the-day strong {
+    color: var(--leaf-deep);
+}
