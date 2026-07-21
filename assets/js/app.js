@@ -1011,7 +1011,8 @@
         }
 
         try {
-            const orderDoc = await db.collection('orders').doc(orderId).get();
+            const orderRef = db.collection('orders').doc(orderId);
+            const orderDoc = await orderRef.get();
             if (!orderDoc.exists) {
                 showToast('❌ Order tidak ditemukan');
                 return;
@@ -1030,6 +1031,8 @@
             const menuRefs = [];
 
             for (const item of items) {
+                const qtyNeeded = Math.max(0, parseInt(item.qty, 10) || 0);
+                if (qtyNeeded <= 0) continue;
                 const menuId = item.id;
                 if (!menuId) {
                     let menuItem = menuDataCache.find(m => {
@@ -1046,19 +1049,40 @@
                         showToast(`❌ Menu "${item.name}" tidak ditemukan.`);
                         return;
                     }
-                    menuRefs.push({ ref: db.collection('menu').doc(menuItem.id), qty: item.qty, name: menuItem.name });
+                    menuRefs.push({ ref: db.collection('menu').doc(menuItem.id), qty: qtyNeeded, name: menuItem.name });
                 } else {
-                    const menuItem = menuDataCache.find(m => m.id === menuId);
+                    let menuItem = menuDataCache.find(m => m.id === menuId);
+                    if (!menuItem) {
+                        const menuDoc = await db.collection('menu').doc(menuId).get();
+                        if (menuDoc.exists) {
+                            menuItem = { id: menuId, ...menuDoc.data() };
+                        }
+                    }
                     if (!menuItem) {
                         showToast(`❌ Menu ID ${menuId} tidak ditemukan.`);
                         return;
                     }
-                    menuRefs.push({ ref: db.collection('menu').doc(menuId), qty: item.qty, name: menuItem.name });
+                    menuRefs.push({ ref: db.collection('menu').doc(menuId), qty: qtyNeeded, name: menuItem.name });
                 }
+            }
+            if (menuRefs.length === 0) {
+                showToast('❌ Item order tidak valid.');
+                return;
             }
 
             try {
                 await db.runTransaction(async (transaction) => {
+                    const latestOrderDoc = await transaction.get(orderRef);
+                    if (!latestOrderDoc.exists) {
+                        throw new Error('Order tidak ditemukan.');
+                    }
+                    const latestOrderData = latestOrderDoc.data() || {};
+                    if (latestOrderData.status === 'completed') {
+                        throw new Error('Order sudah dikonfirmasi sebelumnya.');
+                    }
+                    if (latestOrderData.status !== 'pending') {
+                        throw new Error('Order tidak dalam status pending.');
+                    }
                     const docs = [];
                     for (const item of menuRefs) {
                         const doc = await transaction.get(item.ref);
@@ -1077,11 +1101,31 @@
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     }
+                    transaction.update(orderRef, {
+                        status: 'completed',
+                        confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        confirmedBy: auth.currentUser?.email || 'admin'
+                    });
                 });
             } catch (txError) {
                 console.warn('⚠️ Transaksi gagal, coba manual:', txError);
                 if (txError.code === 'permission-denied') {
                     showToast('⚠️ Transaksi ditolak, mencoba update manual...');
+                    const latestOrder = await orderRef.get();
+                    if (!latestOrder.exists) {
+                        showToast('❌ Order tidak ditemukan');
+                        return;
+                    }
+                    const latestStatus = latestOrder.data()?.status;
+                    if (latestStatus === 'completed') {
+                        showToast('ℹ️ Order sudah dikonfirmasi sebelumnya');
+                        return;
+                    }
+                    if (latestStatus !== 'pending') {
+                        showToast('❌ Order tidak dalam status pending');
+                        return;
+                    }
+                    const manualUpdates = [];
                     for (const item of menuRefs) {
                         const doc = await item.ref.get();
                         if (!doc.exists) {
@@ -1093,21 +1137,23 @@
                             showToast(`❌ Stok ${item.name} tidak cukup.`);
                             return;
                         }
-                        await item.ref.update({
-                            stock: currentStock - item.qty,
+                        manualUpdates.push({ ref: item.ref, newStock: currentStock - item.qty });
+                    }
+                    for (const update of manualUpdates) {
+                        await update.ref.update({
+                            stock: update.newStock,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     }
+                    await orderRef.update({
+                        status: 'completed',
+                        confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        confirmedBy: auth.currentUser?.email || 'admin'
+                    });
                 } else {
                     throw txError;
                 }
             }
-
-            await db.collection('orders').doc(orderId).update({
-                status: 'completed',
-                confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                confirmedBy: auth.currentUser?.email || 'admin'
-            });
 
             for (const item of menuRefs) {
                 const cacheItem = menuDataCache.find(m => m.id === item.ref.id);
@@ -1473,7 +1519,8 @@
                 });
 
                 if (success) {
-                    trackOrder(calculatedTotal, Object.keys(cartData).length);
+                    const totalItemCount = Object.values(cartData).reduce((sum, qty) => sum + (parseInt(qty, 10) || 0), 0);
+                    trackOrder(calculatedTotal, totalItemCount);
                     cartData = {};
                     saveCart();
                     updateCart();
@@ -1547,6 +1594,8 @@
                     const data = doc.data();
                     completedOrders++;
                     totalRevenue += data.total || 0;
+                    const customerKey = data.uid || data.deviceId;
+                    if (customerKey) customerSet.add(customerKey);
                 });
             } catch (indexError) {
                 const ordersSnapshot = await db.collection('orders')
@@ -1558,6 +1607,8 @@
                     if (data.status === 'completed') {
                         completedOrders++;
                         totalRevenue += data.total || 0;
+                        const customerKey = data.uid || data.deviceId;
+                        if (customerKey) customerSet.add(customerKey);
                     }
                 });
             }
@@ -2009,27 +2060,29 @@
                         trackAddToCart(item.name, activePrice, 1);
                         showToast(`✅ ${item.name} ×1 ditambahkan`);
                     } else {
-                        trackAddToCart(item.name, activePrice, qty);
-                        showToast(`✅ ${item.name} ×${qty} ditambahkan`);
+                        showToast(`✅ ${item.name} ×${qty} siap dipesan`);
                     }
                     updateCart();
                 });
 
                 function updateQty(change) {
                     if (item.stock === 0) return;
-                    let val = parseInt(qtySpan.textContent) || 0;
-                    val = Math.max(0, Math.min(item.stock, val + change));
+                    const prevVal = parseInt(qtySpan.textContent, 10) || 0;
+                    let val = Math.max(0, Math.min(item.stock, prevVal + change));
+                    const delta = val - prevVal;
                     qtySpan.textContent = val;
                     qtySpan.classList.toggle('zero', val === 0);
                     if (val > 0) {
                         checkbox.checked = true;
                         cartData[item.id] = val;
-                        trackAddToCart(item.name, activePrice, val);
-                        showToast(`✅ ${item.name} ×${val} ditambahkan`);
+                        if (delta > 0) {
+                            trackAddToCart(item.name, activePrice, delta);
+                            showToast(`✅ ${item.name} ×${val} ditambahkan`);
+                        }
                     } else {
                         checkbox.checked = false;
                         delete cartData[item.id];
-                        trackRemoveFromCart(item.name);
+                        if (prevVal > 0) trackRemoveFromCart(item.name);
                     }
                     saveCart();
                     updateCart();
