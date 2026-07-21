@@ -1,0 +1,122 @@
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    position: relative;
+    overflow: hidden;
+    padding: 80px 0 64px;
+    border-bottom: 4px solid var(--brass);
+    transition: background 0.3s ease;
+}
+
+.hero .branch {
+    position: absolute;
+    opacity: 0.35;
+    pointer-events: none;
+}
+.hero .branch.tl {
+    top: -20px;
+    left: -40px;
+    width: 200px;
+    transform: rotate(-10deg);
+}
+.hero .branch.br {
+    bottom: -30px;
+    right: -50px;
+    width: 240px;
+    transform: rotate(170deg);
+}
+
+.eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 2px;
+    background: var(--gold-light);
+    display: inline-block;
+}
+
+h1.brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(48px, 10vw, 80px);
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    color: var(--ivory);
+}
+h1.brand em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass);
+}
+
+.tagline {
+    margin-top: 18px;
+    max-width: 38ch;
+    font-size: 16px;
+    color: rgba(247, 243, 233, 0.85);
+}
+
+.hero-meta {
+    margin-top: 34px;
+    display: flex;
+    gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(247, 243, 233, 0.6);
+    flex-wrap: wrap;
+}
+.hero-meta strong {
+    color: var(--ivory);
+    font-weight: 500;
+}
+
+.hero-buttons {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all var(--transition);
+    border: none;
+    cursor: pointer;
+}
+.hero-btn-wa {
+    background: #25D366;
+    color: #fff;
+}
+.hero-btn-wa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
+}
+.hero-btn-map {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--ivory);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.hero-btn-map:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
