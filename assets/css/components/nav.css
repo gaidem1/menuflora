@@ -1,0 +1,47 @@
+/* ============================================
+   CATEGORY NAVIGATION
+   ============================================ */
+.cats {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-nav);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.3s ease;
+}
+.cats .wrap {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 14px 28px;
+    scrollbar-width: none;
+}
+.cats .wrap::-webkit-scrollbar {
+    display: none;
+}
+.cat-filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1.5px solid transparent;
+    background: transparent;
+    color: var(--leaf-mid);
+    transition: all var(--transition);
+    font-weight: 500;
+    cursor: pointer;
+}
+.cat-filter-btn:hover {
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    border-color: var(--leaf-deep);
+}
+.cat-filter-btn.active {
+    background: var(--brass);
+    color: var(--leaf-deep);
+    border-color: var(--brass);
+}
