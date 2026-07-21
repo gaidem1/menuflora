@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SECURITY: defense-in-depth against injected/foreign scripts. frame-src includes
+    *.firebaseapp.com because Google Sign-In's popup flow needs a hidden helper iframe
+    from there — leaving it out is what broke admin login last time. If anything stops
+    working after deploying this, check the browser console for a CSP error first. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://www.google-analytics.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google-analytics.com https://api.cloudinary.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self';">
     <title>Flora Coffee — Menu Kesugihan, Cilacap</title>
     <meta name="description" content="Menu Flora Coffee: kopi, non-kopi, camilan, mie, dan signature di Kesugihan, Cilacap. Buka setiap hari, harga terjangkau.">
     <meta name="theme-color" content="#2a4230">
@@ -301,9 +306,15 @@
                     </span>
                 </div>
 
-                <!-- ===== PENDING ORDERS ===== -->
+                <!-- ===== PENDING / ALL ORDERS ===== -->
                 <div style="margin-top:24px;border-top:2px solid var(--line);padding-top:20px;">
-                    <h3>⏳ Order Menunggu Konfirmasi</h3>
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <h3 style="margin:0;">📦 Pesanan</h3>
+                        <div style="display:flex;gap:6px;">
+                            <button type="button" class="btn btn-sm" id="ordersFilterPending" style="background:var(--brass);color:var(--leaf-deep);">⏳ Pending</button>
+                            <button type="button" class="btn btn-sm btn-outline" id="ordersFilterAll">📋 Semua</button>
+                        </div>
+                    </div>
                     <div id="pendingOrdersList" style="margin-top:12px;">
                         <p style="color:var(--text-muted);">Memuat...</p>
                     </div>
