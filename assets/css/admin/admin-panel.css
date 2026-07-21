@@ -1,0 +1,58 @@
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+.admin-section {
+    margin-top: 32px;
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-md);
+}
+.admin-section h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: var(--leaf-deep);
+    margin-bottom: 16px;
+}
+.admin-section .form-group {
+    margin-bottom: 14px;
+}
+.admin-section .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+.admin-section .form-group input,
+.admin-section .form-group textarea,
+.admin-section .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Work Sans', sans-serif;
+    background: var(--bg-body);
+    color: var(--ink);
+}
+.admin-section .form-group input:focus,
+.admin-section .form-group textarea:focus,
+.admin-section .form-group select:focus {
+    border-color: var(--brass);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 155, 92, 0.15);
+}
+.admin-section .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.admin-section .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
