@@ -1,0 +1,114 @@
+/* ============================================
+   SKELETON LOADING
+   ============================================ */
+.skeleton-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.skeleton {
+    height: 76px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    background: var(--skeleton-bg);
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ============================================
+   SKELETON VARIANT — CARD
+   ============================================ */
+.skeleton-card {
+    height: 200px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    background: var(--skeleton-bg);
+}
+
+.skeleton-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ============================================
+   SKELETON VARIANT — TEXT
+   ============================================ */
+.skeleton-text {
+    height: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    background: var(--skeleton-bg);
+    margin-bottom: 8px;
+}
+
+.skeleton-text::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-text-sm {
+    height: 12px;
+    width: 60%;
+}
+
+.skeleton-text-lg {
+    height: 24px;
+    width: 80%;
+}
+
+/* ============================================
+   SKELETON VARIANT — GRID
+   ============================================ */
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.skeleton-grid .skeleton-card {
+    height: 180px;
+}
+
+/* ============================================
+   SKELETON — DARK MODE ADJUSTMENT
+   ============================================ */
+[data-theme="dark"] .skeleton,
+[data-theme="dark"] .skeleton-card,
+[data-theme="dark"] .skeleton-text {
+    background: var(--skeleton-bg);
+}
+
+[data-theme="dark"] .skeleton::after,
+[data-theme="dark"] .skeleton-card::after,
+[data-theme="dark"] .skeleton-text::after {
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+}
