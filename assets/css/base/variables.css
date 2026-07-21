@@ -1,0 +1,235 @@
+/* ============================================
+   ROOT VARIABLES
+   ============================================ */
+:root {
+    --ink: #1e2a1e;
+    --ivory: #f6f2e9;
+    --leaf-deep: #1f3a2b;
+    --leaf-mid: #4a6b50;
+    --brass: #c49b5c;
+    --gold-light: #e8c87a;
+    --coffee-brown: #5c3a2a;
+    --line: rgba(30, 42, 30, 0.12);
+    --bg-body: #f6f2e9;
+    --bg-nav: rgba(246, 242, 233, 0.92);
+    --text-muted: #5b6356;
+    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
+    --radius: 16px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --skeleton-bg: #ececec;
+    --skeleton-shine: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+[data-theme="dark"] {
+    --ink: #e8e4da;
+    --ivory: #1a2a1e;
+    --leaf-deep: #0f1f14;
+    --leaf-mid: #6a8b70;
+    --brass: #e8c87a;
+    --gold-light: #b58d4a;
+    --coffee-brown: #d4b8a0;
+    --line: rgba(232, 228, 218, 0.12);
+    --bg-body: #0f1f14;
+    --bg-nav: rgba(15, 31, 20, 0.92);
+    --text-muted: #a8b8a4;
+    --skeleton-bg: #1a2a1e;
+    --skeleton-shine: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================
+   DARK MODE — OVERRIDES
+   ============================================ */
+[data-theme="dark"] h1.brand,
+[data-theme="dark"] h1.brand em {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .hero .tagline {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+[data-theme="dark"] .hero-meta {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+[data-theme="dark"] .hero-meta strong {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .eyebrow {
+    color: var(--gold-light) !important;
+}
+[data-theme="dark"] .eyebrow::before {
+    background: var(--gold-light) !important;
+}
+[data-theme="dark"] .hero-btn-map {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+[data-theme="dark"] .hero-btn-map:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+[data-theme="dark"] .hero-btn-map svg .cls-1 {
+    fill: #ffffff !important;
+}
+[data-theme="dark"] .hero-btn-map svg .cls-2 {
+    fill: #ef4136 !important;
+}
+[data-theme="dark"] .admin-section {
+    background: rgba(15, 31, 20, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .qty-controls {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .qty-controls button {
+    background: #4a6b50;
+    color: #f6f2e9;
+}
+[data-theme="dark"] .qty-controls button:hover:not(:disabled) {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .qty-controls .qty-value {
+    color: #e8e4da !important;
+}
+[data-theme="dark"] .badge-favorit {
+    background: #f39c12;
+    color: #1e2a1e;
+}
+[data-theme="dark"] .btn {
+    background: var(--leaf-mid);
+    color: #ffffff;
+}
+[data-theme="dark"] .btn:hover {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .btn-danger {
+    background: #c0392b;
+    color: #ffffff;
+}
+[data-theme="dark"] .btn-danger:hover {
+    background: #e74c3c;
+}
+[data-theme="dark"] .btn-outline {
+    border-color: #ffffff;
+    color: #ffffff;
+}
+[data-theme="dark"] .btn-outline:hover {
+    background: #ffffff;
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .btn-wa {
+    background: #25D366 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .btn-wa:hover {
+    background: #1da85c !important;
+}
+[data-theme="dark"] .pending-confirm-btn {
+    background: #27ae60 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .pending-confirm-btn:hover {
+    background: #2ecc71 !important;
+}
+[data-theme="dark"] .pending-cancel-btn {
+    background: #c0392b !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] .pending-cancel-btn:hover {
+    background: #e74c3c !important;
+}
+[data-theme="dark"] .toast {
+    background: #1a2a1e;
+    color: #f6f2e9;
+    border-color: var(--brass);
+}
+[data-theme="dark"] footer {
+    background: var(--leaf-deep);
+    border-top-color: var(--brass);
+}
+[data-theme="dark"] footer h3,
+[data-theme="dark"] footer p,
+[data-theme="dark"] footer .foot-note {
+    color: #ffffff !important;
+}
+[data-theme="dark"] footer .btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+[data-theme="dark"] footer .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+[data-theme="dark"] footer .btn-wa {
+    background: #25D366 !important;
+    color: #ffffff !important;
+    border: none;
+}
+[data-theme="dark"] footer .btn-wa:hover {
+    background: #1da85c !important;
+}
+[data-theme="dark"] .theme-toggle {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .scroll-top {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .cart-dropdown {
+    background: var(--bg-body);
+    border-color: var(--line);
+}
+[data-theme="dark"] .cart-dropdown .cart-item {
+    border-color: var(--line);
+}
+[data-theme="dark"] .cart-mini {
+    border-color: var(--bg-body);
+}
+[data-theme="dark"] .cart-mini-badge {
+    border-color: var(--bg-body);
+}
+[data-theme="dark"] .cart-badge {
+    border-color: var(--bg-body);
+}
+[data-theme="dark"] .floating-wa .wa-status {
+    border-color: var(--bg-body);
+}
+[data-theme="dark"] .lang-switch {
+    background: var(--bg-body);
+    border-color: var(--line);
+}
+[data-theme="dark"] .lang-btn.active {
+    background: var(--brass);
+    color: var(--leaf-deep);
+}
+[data-theme="dark"] .cat-head h2 {
+    color: var(--gold-light);
+}
+[data-theme="dark"] .menu-of-the-day {
+    background: var(--leaf-mid);
+    color: var(--ivory);
+}
+[data-theme="dark"] .menu-of-the-day strong {
+    color: var(--gold-light);
+}
+[data-theme="dark"] .upload-zone {
+    border-color: var(--line);
+}
+[data-theme="dark"] .upload-zone:hover,
+[data-theme="dark"] .upload-zone.dragover {
+    border-color: var(--brass);
+    background: rgba(232, 200, 122, 0.05);
+}
+[data-theme="dark"] .modal-content h3 {
+    color: var(--gold-light);
+}
+[data-theme="dark"] mark {
+    background: var(--gold-light);
+    color: var(--leaf-deep);
+}
