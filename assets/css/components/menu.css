@@ -1,0 +1,301 @@
+/* ============================================
+   SKELETON
+   ============================================ */
+.skeleton-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+}
+.skeleton {
+    height: 76px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    background: var(--skeleton-bg);
+}
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ============================================
+   CATEGORY
+   ============================================ */
+.category {
+    margin-bottom: 56px;
+    scroll-margin-top: 120px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.category.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+.category.hidden {
+    display: none;
+}
+
+.cat-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 4px;
+}
+.cat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--brass);
+    font-weight: 500;
+}
+.cat-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 32px;
+    color: var(--leaf-deep);
+    letter-spacing: -0.02em;
+}
+.cat-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    padding-left: 40px;
+}
+
+/* ============================================
+   ITEM
+   ============================================ */
+.item {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    gap: 2px 12px;
+    padding: 18px 16px;
+    background: var(--bg-body);
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    margin-bottom: 8px;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.item:hover {
+    border-color: var(--brass);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.item.hidden {
+    display: none;
+}
+.item:last-child {
+    margin-bottom: 0;
+}
+
+.item-checkbox {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--brass);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.item-checkbox:checked {
+    transform: scale(1.1);
+}
+.item-checkbox:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.item-thumb {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+}
+.item-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: none;
+}
+.item-image.show {
+    display: block;
+}
+.item-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: var(--line);
+}
+
+.item-info {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.item-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.item-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brass);
+    background: rgba(196, 155, 92, 0.15);
+    border: 1px solid var(--brass);
+    border-radius: 100px;
+    padding: 1px 8px;
+    display: inline-block;
+    line-height: 1.4;
+}
+.tag-new {
+    background: rgba(52, 152, 219, 0.15);
+    border-color: #3498db;
+    color: #3498db;
+}
+.badge-promo {
+    font-size: 9px;
+    background: #e74c3c;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+.badge-favorit {
+    font-size: 9px;
+    background: #f1c40f;
+    color: #1e2a1e;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+.badge-habis {
+    font-size: 9px;
+    background: #95a5a6;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+.badge-new {
+    font-size: 9px;
+    background: #3498db;
+    color: white;
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1.4;
+}
+.item-desc {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    word-break: break-word;
+}
+
+.item-price {
+    grid-column: 4;
+    grid-row: 1 / 3;
+    align-self: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--coffee-brown);
+    background: rgba(92, 58, 42, 0.06);
+    padding: 2px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+.price-original {
+    text-decoration: line-through;
+    color: #95a5a6;
+    font-size: 13px;
+    margin-right: 6px;
+}
+
+.qty-controls {
+    grid-column: 5;
+    grid-row: 1 / 3;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-body);
+    border-radius: 100px;
+    padding: 2px 4px;
+    border: 1px solid var(--line);
+    transition: all 0.2s ease;
+}
+.item:hover .qty-controls {
+    border-color: var(--brass);
+}
+.qty-controls button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--leaf-deep);
+    color: var(--ivory);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.qty-controls button:hover:not(:disabled) {
+    transform: scale(1.12);
+    background: var(--brass);
+}
+.qty-controls button:active:not(:disabled) {
+    transform: scale(0.88);
+}
+.qty-controls button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.qty-controls .qty-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 24px;
+    text-align: center;
+    color: var(--ink);
+    transition: color 0.3s ease;
+}
+.qty-controls .qty-value.zero {
+    opacity: 0.35;
+}
