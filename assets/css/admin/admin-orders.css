@@ -1,0 +1,45 @@
+/* ============================================
+   PENDING ORDERS LIST
+   ============================================ */
+#pendingOrdersList {
+    margin-top: 12px;
+}
+.pending-item {
+    background: var(--bg-body);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.pending-item:last-child {
+    margin-bottom: 0;
+}
+.pending-item .date {
+    font-weight: 600;
+}
+.pending-item .items {
+    font-size: 14px;
+}
+.pending-item .total {
+    font-weight: 600;
+    color: var(--brass);
+}
+.pending-item .actions {
+    display: flex;
+    gap: 8px;
+}
+@media (max-width: 600px) {
+    .pending-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pending-item .actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
