@@ -1,0 +1,163 @@
+<!-- ============================================
+   ADMIN MENU GRID — LIST & GRID
+   ============================================ -->
+<div style="margin-top:24px;border-top:2px solid var(--line);padding-top:20px;">
+    
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <h3>📋 Semua Menu</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn" id="newMenuBtn">+ Tambah Baru</button>
+            <button class="btn btn-outline" id="backupBtn">⬇️ Backup JSON</button>
+            <button class="btn btn-outline" id="exportReportBtn">📊 Export Report</button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingMenu" class="loading">⏳ Memuat menu...</div>
+
+    <!-- Grid -->
+    <div class="menu-grid" id="adminMenuGrid"></div>
+
+</div>
+
+<!-- CSS Pendukung (jika belum ada) -->
+<style>
+    .admin-section .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .admin-section .admin-card {
+        background: var(--bg-body);
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+    }
+    .admin-section .admin-card-img {
+        position: relative;
+        width: 100%;
+        height: 140px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        background: var(--line);
+    }
+    .admin-section .admin-card-img img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .admin-section .admin-card-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+    }
+    .admin-card-img .badge-promo,
+    .admin-card-img .badge-favorit,
+    .admin-card-img .badge-habis,
+    .admin-card-img .badge-new {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+    }
+    .admin-card-img .badge-habis {
+        left: 8px;
+        right: auto;
+    }
+
+    .admin-section .admin-card-info h4 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .admin-section .admin-card-info p {
+        margin: 0 0 6px;
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    .admin-section .admin-card-price {
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+    .admin-section .admin-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    .admin-section .admin-card-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .admin-section .admin-card-actions button {
+        flex: 1;
+        padding: 4px 8px;
+        font-size: 11px;
+        min-width: 60px;
+    }
+
+    /* Stock Control */
+    .admin-card-stock {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        margin-bottom: 8px;
+    }
+    .admin-card-stock button {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 50%;
+        background: var(--leaf-deep);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .admin-card-stock button:hover {
+        transform: scale(1.1);
+        background: var(--brass);
+    }
+    .admin-card-stock button:active {
+        transform: scale(0.9);
+    }
+    .admin-card-stock span {
+        font-weight: 500;
+        font-size: 14px;
+        min-width: 50px;
+        text-align: center;
+    }
+
+    .tag-favorit { background: #f1c40f; color: #1e2a1e; }
+    .tag-promo { background: #e74c3c; color: white; }
+    .tag-habis { background: #95a5a6; color: white; }
+    .loading {
+        padding: 20px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+    .loading.hidden { display: none; }
+
+    @media (max-width: 600px) {
+        .admin-section .menu-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
