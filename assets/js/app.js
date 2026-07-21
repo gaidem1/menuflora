@@ -916,9 +916,18 @@
         if (!container) return;
 
         try {
-            let query = db.collection('orders').limit(filter === 'all' ? 100 : 50);
-            if (filter === 'pending') query = query.where('status', '==', 'pending');
-            const snapshot = await query.get();
+            const limitCount = filter === 'all' ? 100 : 50;
+            let snapshot;
+
+            try {
+                let orderedQuery = db.collection('orders');
+                if (filter === 'pending') orderedQuery = orderedQuery.where('status', '==', 'pending');
+                snapshot = await orderedQuery.orderBy('timestamp', 'desc').limit(limitCount).get();
+            } catch (queryErr) {
+                let fallbackQuery = db.collection('orders');
+                if (filter === 'pending') fallbackQuery = fallbackQuery.where('status', '==', 'pending');
+                snapshot = await fallbackQuery.limit(limitCount).get();
+            }
 
             const docs = [];
             snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
@@ -1048,60 +1057,30 @@
                     }
                     menuRefs.push({ ref: db.collection('menu').doc(menuItem.id), qty: item.qty, name: menuItem.name });
                 } else {
-                    const menuItem = menuDataCache.find(m => m.id === menuId);
-                    if (!menuItem) {
-                        showToast(`❌ Menu ID ${menuId} tidak ditemukan.`);
-                        return;
-                    }
-                    menuRefs.push({ ref: db.collection('menu').doc(menuId), qty: item.qty, name: menuItem.name });
+                    menuRefs.push({ ref: db.collection('menu').doc(menuId), qty: item.qty, name: item.name || `ID ${menuId}` });
                 }
             }
 
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const docs = [];
-                    for (const item of menuRefs) {
-                        const doc = await transaction.get(item.ref);
-                        if (!doc.exists) {
-                            throw new Error(`Menu ${item.name} tidak ada.`);
-                        }
-                        const currentStock = doc.data().stock || 0;
-                        if (currentStock < item.qty) {
-                            throw new Error(`Stok ${item.name} tidak cukup (sisa ${currentStock}).`);
-                        }
-                        docs.push({ ref: item.ref, stock: currentStock, qty: item.qty });
+            await db.runTransaction(async (transaction) => {
+                const docs = [];
+                for (const item of menuRefs) {
+                    const doc = await transaction.get(item.ref);
+                    if (!doc.exists) {
+                        throw new Error(`Menu ${item.name} tidak ada.`);
                     }
-                    for (const docInfo of docs) {
-                        transaction.update(docInfo.ref, {
-                            stock: docInfo.stock - docInfo.qty,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+                    const currentStock = doc.data().stock || 0;
+                    if (currentStock < item.qty) {
+                        throw new Error(`Stok ${item.name} tidak cukup (sisa ${currentStock}).`);
                     }
-                });
-            } catch (txError) {
-                console.warn('⚠️ Transaksi gagal, coba manual:', txError);
-                if (txError.code === 'permission-denied') {
-                    showToast('⚠️ Transaksi ditolak, mencoba update manual...');
-                    for (const item of menuRefs) {
-                        const doc = await item.ref.get();
-                        if (!doc.exists) {
-                            showToast(`❌ Menu ${item.name} tidak ditemukan.`);
-                            return;
-                        }
-                        const currentStock = doc.data().stock || 0;
-                        if (currentStock < item.qty) {
-                            showToast(`❌ Stok ${item.name} tidak cukup.`);
-                            return;
-                        }
-                        await item.ref.update({
-                            stock: currentStock - item.qty,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                } else {
-                    throw txError;
+                    docs.push({ ref: item.ref, stock: currentStock, qty: item.qty });
                 }
-            }
+                for (const docInfo of docs) {
+                    transaction.update(docInfo.ref, {
+                        stock: docInfo.stock - docInfo.qty,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
 
             await db.collection('orders').doc(orderId).update({
                 status: 'completed',
@@ -1276,10 +1255,19 @@
             const uid = auth.currentUser?.uid;
             if (!uid) throw new Error('Belum terautentikasi — coba refresh halaman.');
 
-            const snapshot = await db.collection('orders')
-                .where('uid', '==', uid)
-                .limit(50)
-                .get();
+            let snapshot;
+            try {
+                snapshot = await db.collection('orders')
+                    .where('uid', '==', uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+            } catch (queryErr) {
+                snapshot = await db.collection('orders')
+                    .where('uid', '==', uid)
+                    .limit(50)
+                    .get();
+            }
             const history = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
@@ -1547,6 +1535,8 @@
                     const data = doc.data();
                     completedOrders++;
                     totalRevenue += data.total || 0;
+                    const customerId = data.uid || data.deviceId;
+                    if (customerId) customerSet.add(customerId);
                 });
             } catch (indexError) {
                 const ordersSnapshot = await db.collection('orders')
@@ -1558,6 +1548,8 @@
                     if (data.status === 'completed') {
                         completedOrders++;
                         totalRevenue += data.total || 0;
+                        const customerId = data.uid || data.deviceId;
+                        if (customerId) customerSet.add(customerId);
                     }
                 });
             }
@@ -2498,16 +2490,26 @@
                     .limit(200)
                     .get();
                 const rows = [['Tanggal', 'Total', 'Items', 'Note']];
+                const toCsvCell = (value) => {
+                    const str = String(value ?? '');
+                    if (/[",\n]/.test(str)) {
+                        return `"${str.replace(/"/g, '""')}"`;
+                    }
+                    return str;
+                };
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    const itemsText = Array.isArray(data.items)
+                        ? data.items.map(i => `${i?.name || '-'} x${i?.qty || 0}`).join(' | ')
+                        : (typeof data.items === 'string' ? data.items : '-');
                     rows.push([
                         data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
                         'Rp' + (data.total || 0).toLocaleString('id-ID'),
-                        (data.items || '-').replace(/,/g, ';'),
-                        (data.customerNote || '').replace(/,/g, ';')
+                        itemsText,
+                        data.customerNote || ''
                     ]);
                 });
-                const csv = rows.map(row => row.join(',')).join('\n');
+                const csv = rows.map(row => row.map(toCsvCell).join(',')).join('\n');
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');

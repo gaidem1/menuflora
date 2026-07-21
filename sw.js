@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flora-coffee-v2';
+const CACHE_NAME = 'flora-coffee-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -31,26 +31,50 @@ self.addEventListener('activate', event => {
 
 // Fetch Strategy: Cache First, Network Fallback
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // Navigasi: utamakan network agar konten terbaru, fallback ke shell saat offline.
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Jangan intercept traffic eksternal (Firebase, Analytics, dll) supaya tidak stale.
+  if (url.origin !== self.location.origin) return;
+
+  const isStaticAsset = (
+    url.pathname === '/' ||
+    url.pathname === '/index.html' ||
+    url.pathname === '/manifest.json' ||
+    url.pathname.startsWith('/assets/')
+  );
+
+  if (!isStaticAsset) {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(req))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) return response;
-        return fetch(event.request)
-          .then(response => {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              if (event.request.method === 'GET') {
-                cache.put(event.request, clone);
-              }
-            });
-            return response;
-          })
-          .catch(() => {
-            // Offline fallback
-            if (event.request.mode === 'navigate') {
-              return caches.match('/');
-            }
-          });
-      })
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+      return fetch(req).then(response => {
+        if (
+          response &&
+          response.status === 200 &&
+          response.type === 'basic'
+        ) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+        }
+        return response;
+      });
+    })
   );
 });

@@ -1,7 +1,7 @@
 {
-  "name": "Flora Coffee",
-  "short_name": "Flora Coffee",
-  "description": "Menu Flora Coffee - Kopi, Camilan, dan Mie di Kesugihan, Cilacap",
+  "name": "Kedai Flora",
+  "short_name": "Kedai Flora",
+  "description": "Menu Kedai Flora - Kopi, Camilan, dan Mie di Kesugihan, Cilacap",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f2e9",
