@@ -2491,7 +2491,10 @@
                     .get();
                 const rows = [['Tanggal', 'Total', 'Items', 'Note']];
                 const toCsvCell = (value) => {
-                    const str = String(value ?? '');
+                    let str = String(value ?? '');
+                    if (/^[\t\r ]*[=+\-@]/.test(str)) {
+                        str = `'${str}`;
+                    }
                     if (/[",\n]/.test(str)) {
                         return `"${str.replace(/"/g, '""')}"`;
                     }
