@@ -9,8 +9,8 @@
             eyebrow: 'Menu · ',
             open: '🟢 Buka Sekarang',
             closed: '🔴 Tutup — Buka lagi 11.00',
-            brand: 'Flora',
-            brandEm: 'Coffee',
+            brand: 'Kedai',           // diubah
+            brandEm: 'Flora',         // diubah
             tagline: 'Kopi, camilan, mie, dan signature — semua tersedia di sini.',
             hours: '11.00 – 23.00',
             days: 'Senin–Minggu',
@@ -32,9 +32,10 @@
             total: 'Total',
             emptyCart: 'Belum ada pesanan',
             orderNow: 'Pesan Sekarang',
-            footerTitle: 'Mau pesan?',
-            footerDesc: 'Kirim pesan lewat WhatsApp, sebutkan menu dan jumlahnya — kami siapkan begitu Anda tiba.',
-            waFooter: 'Pesan via WhatsApp',
+            // [UBAH] Footer
+            footerTitle: 'Bingung Mau Pesan Apa?',
+            footerDesc: 'Bisa minta rekomendasi langsung ke admin! Ada banyak pilihan favorit yang siap direkomendasikan sesuai seleramu. 👀 _Yuk, chat admin buat spill menu paling hits hari ini!_',
+            waFooter: 'Chat Admin Sekarang',
             mapsFooter: 'Lihat di Maps',
             printFooter: 'Cetak Menu',
             menuOfTheDay: '🌟 Hari ini rekomendasi: ',
@@ -45,8 +46,8 @@
             eyebrow: 'Menu · ',
             open: '🟢 Open Now',
             closed: '🔴 Closed — Opens at 11.00',
-            brand: 'Flora',
-            brandEm: 'Coffee',
+            brand: 'Kedai',           // diubah
+            brandEm: 'Flora',         // diubah
             tagline: 'Coffee, snacks, noodles, and signatures — all available here.',
             hours: '11.00 – 23.00',
             days: 'Monday–Sunday',
@@ -68,9 +69,10 @@
             total: 'Total',
             emptyCart: 'No order yet',
             orderNow: 'Order Now',
-            footerTitle: 'Want to order?',
-            footerDesc: 'Send a message via WhatsApp, mention the menu and quantity — we\'ll prepare it for you.',
-            waFooter: 'Order via WhatsApp',
+            // [UBAH] Footer
+            footerTitle: 'Confused What to Order?',
+            footerDesc: 'Ask the admin for recommendations! There are many favorites ready to be recommended according to your taste. 👀 _Chat admin to get today\'s hottest menu!_',
+            waFooter: 'Chat Admin Now',
             mapsFooter: 'View on Maps',
             printFooter: 'Print Menu',
             menuOfTheDay: '🌟 Today\'s recommendation: ',
@@ -186,12 +188,6 @@
     // ============================================
     // ANONYMOUS AUTH — invisible identity per visitor
     // ============================================
-    // Every visitor (customer) is signed in anonymously in the background — no
-    // prompt, nothing they see. This gives each browser a real, Firebase-verified
-    // request.auth.uid, so Firestore Rules can restrict order history to "your own
-    // orders" at the RULES level, not just by filtering a query (which anyone could
-    // bypass from the console). Requires "Anonymous" enabled under Firebase Console
-    // → Authentication → Sign-in method.
     const anonAuthReady = auth.signInAnonymously().catch(err => {
         console.error('❌ Anonymous sign-in gagal (aktifkan provider "Anonymous" di Firebase Console → Authentication):', err);
     });
@@ -331,29 +327,29 @@
     let orderInProgress = false;
 
     // ============================================
-    // CATEGORY DATA (dengan Signature)
+    // CATEGORY DATA (dengan Signature) — [UBAH] Signature pertama
     // ============================================
-    const categories = ['kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
+    const categories = ['signature', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
     const categoryNames = {
+        'signature': '⭐ Signature',
         'kopi-klasik': '☕ Kopi',
         'non-kopi': '🍵 Non Kopi',
         'camilan': '🍽️ Camilan',
-        'mie': '🍜 Mie & Topping',
-        'signature': '⭐ Signature'
+        'mie': '🍜 Mie & Topping'
     };
     const categoryDescs = {
+        'signature': '🌟 Menu andalan Kedai Flora yang wajib dicoba!',
         'kopi-klasik': 'Berbagai pilihan kopi untuk menemani harimu.',
         'non-kopi': 'Minuman segar tanpa kopi, dari yakult hingga matcha.',
         'camilan': 'Camilan gurih untuk mengisi perut.',
-        'mie': 'Mie instan dengan berbagai topping pilihan.',
-        'signature': '🌟 Menu andalan Flora Coffee yang wajib dicoba!'
+        'mie': 'Mie instan dengan berbagai topping pilihan.'
     };
     const categoryIcons = {
+        'signature': '⭐',
         'kopi-klasik': '☕',
         'non-kopi': '🍵',
         'camilan': '🍽️',
-        'mie': '🍜',
-        'signature': '⭐'
+        'mie': '🍜'
     };
 
     // ============================================
@@ -506,7 +502,7 @@
     const shareBtn = document.getElementById('shareBtn');
     if (shareBtn) {
         shareBtn.addEventListener('click', async function() {
-            const shareData = { title: 'Flora Coffee — Menu', text: 'Cek menu Flora Coffee di sini!', url: window.location.href };
+            const shareData = { title: 'Kedai Flora — Menu', text: 'Cek menu Kedai Flora di sini!', url: window.location.href };
             const method = navigator.share ? 'navigator.share' : 'clipboard';
             trackEvent('Engagement', 'share', method);
             if (navigator.share) {
@@ -691,7 +687,7 @@
             cartTotal.textContent = 'Rp' + total.toLocaleString('id-ID');
             cartDetail.textContent = orderList.join(' · ') || 'Belum ada pesanan';
             const message = encodeURIComponent(
-                'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
+                'Halo Kedai Flora,\n\nSaya mau pesan:\n' +
                 orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
                 '\n\nTotal: Rp' + total.toLocaleString('id-ID')
             );
@@ -922,9 +918,6 @@
         if (!container) return;
 
         try {
-            // Only ever a single-field filter (or none) — never combined with orderBy
-            // on a different field — so this never needs a Firestore composite index.
-            // Sorted client-side instead.
             let query = db.collection('orders').limit(filter === 'all' ? 100 : 50);
             if (filter === 'pending') query = query.where('status', '==', 'pending');
             const snapshot = await query.get();
@@ -987,8 +980,6 @@
                 ? `<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-top:2px;">📝 ${escapeHtml(data.customerNote)}</div>`
                 : '';
 
-            // Pending orders still need action buttons; anything already resolved
-            // (completed/cancelled) just shows its status instead.
             const actionsHtml = data.status === 'pending'
                 ? `<button class="btn btn-sm pending-confirm-btn" style="background:#27ae60;" data-id="${data.id}">✅ Konfirmasi</button>
                    <button class="btn btn-sm btn-danger pending-cancel-btn" data-id="${data.id}">❌ Batalkan</button>`
@@ -1068,10 +1059,8 @@
                 }
             }
 
-            // ===== PERBAIKAN TRANSACTION =====
             try {
                 await db.runTransaction(async (transaction) => {
-                    // 1. Baca SEMUA dokumen terlebih dahulu
                     const docs = [];
                     for (const item of menuRefs) {
                         const doc = await transaction.get(item.ref);
@@ -1084,7 +1073,6 @@
                         }
                         docs.push({ ref: item.ref, stock: currentStock, qty: item.qty });
                     }
-                    // 2. Setelah semua baca selesai, lakukan update
                     for (const docInfo of docs) {
                         transaction.update(docInfo.ref, {
                             stock: docInfo.stock - docInfo.qty,
@@ -1117,14 +1105,12 @@
                 }
             }
 
-            // Update status order
             await db.collection('orders').doc(orderId).update({
                 status: 'completed',
                 confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 confirmedBy: auth.currentUser?.email || 'admin'
             });
 
-            // Update cache
             for (const item of menuRefs) {
                 const cacheItem = menuDataCache.find(m => m.id === item.ref.id);
                 if (cacheItem) {
@@ -1292,9 +1278,6 @@
             const uid = auth.currentUser?.uid;
             if (!uid) throw new Error('Belum terautentikasi — coba refresh halaman.');
 
-            // Only this visitor's own orders — single equality filter on the
-            // Firestore-verified uid (no compound where+orderBy), so this never
-            // needs a composite index. Sorted by date client-side instead.
             const snapshot = await db.collection('orders')
                 .where('uid', '==', uid)
                 .limit(50)
@@ -1498,7 +1481,7 @@
                     updateCart();
 
                     const message = encodeURIComponent(
-                        'Halo Flora Coffee,\n\nSaya mau pesan:\n' +
+                        'Halo Kedai Flora,\n\nSaya mau pesan:\n' +
                         rawItems.map((item, i) => `${i+1}. ${item}`).join('\n') +
                         '\n\nTotal: Rp' + calculatedTotal.toLocaleString('id-ID') +
                         '\n\nMohon dikonfirmasi setelah pembayaran.'
@@ -1931,7 +1914,6 @@
                 nameSpan.className = 'item-name';
                 nameSpan.textContent = item.name || 'Unknown';
 
-                // ===== BADGES =====
                 if (item.tag === 'Favorit') {
                     const tag = document.createElement('span');
                     tag.className = 'item-tag';
@@ -2202,7 +2184,6 @@
                 imgDiv.appendChild(placeholder);
             }
 
-            // Badges
             if (item.promoPrice) {
                 const badge = document.createElement('span');
                 badge.className = 'badge-promo';
@@ -2428,9 +2409,6 @@
             adminSection.classList.add('admin-hidden');
             adminSection.style.display = 'none';
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-            // No session at all (e.g. right after logout) means order placement and
-            // "Riwayat Pesanan" would fail until a manual refresh — restore the
-            // anonymous customer session automatically instead.
             if (!user) {
                 auth.signInAnonymously().catch(err => console.error('❌ Anonymous sign-in gagal:', err));
             }
@@ -2651,7 +2629,7 @@
             if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
         }
         if (e.altKey && e.key >= '1' && e.key <= '5') {
-            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
+            const filters = ['all', 'signature', 'kopi-klasik', 'non-kopi', 'camilan', 'mie'];
             const idx = parseInt(e.key);
             const filter = filters[idx] || 'all';
             const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
@@ -2694,6 +2672,6 @@
         }
     }, 300000);
 
-    console.log('🌿 Flora Coffee Menu v3.3 — Transaction fix, all features!');
+    console.log('🌿 Kedai Flora Menu v3.3 — Transaction fix, all features!');
 
 })();
