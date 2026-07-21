@@ -1,0 +1,45 @@
+/* ============================================
+   FLOATING WHATSAPP
+   ============================================ */
+.floating-wa {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 99;
+    background: #25D366;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: all var(--transition);
+}
+.floating-wa:hover {
+    transform: scale(1.1) translateY(-4px);
+}
+.floating-wa:active {
+    transform: scale(0.92);
+}
+.floating-wa svg {
+    width: 24px;
+    height: 24px;
+}
+.floating-wa .wa-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: #95a5a6;
+}
+.floating-wa .wa-status.online {
+    background: #4caf50;
+}
+.floating-wa .wa-status.offline {
+    background: #95a5a6;
+}
