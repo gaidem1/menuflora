@@ -184,6 +184,19 @@
     const auth = firebase.auth();
 
     // ============================================
+    // ANONYMOUS AUTH — invisible identity per visitor
+    // ============================================
+    // Every visitor (customer) is signed in anonymously in the background — no
+    // prompt, nothing they see. This gives each browser a real, Firebase-verified
+    // request.auth.uid, so Firestore Rules can restrict order history to "your own
+    // orders" at the RULES level, not just by filtering a query (which anyone could
+    // bypass from the console). Requires "Anonymous" enabled under Firebase Console
+    // → Authentication → Sign-in method.
+    const anonAuthReady = auth.signInAnonymously().catch(err => {
+        console.error('❌ Anonymous sign-in gagal (aktifkan provider "Anonymous" di Firebase Console → Authentication):', err);
+    });
+
+    // ============================================
     // OFFLINE PERSISTENCE
     // ============================================
     db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
@@ -233,6 +246,33 @@
     const backupBtn = document.getElementById('backupBtn');
     const exportReportBtn = document.getElementById('exportReportBtn');
     const cleanGhostOrdersBtn = document.getElementById('cleanGhostOrdersBtn');
+    const ordersFilterPendingBtn = document.getElementById('ordersFilterPending');
+    const ordersFilterAllBtn = document.getElementById('ordersFilterAll');
+
+    function setOrdersFilterActive(mode) {
+        if (ordersFilterPendingBtn) {
+            ordersFilterPendingBtn.className = mode === 'pending' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
+            ordersFilterPendingBtn.style.background = mode === 'pending' ? 'var(--brass)' : '';
+            ordersFilterPendingBtn.style.color = mode === 'pending' ? 'var(--leaf-deep)' : '';
+        }
+        if (ordersFilterAllBtn) {
+            ordersFilterAllBtn.className = mode === 'all' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
+            ordersFilterAllBtn.style.background = mode === 'all' ? 'var(--brass)' : '';
+            ordersFilterAllBtn.style.color = mode === 'all' ? 'var(--leaf-deep)' : '';
+        }
+    }
+    if (ordersFilterPendingBtn) {
+        ordersFilterPendingBtn.addEventListener('click', () => {
+            setOrdersFilterActive('pending');
+            loadPendingOrders('pending');
+        });
+    }
+    if (ordersFilterAllBtn) {
+        ordersFilterAllBtn.addEventListener('click', () => {
+            setOrdersFilterActive('all');
+            loadPendingOrders('all');
+        });
+    }
 
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');
@@ -275,6 +315,19 @@
     let menuUnsubscribe = null;
     let menuDataCache = [];
     let lastOrderSubmitTime = 0;
+
+    // Persistent per-device ID (not tied to any account) so a customer's own
+    // "Riwayat Pesanan" can show just their own orders instead of every visitor's
+    // orders. Generated once and reused from localStorage on every later visit.
+    function getOrCreateDeviceId() {
+        let id = localStorage.getItem('flora-device-id');
+        if (!id) {
+            id = 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+            localStorage.setItem('flora-device-id', id);
+        }
+        return id;
+    }
+    const deviceId = getOrCreateDeviceId();
     let orderInProgress = false;
 
     // ============================================
@@ -762,6 +815,12 @@
     // ============================================
     async function saveOrderToFirestore(order) {
         try {
+            await anonAuthReady;
+            if (!auth.currentUser) {
+                showToast('❌ Gagal terhubung ke server. Coba refresh halaman.');
+                return false;
+            }
+
             const now = Date.now();
             if (now - lastOrderSubmitTime < 3000) {
                 showToast('⏳ Tunggu sebentar sebelum memesan lagi');
@@ -817,6 +876,8 @@
                 customerNote: order.customerNote || '',
                 status: 'pending',
                 source: 'web',
+                deviceId: deviceId,
+                uid: auth.currentUser.uid,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 orderDate: new Date().toISOString().split('T')[0],
                 orderTime: new Date().toLocaleTimeString('id-ID'),
@@ -854,63 +915,58 @@
     // ============================================
     // ADMIN: Load Pending Orders
     // ============================================
-    async function loadPendingOrders() {
+    async function loadPendingOrders(filter) {
+        filter = filter || 'pending';
         if (!isAdmin) return;
         const container = document.getElementById('pendingOrdersList');
         if (!container) return;
 
         try {
-            let snapshot;
-            try {
-                snapshot = await db.collection('orders')
-                    .where('status', '==', 'pending')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-            } catch (indexError) {
-                console.warn('⚠️ Indeks belum siap, pakai fallback sorting client-side');
-                snapshot = await db.collection('orders')
-                    .where('status', '==', 'pending')
-                    .limit(50)
-                    .get();
-                const docs = [];
-                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-                docs.sort((a, b) => {
-                    const timeA = a.timestamp?.toDate?.()?.getTime() || 0;
-                    const timeB = b.timestamp?.toDate?.()?.getTime() || 0;
-                    return timeB - timeA;
-                });
-                renderPendingOrders(docs, container);
-                return;
-            }
+            // Only ever a single-field filter (or none) — never combined with orderBy
+            // on a different field — so this never needs a Firestore composite index.
+            // Sorted client-side instead.
+            let query = db.collection('orders').limit(filter === 'all' ? 100 : 50);
+            if (filter === 'pending') query = query.where('status', '==', 'pending');
+            const snapshot = await query.get();
 
             const docs = [];
             snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-            renderPendingOrders(docs, container);
+            docs.sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
+            renderPendingOrders(docs, container, filter);
 
         } catch (err) {
-            console.error('Error loading pending orders:', err);
+            console.error('Error loading orders:', err);
             container.innerHTML = `
                 <div style="padding:20px;text-align:center;color:var(--text-muted);">
-                    ❌ Gagal memuat: ${err.message}
+                    ❌ Gagal memuat: ${escapeHtml(err.message || '')}
                     <br><br>
-                    <button class="btn btn-sm" onclick="loadPendingOrders()" style="margin-top:8px;">
+                    <button class="btn btn-sm" id="retryLoadOrdersBtn" style="margin-top:8px;">
                         🔄 Coba Lagi
                     </button>
                 </div>
             `;
+            const retryBtn = document.getElementById('retryLoadOrdersBtn');
+            if (retryBtn) retryBtn.addEventListener('click', () => loadPendingOrders(filter));
         }
     }
 
-    function renderPendingOrders(docs, container) {
+    function renderPendingOrders(docs, container, filter) {
+        filter = filter || 'pending';
         if (!docs || docs.length === 0) {
             container.innerHTML = `
                 <div style="padding:20px;text-align:center;color:var(--text-muted);">
-                    ✅ Tidak ada order pending
+                    ${filter === 'all' ? '📭 Belum ada order' : '✅ Tidak ada order pending'}
                 </div>
             `;
             return;
         }
+
+        const statusBadge = (status) => {
+            if (status === 'completed') return '<span class="status-badge completed">✅ Selesai</span>';
+            if (status === 'cancelled') return '<span class="status-badge cancelled">❌ Dibatalkan</span>';
+            if (status === 'pending') return '<span class="status-badge pending">⏳ Pending</span>';
+            return `<span class="status-badge">📌 ${escapeHtml(status || '-')}</span>`;
+        };
 
         let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
         docs.forEach(doc => {
@@ -927,20 +983,27 @@
                 itemsDisplay = '-';
             }
 
+            const noteHtml = data.customerNote
+                ? `<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-top:2px;">📝 ${escapeHtml(data.customerNote)}</div>`
+                : '';
+
+            // Pending orders still need action buttons; anything already resolved
+            // (completed/cancelled) just shows its status instead.
+            const actionsHtml = data.status === 'pending'
+                ? `<button class="btn btn-sm pending-confirm-btn" style="background:#27ae60;" data-id="${data.id}">✅ Konfirmasi</button>
+                   <button class="btn btn-sm btn-danger pending-cancel-btn" data-id="${data.id}">❌ Batalkan</button>`
+                : statusBadge(data.status);
+
             html += `
                 <div class="pending-item">
                     <div>
                         <div class="date">📅 ${date}</div>
                         <div class="items">${escapeHtml(itemsDisplay)}</div>
                         <div class="total">${total}</div>
+                        ${noteHtml}
                     </div>
                     <div class="actions">
-                        <button class="btn btn-sm pending-confirm-btn" style="background:#27ae60;" data-id="${data.id}">
-                            ✅ Konfirmasi
-                        </button>
-                        <button class="btn btn-sm btn-danger pending-cancel-btn" data-id="${data.id}">
-                            ❌ Batalkan
-                        </button>
+                        ${actionsHtml}
                     </div>
                 </div>
             `;
@@ -1225,8 +1288,15 @@
     // ============================================
     async function loadOrderHistoryFromFirestore() {
         try {
+            await anonAuthReady;
+            const uid = auth.currentUser?.uid;
+            if (!uid) throw new Error('Belum terautentikasi — coba refresh halaman.');
+
+            // Only this visitor's own orders — single equality filter on the
+            // Firestore-verified uid (no compound where+orderBy), so this never
+            // needs a composite index. Sorted by date client-side instead.
             const snapshot = await db.collection('orders')
-                .orderBy('timestamp', 'desc')
+                .where('uid', '==', uid)
                 .limit(50)
                 .get();
             const history = [];
@@ -1237,9 +1307,12 @@
                     items: data.items || [],
                     total: 'Rp' + (data.total || 0).toLocaleString('id-ID'),
                     date: data.timestamp?.toDate?.()?.toLocaleString('id-ID') || 'Baru saja',
-                    status: data.status || 'pending'
+                    status: data.status || 'pending',
+                    customerNote: data.customerNote || '',
+                    _ts: data.timestamp?.toMillis?.() || 0
                 });
             });
+            history.sort((a, b) => b._ts - a._ts);
             return history;
         } catch (err) {
             console.error('Error loading history from Firestore:', err);
@@ -1289,6 +1362,13 @@
             totalDiv.className = 'total';
             totalDiv.textContent = 'Total: ' + item.total;
             div.appendChild(totalDiv);
+
+            if (item.customerNote) {
+                const noteDiv = document.createElement('div');
+                noteDiv.style.cssText = 'font-size:12px;color:var(--text-muted);font-style:italic;margin-top:2px;';
+                noteDiv.textContent = '📝 ' + item.customerNote;
+                div.appendChild(noteDiv);
+            }
 
             const statusSpan = document.createElement('span');
             statusSpan.className = 'status-badge';
@@ -2254,360 +2334,4 @@
         if (fileInput) fileInput.value = '';
         uploadProgress.classList.add('hidden');
         progressFill.style.width = '0%';
-        progressText.textContent = '';
-        if (previewStatus) {
-            previewStatus.textContent = '';
-            previewStatus.className = 'preview-status';
-        }
-    }
-
-    if (newMenuBtn) newMenuBtn.addEventListener('click', resetForm);
-    if (cancelBtn) cancelBtn.addEventListener('click', resetForm);
-
-    // ============================================
-    // SAVE MENU (admin)
-    // ============================================
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Anda tidak memiliki akses admin'); return; }
-            const name = inputName.value.trim();
-            const price = parseInt(inputPrice.value);
-            const desc = inputDesc.value.trim();
-            const category = inputCategory.value;
-            const tag = inputTag.value.trim();
-            const stock = parseInt(inputStock.value);
-            const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
-            const image = inputImage.value.trim();
-            const imagePublicId = inputImagePublicId.value.trim();
-
-            if (!name) { showToast('❌ Nama menu wajib diisi'); inputName.focus(); return; }
-            if (isNaN(price) || price < 0) { showToast('❌ Harga harus diisi dengan angka valid'); inputPrice.focus(); return; }
-            if (isNaN(stock) || stock < 0) { showToast('❌ Stok harus diisi dengan angka valid'); inputStock.focus(); return; }
-            if (promoPrice !== null && (isNaN(promoPrice) || promoPrice < 0 || promoPrice >= price)) {
-                showToast('❌ Harga promo harus lebih kecil dari harga normal'); inputPromo.focus(); return;
-            }
-            if (name.length > 100) { showToast('❌ Nama terlalu panjang (maks 100 karakter)'); inputName.focus(); return; }
-            if (desc.length > 500) { showToast('❌ Deskripsi terlalu panjang (maks 500 karakter)'); inputDesc.focus(); return; }
-
-            try {
-                const existing = await db.collection('menu').where('name', '==', name).get();
-                if (!existing.empty && existing.docs[0].id !== editingId) {
-                    showToast('❌ Nama menu sudah ada! Gunakan nama lain.'); inputName.focus(); return;
-                }
-            } catch (err) { console.error('Error checking duplicate:', err); }
-
-            const data = {
-                name, price, desc: desc || '', category, tag: tag || '', stock,
-                promoPrice: promoPrice, image: image || '', imagePublicId: imagePublicId || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                if (editingId) {
-                    const oldDoc = await db.collection('menu').doc(editingId).get();
-                    if (oldDoc.exists && oldDoc.data().imagePublicId && oldDoc.data().imagePublicId !== imagePublicId) {
-                        deleteImageFromCloudinary(oldDoc.data().imagePublicId);
-                    }
-                    await db.collection('menu').doc(editingId).update(data);
-                    showToast('✅ Menu berhasil diupdate!');
-                    trackEvent('Admin', 'update_menu', name);
-                } else {
-                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    const newId = Date.now().toString();
-                    await db.collection('menu').doc(newId).set(data);
-                    showToast('✅ Menu baru berhasil ditambahkan!');
-                    trackEvent('Admin', 'add_menu', name);
-                }
-                resetForm();
-                loadDashboardStats();
-            } catch (err) {
-                console.error('Error saving:', err);
-                showToast('❌ Gagal menyimpan menu: ' + err.message);
-            }
-        });
-    }
-
-    // ============================================
-    // AUTHENTICATION
-    // ============================================
-    auth.onAuthStateChanged(user => {
-        if (user && ADMIN_EMAILS.includes(user.email)) {
-            isAdmin = true;
-            adminSection.classList.remove('admin-hidden');
-            adminSection.style.display = 'block';
-            adminUserEmail.textContent = user.email;
-            loadDashboardStats();
-            loadOperationalStatus();
-            loadMenuForAdmin();
-            loadMenu();
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            trackEvent('Auth', 'admin_login', user.email);
-            console.log('✅ Admin logged in, menu loaded');
-        } else {
-            isAdmin = false;
-            adminSection.classList.add('admin-hidden');
-            adminSection.style.display = 'none';
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        }
-    });
-
-    // ============================================
-    // SECRET TRIGGER
-    // ============================================
-    let tapCount = 0;
-    let tapTimer = null;
-    if (secretTrigger) {
-        secretTrigger.addEventListener('click', function() {
-            tapCount++;
-            if (tapTimer) clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => { tapCount = 0; }, 1000);
-            if (tapCount >= 5) {
-                tapCount = 0;
-                if (!isAdmin) {
-                    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-                        .then(result => {
-                            if (ADMIN_EMAILS.includes(result.user.email)) {
-                                showToast('✅ Selamat datang Admin!');
-                                trackEvent('Auth', 'admin_login_popup', result.user.email);
-                            } else {
-                                showToast('❌ Email tidak terdaftar sebagai admin');
-                                auth.signOut();
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Auth error:', err);
-                            showToast('❌ Gagal login: ' + err.message);
-                        });
-                } else {
-                    showToast('👋 Anda sudah login sebagai admin');
-                }
-            }
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            auth.signOut().then(() => {
-                showToast('👋 Logout berhasil');
-                trackEvent('Auth', 'admin_logout');
-                isAdmin = false;
-                adminSection.classList.add('admin-hidden');
-                adminSection.style.display = 'none';
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-            }).catch(err => {
-                console.error('Logout error:', err);
-                showToast('❌ Gagal logout');
-            });
-        });
-    }
-
-    // ============================================
-    // BACKUP & EXPORT
-    // ============================================
-    if (backupBtn) {
-        backupBtn.addEventListener('click', function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa backup'); return; }
-            db.collection('menu').get().then(snapshot => {
-                const data = [];
-                snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `flora-backup-${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('✅ Backup berhasil diunduh');
-                trackEvent('Admin', 'backup');
-            }).catch(err => {
-                console.error('Backup error:', err);
-                showToast('❌ Gagal backup data');
-            });
-        });
-    }
-
-    if (exportReportBtn) {
-        exportReportBtn.addEventListener('click', async function() {
-            if (!isAdmin) { showToast('❌ Hanya admin yang bisa export'); return; }
-            try {
-                const snapshot = await db.collection('orders')
-                    .where('status', '==', 'completed')
-                    .orderBy('timestamp', 'desc')
-                    .limit(200)
-                    .get();
-                const rows = [['Tanggal', 'Total', 'Items', 'Note']];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    rows.push([
-                        data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
-                        'Rp' + (data.total || 0).toLocaleString('id-ID'),
-                        (data.items || '-').replace(/,/g, ';'),
-                        (data.customerNote || '').replace(/,/g, ';')
-                    ]);
-                });
-                const csv = rows.map(row => row.join(',')).join('\n');
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `flora-report-${new Date().toISOString().slice(0,10)}.csv`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('✅ Laporan berhasil diexport');
-                trackEvent('Admin', 'export_report');
-            } catch (err) {
-                console.error('Export error:', err);
-                showToast('❌ Gagal export laporan: ' + err.message);
-            }
-        });
-    }
-
-    // ============================================
-    // CLEAN GHOST ORDERS — ARCHIVE
-    // ============================================
-    if (cleanGhostOrdersBtn) {
-        cleanGhostOrdersBtn.addEventListener('click', async function() {
-            if (!isAdmin) {
-                showToast('❌ Hanya admin yang bisa membersihkan data');
-                return;
-            }
-
-            cleanGhostOrdersBtn.disabled = true;
-            cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
-
-            try {
-                const snapshot = await db.collection('orders').get();
-                const ghosts = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.status !== 'pending' && data.status !== 'completed' && data.status !== 'cancelled') {
-                        ghosts.push(doc.id);
-                    }
-                });
-
-                if (ghosts.length === 0) {
-                    showToast('✅ Tidak ada ghost order');
-                    cleanGhostOrdersBtn.disabled = false;
-                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
-                    return;
-                }
-
-                const sure = confirm(
-                    `Ditemukan ${ghosts.length} ghost order (status tidak dikenal).\n\n` +
-                    `Semua akan diarsipkan (status menjadi "archived") dan TIDAK akan muncul di daftar aktif.\n\n` +
-                    `Lanjutkan?`
-                );
-                if (!sure) {
-                    showToast('Dibatalkan');
-                    cleanGhostOrdersBtn.disabled = false;
-                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
-                    return;
-                }
-
-                cleanGhostOrdersBtn.textContent = `⏳ Memproses 0/${ghosts.length}...`;
-
-                let processed = 0;
-                for (let i = 0; i < ghosts.length; i += 500) {
-                    const chunk = ghosts.slice(i, i + 500);
-                    const batch = db.batch();
-                    chunk.forEach(id => {
-                        const ref = db.collection('orders').doc(id);
-                        batch.update(ref, {
-                            status: 'archived',
-                            archivedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    });
-                    await batch.commit();
-                    processed += chunk.length;
-                    cleanGhostOrdersBtn.textContent = `⏳ Memproses ${processed}/${ghosts.length}...`;
-                }
-
-                showToast(`✅ ${processed} ghost order berhasil diarsipkan`);
-                trackEvent('Admin', 'archive_ghost_orders', '', processed);
-                loadDashboardStats();
-
-            } catch (err) {
-                console.error('Clean ghost orders error:', err);
-                showToast('❌ Gagal mengarsipkan: ' + err.message);
-            } finally {
-                cleanGhostOrdersBtn.disabled = false;
-                cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
-            }
-        });
-    }
-
-    // ============================================
-    // TOAST SYSTEM
-    // ============================================
-    function showToast(message, duration = 2500) {
-        const existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        requestAnimationFrame(() => { toast.classList.add('show'); });
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => { toast.remove(); }, 400);
-        }, duration);
-    }
-
-    // ============================================
-    // KEYBOARD SHORTCUTS
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); searchInput.focus(); }
-        if (e.key === 'Escape') {
-            if (searchInput.value) { searchInput.value = ''; filterMenu(); searchInput.blur(); }
-            if (historyModal && historyModal.classList.contains('show')) historyModal.classList.remove('show');
-            if (waConfirmModal && waConfirmModal.classList.contains('show')) waConfirmModal.classList.remove('show');
-            if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
-        }
-        if (e.altKey && e.key >= '1' && e.key <= '5') {
-            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
-            const idx = parseInt(e.key);
-            const filter = filters[idx] || 'all';
-            const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
-            if (btn) btn.click();
-        }
-    });
-
-    // ============================================
-    // LANGUAGE SWITCH
-    // ============================================
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() { setLang(this.dataset.lang); });
-    });
-
-    // ============================================
-    // NETWORK STATUS
-    // ============================================
-    window.addEventListener('online', function() {
-        showToast('🔄 Koneksi kembali online!');
-        loadMenu();
-        if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
-    });
-    window.addEventListener('offline', function() {
-        showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
-    });
-
-    // ============================================
-    // INIT
-    // ============================================
-    const savedLang = localStorage.getItem('flora-lang') || 'id';
-    setLang(savedLang);
-    loadMenu();
-    showMenuOfTheDay();
-    loadOperationalStatus();
-
-    setInterval(() => {
-        if (navigator.onLine) {
-            loadMenu();
-            if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
-        }
-    }, 300000);
-
-    console.log('🌿 Flora Coffee Menu v3.3 — Transaction fix, all features!');
-
-})();
+        progressText.textCo
