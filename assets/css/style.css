@@ -21,7 +21,7 @@
 @import url('components/footer.css');
 @import url('components/language-switch.css');
 @import url('components/menu-of-day.css');
-@import url('components/skeleton.css');
+@import url('components/skeleton.css');  /* ← Tambahkan ini */
 
 /* Admin */
 @import url('admin/admin-panel.css');
