@@ -2334,4 +2334,366 @@
         if (fileInput) fileInput.value = '';
         uploadProgress.classList.add('hidden');
         progressFill.style.width = '0%';
-        progressText.textCo
+        progressText.textContent = '';
+        if (previewStatus) {
+            previewStatus.textContent = '';
+            previewStatus.className = 'preview-status';
+        }
+    }
+
+    if (newMenuBtn) newMenuBtn.addEventListener('click', resetForm);
+    if (cancelBtn) cancelBtn.addEventListener('click', resetForm);
+
+    // ============================================
+    // SAVE MENU (admin)
+    // ============================================
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async function() {
+            if (!isAdmin) { showToast('❌ Anda tidak memiliki akses admin'); return; }
+            const name = inputName.value.trim();
+            const price = parseInt(inputPrice.value);
+            const desc = inputDesc.value.trim();
+            const category = inputCategory.value;
+            const tag = inputTag.value.trim();
+            const stock = parseInt(inputStock.value);
+            const promoPrice = inputPromo.value ? parseInt(inputPromo.value) : null;
+            const image = inputImage.value.trim();
+            const imagePublicId = inputImagePublicId.value.trim();
+
+            if (!name) { showToast('❌ Nama menu wajib diisi'); inputName.focus(); return; }
+            if (isNaN(price) || price < 0) { showToast('❌ Harga harus diisi dengan angka valid'); inputPrice.focus(); return; }
+            if (isNaN(stock) || stock < 0) { showToast('❌ Stok harus diisi dengan angka valid'); inputStock.focus(); return; }
+            if (promoPrice !== null && (isNaN(promoPrice) || promoPrice < 0 || promoPrice >= price)) {
+                showToast('❌ Harga promo harus lebih kecil dari harga normal'); inputPromo.focus(); return;
+            }
+            if (name.length > 100) { showToast('❌ Nama terlalu panjang (maks 100 karakter)'); inputName.focus(); return; }
+            if (desc.length > 500) { showToast('❌ Deskripsi terlalu panjang (maks 500 karakter)'); inputDesc.focus(); return; }
+
+            try {
+                const existing = await db.collection('menu').where('name', '==', name).get();
+                if (!existing.empty && existing.docs[0].id !== editingId) {
+                    showToast('❌ Nama menu sudah ada! Gunakan nama lain.'); inputName.focus(); return;
+                }
+            } catch (err) { console.error('Error checking duplicate:', err); }
+
+            const data = {
+                name, price, desc: desc || '', category, tag: tag || '', stock,
+                promoPrice: promoPrice, image: image || '', imagePublicId: imagePublicId || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if (editingId) {
+                    const oldDoc = await db.collection('menu').doc(editingId).get();
+                    if (oldDoc.exists && oldDoc.data().imagePublicId && oldDoc.data().imagePublicId !== imagePublicId) {
+                        deleteImageFromCloudinary(oldDoc.data().imagePublicId);
+                    }
+                    await db.collection('menu').doc(editingId).update(data);
+                    showToast('✅ Menu berhasil diupdate!');
+                    trackEvent('Admin', 'update_menu', name);
+                } else {
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    const newId = Date.now().toString();
+                    await db.collection('menu').doc(newId).set(data);
+                    showToast('✅ Menu baru berhasil ditambahkan!');
+                    trackEvent('Admin', 'add_menu', name);
+                }
+                resetForm();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving:', err);
+                showToast('❌ Gagal menyimpan menu: ' + err.message);
+            }
+        });
+    }
+
+    // ============================================
+    // AUTHENTICATION
+    // ============================================
+    auth.onAuthStateChanged(user => {
+        if (user && !user.isAnonymous && ADMIN_EMAILS.includes(user.email)) {
+            isAdmin = true;
+            adminSection.classList.remove('admin-hidden');
+            adminSection.style.display = 'block';
+            adminUserEmail.textContent = user.email;
+            loadDashboardStats();
+            loadOperationalStatus();
+            loadMenuForAdmin();
+            loadMenu();
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            trackEvent('Auth', 'admin_login', user.email);
+            console.log('✅ Admin logged in, menu loaded');
+        } else {
+            isAdmin = false;
+            adminSection.classList.add('admin-hidden');
+            adminSection.style.display = 'none';
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            // No session at all (e.g. right after logout) means order placement and
+            // "Riwayat Pesanan" would fail until a manual refresh — restore the
+            // anonymous customer session automatically instead.
+            if (!user) {
+                auth.signInAnonymously().catch(err => console.error('❌ Anonymous sign-in gagal:', err));
+            }
+        }
+    });
+
+    // ============================================
+    // SECRET TRIGGER
+    // ============================================
+    let tapCount = 0;
+    let tapTimer = null;
+    if (secretTrigger) {
+        secretTrigger.addEventListener('click', function() {
+            tapCount++;
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => { tapCount = 0; }, 1000);
+            if (tapCount >= 5) {
+                tapCount = 0;
+                if (!isAdmin) {
+                    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+                        .then(result => {
+                            if (ADMIN_EMAILS.includes(result.user.email)) {
+                                showToast('✅ Selamat datang Admin!');
+                                trackEvent('Auth', 'admin_login_popup', result.user.email);
+                            } else {
+                                showToast('❌ Email tidak terdaftar sebagai admin');
+                                auth.signOut();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Auth error:', err);
+                            showToast('❌ Gagal login: ' + err.message);
+                        });
+                } else {
+                    showToast('👋 Anda sudah login sebagai admin');
+                }
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            auth.signOut().then(() => {
+                showToast('👋 Logout berhasil');
+                trackEvent('Auth', 'admin_logout');
+                isAdmin = false;
+                adminSection.classList.add('admin-hidden');
+                adminSection.style.display = 'none';
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            }).catch(err => {
+                console.error('Logout error:', err);
+                showToast('❌ Gagal logout');
+            });
+        });
+    }
+
+    // ============================================
+    // BACKUP & EXPORT
+    // ============================================
+    if (backupBtn) {
+        backupBtn.addEventListener('click', function() {
+            if (!isAdmin) { showToast('❌ Hanya admin yang bisa backup'); return; }
+            db.collection('menu').get().then(snapshot => {
+                const data = [];
+                snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `flora-backup-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('✅ Backup berhasil diunduh');
+                trackEvent('Admin', 'backup');
+            }).catch(err => {
+                console.error('Backup error:', err);
+                showToast('❌ Gagal backup data');
+            });
+        });
+    }
+
+    if (exportReportBtn) {
+        exportReportBtn.addEventListener('click', async function() {
+            if (!isAdmin) { showToast('❌ Hanya admin yang bisa export'); return; }
+            try {
+                const snapshot = await db.collection('orders')
+                    .where('status', '==', 'completed')
+                    .orderBy('timestamp', 'desc')
+                    .limit(200)
+                    .get();
+                const rows = [['Tanggal', 'Total', 'Items', 'Note']];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    rows.push([
+                        data.timestamp?.toDate?.()?.toLocaleString('id-ID') || '-',
+                        'Rp' + (data.total || 0).toLocaleString('id-ID'),
+                        (data.items || '-').replace(/,/g, ';'),
+                        (data.customerNote || '').replace(/,/g, ';')
+                    ]);
+                });
+                const csv = rows.map(row => row.join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `flora-report-${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('✅ Laporan berhasil diexport');
+                trackEvent('Admin', 'export_report');
+            } catch (err) {
+                console.error('Export error:', err);
+                showToast('❌ Gagal export laporan: ' + err.message);
+            }
+        });
+    }
+
+    // ============================================
+    // CLEAN GHOST ORDERS — ARCHIVE
+    // ============================================
+    if (cleanGhostOrdersBtn) {
+        cleanGhostOrdersBtn.addEventListener('click', async function() {
+            if (!isAdmin) {
+                showToast('❌ Hanya admin yang bisa membersihkan data');
+                return;
+            }
+
+            cleanGhostOrdersBtn.disabled = true;
+            cleanGhostOrdersBtn.textContent = '⏳ Memeriksa...';
+
+            try {
+                const snapshot = await db.collection('orders').get();
+                const ghosts = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.status !== 'pending' && data.status !== 'completed' && data.status !== 'cancelled') {
+                        ghosts.push(doc.id);
+                    }
+                });
+
+                if (ghosts.length === 0) {
+                    showToast('✅ Tidak ada ghost order');
+                    cleanGhostOrdersBtn.disabled = false;
+                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
+                    return;
+                }
+
+                const sure = confirm(
+                    `Ditemukan ${ghosts.length} ghost order (status tidak dikenal).\n\n` +
+                    `Semua akan diarsipkan (status menjadi "archived") dan TIDAK akan muncul di daftar aktif.\n\n` +
+                    `Lanjutkan?`
+                );
+                if (!sure) {
+                    showToast('Dibatalkan');
+                    cleanGhostOrdersBtn.disabled = false;
+                    cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
+                    return;
+                }
+
+                cleanGhostOrdersBtn.textContent = `⏳ Memproses 0/${ghosts.length}...`;
+
+                let processed = 0;
+                for (let i = 0; i < ghosts.length; i += 500) {
+                    const chunk = ghosts.slice(i, i + 500);
+                    const batch = db.batch();
+                    chunk.forEach(id => {
+                        const ref = db.collection('orders').doc(id);
+                        batch.update(ref, {
+                            status: 'archived',
+                            archivedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+                    await batch.commit();
+                    processed += chunk.length;
+                    cleanGhostOrdersBtn.textContent = `⏳ Memproses ${processed}/${ghosts.length}...`;
+                }
+
+                showToast(`✅ ${processed} ghost order berhasil diarsipkan`);
+                trackEvent('Admin', 'archive_ghost_orders', '', processed);
+                loadDashboardStats();
+
+            } catch (err) {
+                console.error('Clean ghost orders error:', err);
+                showToast('❌ Gagal mengarsipkan: ' + err.message);
+            } finally {
+                cleanGhostOrdersBtn.disabled = false;
+                cleanGhostOrdersBtn.textContent = '🧹 Arsipkan Ghost Orders';
+            }
+        });
+    }
+
+    // ============================================
+    // TOAST SYSTEM
+    // ============================================
+    function showToast(message, duration = 2500) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => { toast.classList.add('show'); });
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => { toast.remove(); }, 400);
+        }, duration);
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); searchInput.focus(); }
+        if (e.key === 'Escape') {
+            if (searchInput.value) { searchInput.value = ''; filterMenu(); searchInput.blur(); }
+            if (historyModal && historyModal.classList.contains('show')) historyModal.classList.remove('show');
+            if (waConfirmModal && waConfirmModal.classList.contains('show')) waConfirmModal.classList.remove('show');
+            if (cartDropdown && cartDropdown.classList.contains('show')) cartDropdown.classList.remove('show');
+        }
+        if (e.altKey && e.key >= '1' && e.key <= '5') {
+            const filters = ['all', 'kopi-klasik', 'non-kopi', 'camilan', 'mie', 'signature'];
+            const idx = parseInt(e.key);
+            const filter = filters[idx] || 'all';
+            const btn = document.querySelector(`.cat-filter-btn[data-filter="${filter}"]`);
+            if (btn) btn.click();
+        }
+    });
+
+    // ============================================
+    // LANGUAGE SWITCH
+    // ============================================
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() { setLang(this.dataset.lang); });
+    });
+
+    // ============================================
+    // NETWORK STATUS
+    // ============================================
+    window.addEventListener('online', function() {
+        showToast('🔄 Koneksi kembali online!');
+        loadMenu();
+        if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
+    });
+    window.addEventListener('offline', function() {
+        showToast('⚠️ Koneksi terputus. Menggunakan data offline.');
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    const savedLang = localStorage.getItem('flora-lang') || 'id';
+    setLang(savedLang);
+    loadMenu();
+    showMenuOfTheDay();
+    loadOperationalStatus();
+
+    setInterval(() => {
+        if (navigator.onLine) {
+            loadMenu();
+            if (isAdmin) { loadDashboardStats(); loadMenuForAdmin(); }
+        }
+    }, 300000);
+
+    console.log('🌿 Flora Coffee Menu v3.3 — Transaction fix, all features!');
+
+})();
