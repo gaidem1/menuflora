@@ -1,1 +1,47 @@
-1
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- ===== HEAD ===== -->
+    @@include('partials/head.html')
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    @@include('partials/header/language-switch.html')
+    @@include('partials/header/theme-toggle.html')
+    @@include('partials/header/floating-wa.html')
+    @@include('partials/header/floating-cart.html')
+    @@include('partials/header/scroll-top.html')
+
+    <!-- ===== HERO ===== -->
+    @@include('partials/hero/hero.html')
+
+    <!-- ===== MENU ===== -->
+    @@include('partials/menu/menu-of-the-day.html')
+    @@include('partials/menu/navigation.html')
+    @@include('partials/menu/search.html')
+
+    <main class="wrap">
+        @@include('partials/menu/skeleton.html')
+        @@include('partials/menu/no-result.html')
+        @@include('partials/menu/menu-container.html')
+
+        <!-- ===== ADMIN PANEL ===== -->
+        @@include('partials/admin/admin-panel.html')
+    </main>
+
+    <!-- ===== CART ===== -->
+    @@include('partials/cart/cart-summary.html')
+
+    <!-- ===== MODALS ===== -->
+    @@include('partials/modals/history-modal.html')
+    @@include('partials/modals/confirm-modal.html')
+
+    <!-- ===== FOOTER ===== -->
+    @@include('partials/footer/footer.html')
+
+    <!-- ===== SCRIPTS ===== -->
+    @@include('partials/scripts/scripts.html')
+
+</body>
+</html>
