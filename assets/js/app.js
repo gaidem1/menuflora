@@ -9,8 +9,8 @@
             eyebrow: 'Menu · ',
             open: '🟢 Buka Sekarang',
             closed: '🔴 Tutup — Buka lagi 11.00',
-            brand: 'Kedai',           // diubah
-            brandEm: 'Flora',         // diubah
+            brand: 'Kedai',
+            brandEm: 'Flora',
             tagline: 'Kopi, camilan, mie, dan signature — semua tersedia di sini.',
             hours: '11.00 – 23.00',
             days: 'Senin–Minggu',
@@ -32,7 +32,6 @@
             total: 'Total',
             emptyCart: 'Belum ada pesanan',
             orderNow: 'Pesan Sekarang',
-            // [UBAH] Footer
             footerTitle: 'Bingung Mau Pesan Apa?',
             footerDesc: 'Bisa minta rekomendasi langsung ke admin! Ada banyak pilihan favorit yang siap direkomendasikan sesuai seleramu. 👀 _Yuk, chat admin buat spill menu paling hits hari ini!_',
             waFooter: 'Chat Admin Sekarang',
@@ -46,8 +45,8 @@
             eyebrow: 'Menu · ',
             open: '🟢 Open Now',
             closed: '🔴 Closed — Opens at 11.00',
-            brand: 'Kedai',           // diubah
-            brandEm: 'Flora',         // diubah
+            brand: 'Kedai',
+            brandEm: 'Flora',
             tagline: 'Coffee, snacks, noodles, and signatures — all available here.',
             hours: '11.00 – 23.00',
             days: 'Monday–Sunday',
@@ -69,7 +68,6 @@
             total: 'Total',
             emptyCart: 'No order yet',
             orderNow: 'Order Now',
-            // [UBAH] Footer
             footerTitle: 'Confused What to Order?',
             footerDesc: 'Ask the admin for recommendations! There are many favorites ready to be recommended according to your taste. 👀 _Chat admin to get today\'s hottest menu!_',
             waFooter: 'Chat Admin Now',
@@ -691,7 +689,7 @@
                 orderList.map((item, i) => `${i+1}. ${item}`).join('\n') +
                 '\n\nTotal: Rp' + total.toLocaleString('id-ID')
             );
-            orderBtn.href = 'https://wa.me/6285175012418?text=' + message;
+            orderBtn.href = 'https://wa.me/628562622436?text=' + message;
         } else {
             cartSummary.classList.remove('show');
         }
@@ -1486,7 +1484,7 @@
                         '\n\nTotal: Rp' + calculatedTotal.toLocaleString('id-ID') +
                         '\n\nMohon dikonfirmasi setelah pembayaran.'
                     );
-                    window.open('https://wa.me/6285175012418?text=' + message, '_blank');
+                    window.open('https://wa.me/628562622436?text=' + message, '_blank');
 
                     if (waConfirmModal) waConfirmModal.classList.remove('show');
                     showToast('✅ Pesanan tercatat! Silakan bayar dan kirim bukti via WA.');
