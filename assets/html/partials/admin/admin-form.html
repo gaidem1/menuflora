@@ -1,0 +1,239 @@
+<!-- ============================================
+   ADMIN FORM — ADD / EDIT MENU
+   ============================================ -->
+<div id="formCard" style="margin-top:24px;border-top:2px solid var(--line);padding-top:20px;">
+    
+    <!-- Form Title -->
+    <h3 id="formTitle" style="margin-bottom:12px;">📝 Tambah Menu Baru</h3>
+
+    <!-- ===== ROW 1: Name & Price ===== -->
+    <div class="form-row">
+        <div class="form-group">
+            <label>Nama Menu *</label>
+            <input type="text" id="inputName" placeholder="Contoh: Ice Rost Latte">
+        </div>
+        <div class="form-group">
+            <label>Harga (Rp) *</label>
+            <input type="number" id="inputPrice" placeholder="7000" min="0">
+        </div>
+    </div>
+
+    <!-- ===== DESCRIPTION ===== -->
+    <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea id="inputDesc" rows="2" placeholder="Kopi dingin dengan rasa yang segar."></textarea>
+    </div>
+
+    <!-- ===== ROW 2: Category & Tag ===== -->
+    <div class="form-row">
+        <div class="form-group">
+            <label>Kategori</label>
+            <select id="inputCategory">
+                <option value="kopi-klasik">☕ Kopi</option>
+                <option value="non-kopi">🍵 Non Kopi</option>
+                <option value="camilan">🍽️ Camilan</option>
+                <option value="mie">🍜 Mie & Topping</option>
+                <option value="signature">⭐ Signature</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tag (opsional)</label>
+            <select id="inputTag">
+                <option value="">Tidak ada</option>
+                <option value="Favorit">⭐ Favorit</option>
+                <option value="Promo">🔥 Promo</option>
+                <option value="New">✨ New</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ===== ROW 3: Stock & Promo Price ===== -->
+    <div class="form-row">
+        <div class="form-group">
+            <label>Stok (0 = Habis) *</label>
+            <input type="number" id="inputStock" value="10" min="0">
+        </div>
+        <div class="form-group">
+            <label>Harga Promo</label>
+            <input type="number" id="inputPromo" placeholder="5000" min="0">
+        </div>
+    </div>
+
+    <!-- ===== UPLOAD GAMBAR ===== -->
+    <div class="form-group">
+        <label>📸 Foto Menu</label>
+
+        <!-- Drop Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">
+                <strong>Taruh gambar di sini</strong><br>
+                <span>atau klik untuk memilih file</span>
+            </div>
+            <div class="upload-hint">JPG, PNG, WebP • Maks 5MB</div>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="upload-progress hidden" id="uploadProgress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">⏳ Mengupload... 0%</div>
+        </div>
+
+        <!-- Preview -->
+        <div class="upload-preview-wrapper hidden" id="previewWrapper">
+            <img id="previewImage" alt="Preview gambar menu">
+            <div class="preview-actions">
+                <button type="button" class="btn btn-sm" id="removeImageBtn">✕ Hapus</button>
+                <span class="preview-status" id="previewStatus">✅ Upload berhasil</span>
+            </div>
+        </div>
+
+        <input type="text" id="inputImage" hidden>
+        <input type="text" id="inputImagePublicId" hidden>
+    </div>
+
+    <!-- ===== FORM ACTIONS ===== -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn" id="saveBtn">💾 Simpan Menu</button>
+        <button class="btn btn-outline" id="cancelBtn">Batal</button>
+    </div>
+
+</div>
+
+<!-- CSS Pendukung (jika belum ada) -->
+<style>
+    #formCard .form-group { margin-bottom: 14px; }
+    #formCard .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+    #formCard .form-group input,
+    #formCard .form-group textarea,
+    #formCard .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Work Sans', sans-serif;
+        background: var(--bg-body);
+        color: var(--ink);
+    }
+    #formCard .form-group input:focus,
+    #formCard .form-group textarea:focus,
+    #formCard .form-group select:focus {
+        border-color: var(--brass);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(196, 155, 92, 0.15);
+    }
+    #formCard .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+    @media (max-width: 600px) {
+        #formCard .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+        border: 2px dashed var(--line);
+        border-radius: 12px;
+        padding: 32px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bg-body);
+        position: relative;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+        border-color: var(--brass);
+        background: rgba(196, 155, 92, 0.05);
+    }
+    .upload-zone.dragover { transform: scale(1.01); }
+    .upload-icon { font-size: 40px; margin-bottom: 8px; }
+    .upload-text strong { font-size: 16px; color: var(--ink); }
+    .upload-text span { font-size: 13px; color: var(--text-muted); }
+    .upload-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; opacity: 0.6; }
+
+    .upload-progress {
+        margin-top: 12px;
+        padding: 12px 16px;
+        background: var(--bg-body);
+        border-radius: 8px;
+        border: 1px solid var(--line);
+    }
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--brass), var(--gold-light));
+        width: 0%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+    .progress-text {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        text-align: center;
+    }
+
+    .upload-preview-wrapper {
+        margin-top: 12px;
+        padding: 16px;
+        background: var(--bg-body);
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    #previewImage {
+        display: block;
+        width: 160px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid var(--line);
+        background: var(--skeleton-bg);
+        flex-shrink: 0;
+    }
+    .preview-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    .preview-status { font-size: 13px; font-weight: 500; }
+    .preview-status.success { color: #27ae60; }
+    .preview-status.error { color: #e74c3c; }
+    .preview-status.uploading { color: var(--brass); }
+    
+    @media (max-width: 600px) {
+        .upload-preview-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        #previewImage {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+    }
+</style>
